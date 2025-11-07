@@ -1,0 +1,146 @@
+/* src/app/globals.css */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import "leaflet/dist/leaflet.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    font-family: "Inter", sans-serif;
+  }
+}
+
+@layer components {
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Leaflet Map Styling */
+  .leaflet-container {
+    height: 400px;
+    width: 100%;
+    z-index: 1;
+  }
+
+  .leaflet-default-icon-path {
+    background-image: url("https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png");
+  }
+
+  .leaflet-marker-icon {
+    background-image: url("https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png");
+  }
+
+  .leaflet-marker-shadow {
+    background-image: url("https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png");
+  }
+
+  /* Upload Progress Animations */
+  @keyframes slide-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse-ring {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.5;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.3s ease-out;
+  }
+
+  .animate-pulse-ring {
+    animation: pulse-ring 2s ease-in-out infinite;
+  }
+
+  /* Custom Progress Bar Styles */
+  .progress-bar {
+    transition: width 0.5s ease-out;
+  }
+
+  .progress-bar-smooth {
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .progress-bar-indeterminate {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      #ea580c 50%,
+      transparent 100%
+    );
+    animation: progress-indeterminate 1.5s ease-in-out infinite;
+  }
+
+  @keyframes progress-indeterminate {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+
+  /* Circular Progress Animation */
+  @keyframes rotate-circle {
+    0% {
+      stroke-dashoffset: 565.48;
+    }
+    100% {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  .progress-circle {
+    animation: rotate-circle 2s ease-out forwards;
+  }
+
+  /* Smooth height transitions */
+  .transition-height {
+    transition: height 0.3s ease-in-out, max-height 0.3s ease-in-out;
+  }
+}
+
+@layer utilities {
+  /* Custom scrollbar styling */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #555;
+  }
+}
