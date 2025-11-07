@@ -1,12 +1,12 @@
 // src/hooks/useNotifications.js
 "use client";
-import { useState, useEffect, useCallback } from 'react';
-import { notificationAPI } from '@/lib/api';
-import { 
-  requestNotificationPermission, 
-  getFCMToken, 
-  onMessageListener 
-} from '@/lib/firebase';
+import { useState, useEffect, useCallback } from "react";
+import { notificationAPI } from "@/lib/api";
+import {
+  requestNotificationPermission,
+  getFCMToken,
+  onMessageListener,
+} from "@/lib/firebase";
 
 export const useNotifications = () => {
   const [notifications, setNotifications] = useState([]);
@@ -19,7 +19,7 @@ export const useNotifications = () => {
   const initializeFCM = useCallback(async () => {
     try {
       const hasPermission = await requestNotificationPermission();
-      
+
       if (hasPermission) {
         const token = await getFCMToken();
         if (token) {
@@ -27,13 +27,13 @@ export const useNotifications = () => {
           // Store token to backend
           await notificationAPI.storeFCMToken({
             token,
-            device_name: navigator.userAgent
+            device_name: navigator.userAgent,
           });
-          console.log('✅ FCM token stored successfully');
+          console.log("✅ FCM token stored successfully");
         }
       }
     } catch (err) {
-      console.error('Error initializing FCM:', err);
+      console.error("Error initializing FCM:", err);
     }
   }, []);
 
@@ -46,17 +46,21 @@ export const useNotifications = () => {
       // Add cache buster
       const response = await notificationAPI.getAll({
         ...params,
-        _t: Date.now()
+        _t: Date.now(),
       });
-      
+
       if (response.success) {
         setNotifications(response.data);
         setUnreadCount(response.unread_count);
-        console.log('✅ Notifications refreshed:', response.data.length, 'items');
+        console.log(
+          "✅ Notifications refreshed:",
+          response.data.length,
+          "items"
+        );
       }
     } catch (err) {
       setError(err.message);
-      console.error('Error fetching notifications:', err);
+      console.error("Error fetching notifications:", err);
     } finally {
       setLoading(false);
     }
@@ -68,12 +72,12 @@ export const useNotifications = () => {
       const response = await notificationAPI.getUnreadCount();
       if (response.success) {
         setUnreadCount(response.unread_count);
-        console.log('✅ Unread count refreshed:', response.unread_count);
+        console.log("✅ Unread count refreshed:", response.unread_count);
       }
     } catch (err) {
       // Silently fail for unread count - don't spam console
-      if (!err.message?.includes('timeout')) {
-        console.error('Error fetching unread count:', err);
+      if (!err.message?.includes("timeout")) {
+        console.error("Error fetching unread count:", err);
       }
       // Keep existing count on error
     }
@@ -85,18 +89,18 @@ export const useNotifications = () => {
       const response = await notificationAPI.markAsRead(notificationId);
       if (response.success) {
         // Update local state
-        setNotifications(prev => 
-          prev.map(notif => 
-            notif.id === notificationId 
+        setNotifications((prev) =>
+          prev.map((notif) =>
+            notif.id === notificationId
               ? { ...notif, is_read: true, read_at: new Date().toISOString() }
               : notif
           )
         );
-        setUnreadCount(prev => Math.max(0, prev - 1));
-        console.log('✅ Notification marked as read:', notificationId);
+        setUnreadCount((prev) => Math.max(0, prev - 1));
+        console.log("✅ Notification marked as read:", notificationId);
       }
     } catch (err) {
-      console.error('Error marking notification as read:', err);
+      console.error("Error marking notification as read:", err);
     }
   }, []);
 
@@ -105,71 +109,79 @@ export const useNotifications = () => {
     try {
       const response = await notificationAPI.markAllAsRead();
       if (response.success) {
-        setNotifications(prev => 
-          prev.map(notif => ({ 
-            ...notif, 
-            is_read: true, 
-            read_at: new Date().toISOString() 
+        setNotifications((prev) =>
+          prev.map((notif) => ({
+            ...notif,
+            is_read: true,
+            read_at: new Date().toISOString(),
           }))
         );
         setUnreadCount(0);
-        console.log('✅ All notifications marked as read');
+        console.log("✅ All notifications marked as read");
       }
     } catch (err) {
-      console.error('Error marking all as read:', err);
+      console.error("Error marking all as read:", err);
     }
   }, []);
 
   // Delete notification
-  const deleteNotification = useCallback(async (notificationId) => {
-    try {
-      const response = await notificationAPI.delete(notificationId);
-      if (response.success) {
-        setNotifications(prev => prev.filter(notif => notif.id !== notificationId));
-        fetchUnreadCount(); // Refresh count
-        console.log('✅ Notification deleted:', notificationId);
+  const deleteNotification = useCallback(
+    async (notificationId) => {
+      try {
+        const response = await notificationAPI.delete(notificationId);
+        if (response.success) {
+          setNotifications((prev) =>
+            prev.filter((notif) => notif.id !== notificationId)
+          );
+          fetchUnreadCount(); // Refresh count
+          console.log("✅ Notification deleted:", notificationId);
+        }
+      } catch (err) {
+        console.error("Error deleting notification:", err);
       }
-    } catch (err) {
-      console.error('Error deleting notification:', err);
-    }
-  }, [fetchUnreadCount]);
+    },
+    [fetchUnreadCount]
+  );
 
   // 🔔 Listen for foreground messages
   useEffect(() => {
     let unsubscribe;
-    
+
     const setupListener = async () => {
       try {
         const payload = await onMessageListener();
         if (payload) {
-          console.log('🔔 Foreground message received:', payload);
-          
+          console.log("🔔 Foreground message received:", payload);
+
           // Show browser notification
-          if (Notification.permission === 'granted') {
-            new Notification(payload.notification?.title || 'New Notification', {
-              body: payload.notification?.body || '',
-              icon: '/icon.png',
-              badge: '/badge.png',
-              tag: payload.data?.type || 'default',
-              requireInteraction: true,
-              data: payload.data
-            });
+          if (Notification.permission === "granted") {
+            new Notification(
+              payload.notification?.title || "New Notification",
+              {
+                body: payload.notification?.body || "",
+                icon: "/icon.png",
+                badge: "/badge.png",
+                tag: payload.data?.type || "default",
+                requireInteraction: true,
+                data: payload.data,
+              }
+            );
           }
 
           // 🚀 Immediately refresh notifications
-          console.log('🔄 Auto-refreshing notifications after new message...');
+          console.log("🔄 Auto-refreshing notifications after new message...");
           fetchNotifications();
           fetchUnreadCount();
         }
       } catch (err) {
-        console.error('Error in message listener:', err);
+        console.error("Error in message listener:", err);
       }
     };
 
     setupListener();
 
     return () => {
-      if (unsubscribe && typeof unsubscribe === 'function') {
+      if (unsubscribe && typeof unsubscribe === "function") {
         unsubscribe();
       }
     };
@@ -184,13 +196,13 @@ export const useNotifications = () => {
 
     // Set up auto-refresh interval (15 seconds)
     const refreshInterval = setInterval(() => {
-      console.log('🔄 Auto-refreshing notifications (15s interval)...');
+      console.log("🔄 Auto-refreshing notifications (15s interval)...");
       fetchUnreadCount(); // Only refresh count to be lightweight
     }, 15000);
 
     // Full refresh every 60 seconds
     const fullRefreshInterval = setInterval(() => {
-      console.log('🔄 Full notification refresh (60s interval)...');
+      console.log("🔄 Full notification refresh (60s interval)...");
       fetchNotifications({ per_page: 20 });
     }, 60000);
 
@@ -211,7 +223,7 @@ export const useNotifications = () => {
     markAsRead,
     markAllAsRead,
     deleteNotification,
-    initializeFCM
+    initializeFCM,
   };
 };
 

@@ -1,10 +1,19 @@
 // src/pages/Pengaturan.js
 "use client";
-import React, { useState } from 'react';
-import { 
-  Settings, Bell, Lock, Monitor, Database, 
-  Clock, Calendar, MapPin, Mail, Globe, Shield
-} from 'lucide-react';
+import React, { useState } from "react";
+import {
+  Settings,
+  Bell,
+  Lock,
+  Monitor,
+  Database,
+  Clock,
+  Calendar,
+  MapPin,
+  Mail,
+  Globe,
+  Shield,
+} from "lucide-react";
 
 const Pengaturan = () => {
   const [settings, setSettings] = useState({
@@ -15,36 +24,36 @@ const Pengaturan = () => {
     notifyLeaveRequest: true,
     notifyOvertimeRequest: true,
     notifyShiftSwap: true,
-    
+
     // Keamanan
-    sessionTimeout: '8',
+    sessionTimeout: "8",
     requirePasswordChange: false,
-    passwordChangeInterval: '90',
-    
+    passwordChangeInterval: "90",
+
     // Tampilan
-    theme: 'light',
-    language: 'id',
-    dateFormat: 'DD/MM/YYYY',
-    timeFormat: '24',
-    
+    theme: "light",
+    language: "id",
+    dateFormat: "DD/MM/YYYY",
+    timeFormat: "24",
+
     // Sistem
     autoBackup: true,
-    backupFrequency: 'daily',
-    dataRetention: '365',
-    
+    backupFrequency: "daily",
+    dataRetention: "365",
+
     // Presensi
-    attendanceRadius: '100',
-    lateThreshold: '15',
+    attendanceRadius: "100",
+    lateThreshold: "15",
     autoClockOut: true,
-    clockOutTime: '18:00',
+    clockOutTime: "18:00",
   });
 
   const handleToggle = (key) => {
-    setSettings(prev => ({ ...prev, [key]: !prev[key] }));
+    setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
   };
 
   const handleSelectChange = (key, value) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
+    setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
   return (
@@ -57,7 +66,9 @@ const Pengaturan = () => {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Pengaturan</h1>
-            <p className="text-gray-600 text-sm">Kelola pengaturan sistem presensi</p>
+            <p className="text-gray-600 text-sm">
+              Kelola pengaturan sistem presensi
+            </p>
           </div>
         </div>
       </div>
@@ -70,64 +81,85 @@ const Pengaturan = () => {
             <Bell className="w-5 h-5 text-orange-600" />
             <h2 className="text-lg font-semibold text-gray-900">Notifikasi</h2>
           </div>
-          
+
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium text-gray-900">Notifikasi Email</p>
-                <p className="text-sm text-gray-600">Terima pemberitahuan melalui email</p>
+                <p className="text-sm text-gray-600">
+                  Terima pemberitahuan melalui email
+                </p>
               </div>
               <button
-                onClick={() => handleToggle('emailNotifications')}
+                onClick={() => handleToggle("emailNotifications")}
                 className={`relative w-12 h-6 rounded-full transition-colors ${
-                  settings.emailNotifications ? 'bg-orange-600' : 'bg-gray-300'
+                  settings.emailNotifications ? "bg-orange-600" : "bg-gray-300"
                 }`}
               >
-                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                  settings.emailNotifications ? 'translate-x-6' : ''
-                }`} />
+                <span
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
+                    settings.emailNotifications ? "translate-x-6" : ""
+                  }`}
+                />
               </button>
             </div>
 
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium text-gray-900">Push Notification</p>
-                <p className="text-sm text-gray-600">Terima pemberitahuan push</p>
+                <p className="text-sm text-gray-600">
+                  Terima pemberitahuan push
+                </p>
               </div>
               <button
-                onClick={() => handleToggle('pushNotifications')}
+                onClick={() => handleToggle("pushNotifications")}
                 className={`relative w-12 h-6 rounded-full transition-colors ${
-                  settings.pushNotifications ? 'bg-orange-600' : 'bg-gray-300'
+                  settings.pushNotifications ? "bg-orange-600" : "bg-gray-300"
                 }`}
               >
-                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                  settings.pushNotifications ? 'translate-x-6' : ''
-                }`} />
+                <span
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
+                    settings.pushNotifications ? "translate-x-6" : ""
+                  }`}
+                />
               </button>
             </div>
 
             <hr className="border-gray-200" />
 
             <div className="space-y-3">
-              <p className="text-sm font-medium text-gray-700">Notifikasi untuk:</p>
-              
+              <p className="text-sm font-medium text-gray-700">
+                Notifikasi untuk:
+              </p>
+
               {[
-                { key: 'notifyNewEmployee', label: 'Karyawan baru ditambahkan' },
-                { key: 'notifyLeaveRequest', label: 'Pengajuan izin baru' },
-                { key: 'notifyOvertimeRequest', label: 'Pengajuan lembur baru' },
-                { key: 'notifyShiftSwap', label: 'Permintaan tukar shift' },
-              ].map(item => (
-                <div key={item.key} className="flex items-center justify-between">
+                {
+                  key: "notifyNewEmployee",
+                  label: "Karyawan baru ditambahkan",
+                },
+                { key: "notifyLeaveRequest", label: "Pengajuan izin baru" },
+                {
+                  key: "notifyOvertimeRequest",
+                  label: "Pengajuan lembur baru",
+                },
+                { key: "notifyShiftSwap", label: "Permintaan tukar shift" },
+              ].map((item) => (
+                <div
+                  key={item.key}
+                  className="flex items-center justify-between"
+                >
                   <p className="text-sm text-gray-600">{item.label}</p>
                   <button
                     onClick={() => handleToggle(item.key)}
                     className={`relative w-10 h-5 rounded-full transition-colors ${
-                      settings[item.key] ? 'bg-orange-600' : 'bg-gray-300'
+                      settings[item.key] ? "bg-orange-600" : "bg-gray-300"
                     }`}
                   >
-                    <span className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${
-                      settings[item.key] ? 'translate-x-5' : ''
-                    }`} />
+                    <span
+                      className={`absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform ${
+                        settings[item.key] ? "translate-x-5" : ""
+                      }`}
+                    />
                   </button>
                 </div>
               ))}
@@ -141,7 +173,7 @@ const Pengaturan = () => {
             <Shield className="w-5 h-5 text-orange-600" />
             <h2 className="text-lg font-semibold text-gray-900">Keamanan</h2>
           </div>
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -149,7 +181,9 @@ const Pengaturan = () => {
               </label>
               <select
                 value={settings.sessionTimeout}
-                onChange={(e) => handleSelectChange('sessionTimeout', e.target.value)}
+                onChange={(e) =>
+                  handleSelectChange("sessionTimeout", e.target.value)
+                }
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
               >
                 <option value="1">1 jam</option>
@@ -162,18 +196,26 @@ const Pengaturan = () => {
 
             <div className="flex items-center justify-between">
               <div>
-                <p className="font-medium text-gray-900">Wajib Ubah Password Berkala</p>
-                <p className="text-sm text-gray-600">Admin harus mengubah password secara berkala</p>
+                <p className="font-medium text-gray-900">
+                  Wajib Ubah Password Berkala
+                </p>
+                <p className="text-sm text-gray-600">
+                  Admin harus mengubah password secara berkala
+                </p>
               </div>
               <button
-                onClick={() => handleToggle('requirePasswordChange')}
+                onClick={() => handleToggle("requirePasswordChange")}
                 className={`relative w-12 h-6 rounded-full transition-colors ${
-                  settings.requirePasswordChange ? 'bg-orange-600' : 'bg-gray-300'
+                  settings.requirePasswordChange
+                    ? "bg-orange-600"
+                    : "bg-gray-300"
                 }`}
               >
-                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                  settings.requirePasswordChange ? 'translate-x-6' : ''
-                }`} />
+                <span
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
+                    settings.requirePasswordChange ? "translate-x-6" : ""
+                  }`}
+                />
               </button>
             </div>
 
@@ -184,7 +226,9 @@ const Pengaturan = () => {
                 </label>
                 <select
                   value={settings.passwordChangeInterval}
-                  onChange={(e) => handleSelectChange('passwordChangeInterval', e.target.value)}
+                  onChange={(e) =>
+                    handleSelectChange("passwordChangeInterval", e.target.value)
+                  }
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 >
                   <option value="30">30 hari</option>
@@ -203,7 +247,7 @@ const Pengaturan = () => {
             <Monitor className="w-5 h-5 text-orange-600" />
             <h2 className="text-lg font-semibold text-gray-900">Tampilan</h2>
           </div>
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -211,7 +255,7 @@ const Pengaturan = () => {
               </label>
               <select
                 value={settings.theme}
-                onChange={(e) => handleSelectChange('theme', e.target.value)}
+                onChange={(e) => handleSelectChange("theme", e.target.value)}
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
               >
                 <option value="light">Terang</option>
@@ -226,7 +270,7 @@ const Pengaturan = () => {
               </label>
               <select
                 value={settings.language}
-                onChange={(e) => handleSelectChange('language', e.target.value)}
+                onChange={(e) => handleSelectChange("language", e.target.value)}
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
               >
                 <option value="id">Bahasa Indonesia</option>
@@ -241,7 +285,9 @@ const Pengaturan = () => {
                 </label>
                 <select
                   value={settings.dateFormat}
-                  onChange={(e) => handleSelectChange('dateFormat', e.target.value)}
+                  onChange={(e) =>
+                    handleSelectChange("dateFormat", e.target.value)
+                  }
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 >
                   <option value="DD/MM/YYYY">DD/MM/YYYY</option>
@@ -256,7 +302,9 @@ const Pengaturan = () => {
                 </label>
                 <select
                   value={settings.timeFormat}
-                  onChange={(e) => handleSelectChange('timeFormat', e.target.value)}
+                  onChange={(e) =>
+                    handleSelectChange("timeFormat", e.target.value)
+                  }
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 >
                   <option value="24">24 Jam</option>
@@ -271,24 +319,30 @@ const Pengaturan = () => {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center gap-3 mb-4">
             <Database className="w-5 h-5 text-orange-600" />
-            <h2 className="text-lg font-semibold text-gray-900">Sistem & Data</h2>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Sistem & Data
+            </h2>
           </div>
-          
+
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium text-gray-900">Backup Otomatis</p>
-                <p className="text-sm text-gray-600">Backup data sistem secara otomatis</p>
+                <p className="text-sm text-gray-600">
+                  Backup data sistem secara otomatis
+                </p>
               </div>
               <button
-                onClick={() => handleToggle('autoBackup')}
+                onClick={() => handleToggle("autoBackup")}
                 className={`relative w-12 h-6 rounded-full transition-colors ${
-                  settings.autoBackup ? 'bg-orange-600' : 'bg-gray-300'
+                  settings.autoBackup ? "bg-orange-600" : "bg-gray-300"
                 }`}
               >
-                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                  settings.autoBackup ? 'translate-x-6' : ''
-                }`} />
+                <span
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
+                    settings.autoBackup ? "translate-x-6" : ""
+                  }`}
+                />
               </button>
             </div>
 
@@ -299,7 +353,9 @@ const Pengaturan = () => {
                 </label>
                 <select
                   value={settings.backupFrequency}
-                  onChange={(e) => handleSelectChange('backupFrequency', e.target.value)}
+                  onChange={(e) =>
+                    handleSelectChange("backupFrequency", e.target.value)
+                  }
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 >
                   <option value="hourly">Setiap Jam</option>
@@ -316,7 +372,9 @@ const Pengaturan = () => {
               </label>
               <select
                 value={settings.dataRetention}
-                onChange={(e) => handleSelectChange('dataRetention', e.target.value)}
+                onChange={(e) =>
+                  handleSelectChange("dataRetention", e.target.value)
+                }
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
               >
                 <option value="30">30 hari</option>
@@ -326,7 +384,9 @@ const Pengaturan = () => {
                 <option value="730">730 hari (2 tahun)</option>
                 <option value="unlimited">Unlimited</option>
               </select>
-              <p className="mt-1 text-xs text-gray-500">Berapa lama data presensi disimpan</p>
+              <p className="mt-1 text-xs text-gray-500">
+                Berapa lama data presensi disimpan
+              </p>
             </div>
           </div>
         </div>
@@ -335,9 +395,11 @@ const Pengaturan = () => {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center gap-3 mb-4">
             <MapPin className="w-5 h-5 text-orange-600" />
-            <h2 className="text-lg font-semibold text-gray-900">Pengaturan Presensi</h2>
+            <h2 className="text-lg font-semibold text-gray-900">
+              Pengaturan Presensi
+            </h2>
           </div>
-          
+
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -346,7 +408,9 @@ const Pengaturan = () => {
               <input
                 type="number"
                 value={settings.attendanceRadius}
-                onChange={(e) => handleSelectChange('attendanceRadius', e.target.value)}
+                onChange={(e) =>
+                  handleSelectChange("attendanceRadius", e.target.value)
+                }
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 min="50"
                 max="500"
@@ -364,7 +428,9 @@ const Pengaturan = () => {
               <input
                 type="number"
                 value={settings.lateThreshold}
-                onChange={(e) => handleSelectChange('lateThreshold', e.target.value)}
+                onChange={(e) =>
+                  handleSelectChange("lateThreshold", e.target.value)
+                }
                 className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 min="5"
                 max="60"
@@ -378,17 +444,21 @@ const Pengaturan = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="font-medium text-gray-900">Auto Clock Out</p>
-                <p className="text-sm text-gray-600">Otomatis clock out di akhir shift</p>
+                <p className="text-sm text-gray-600">
+                  Otomatis clock out di akhir shift
+                </p>
               </div>
               <button
-                onClick={() => handleToggle('autoClockOut')}
+                onClick={() => handleToggle("autoClockOut")}
                 className={`relative w-12 h-6 rounded-full transition-colors ${
-                  settings.autoClockOut ? 'bg-orange-600' : 'bg-gray-300'
+                  settings.autoClockOut ? "bg-orange-600" : "bg-gray-300"
                 }`}
               >
-                <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
-                  settings.autoClockOut ? 'translate-x-6' : ''
-                }`} />
+                <span
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform ${
+                    settings.autoClockOut ? "translate-x-6" : ""
+                  }`}
+                />
               </button>
             </div>
 
@@ -400,7 +470,9 @@ const Pengaturan = () => {
                 <input
                   type="time"
                   value={settings.clockOutTime}
-                  onChange={(e) => handleSelectChange('clockOutTime', e.target.value)}
+                  onChange={(e) =>
+                    handleSelectChange("clockOutTime", e.target.value)
+                  }
                   className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
                 />
               </div>
@@ -415,8 +487,9 @@ const Pengaturan = () => {
             <div className="text-sm text-blue-800">
               <p className="font-medium mb-1">Informasi</p>
               <p>
-                Pengaturan ini saat ini <strong>belum terhubung ke backend</strong>. 
-                Fitur ini akan segera diimplementasikan untuk menyimpan preferensi Anda.
+                Pengaturan ini saat ini{" "}
+                <strong>belum terhubung ke backend</strong>. Fitur ini akan
+                segera diimplementasikan untuk menyimpan preferensi Anda.
               </p>
             </div>
           </div>

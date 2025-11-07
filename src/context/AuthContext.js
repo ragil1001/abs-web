@@ -1,7 +1,14 @@
 "use client";
-import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
-import { authAPI, notificationAPI } from '@/lib/api';
-import { toast } from 'react-toastify';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+} from "react";
+import { authAPI, notificationAPI } from "@/lib/api";
+import { toast } from "react-toastify";
 
 const AuthContext = createContext({
   user: null,
@@ -10,8 +17,8 @@ const AuthContext = createContext({
   logout: async () => {},
   isAuthenticated: false,
   refreshUser: async () => {},
-  getUserInitials: () => 'U',
-  getDisplayName: () => 'User',
+  getUserInitials: () => "U",
+  getDisplayName: () => "User",
   formatLastLogin: () => null,
 });
 
@@ -25,107 +32,107 @@ const SESSION_CONFIG = {
 // Token management
 const tokenManager = {
   get: () => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('auth_token');
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("auth_token");
     }
     return null;
   },
-  
+
   set: (token) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('auth_token', token);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("auth_token", token);
     }
   },
-  
+
   remove: () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('auth_user');
-      localStorage.removeItem('session_start');
-      localStorage.removeItem('fcm_token');
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("auth_token");
+      localStorage.removeItem("auth_user");
+      localStorage.removeItem("session_start");
+      localStorage.removeItem("fcm_token");
     }
-  }
+  },
 };
 
 // User data management
 const userManager = {
   get: () => {
-    if (typeof window !== 'undefined') {
-      const user = localStorage.getItem('auth_user');
+    if (typeof window !== "undefined") {
+      const user = localStorage.getItem("auth_user");
       return user ? JSON.parse(user) : null;
     }
     return null;
   },
-  
+
   set: (user) => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('auth_user', JSON.stringify(user));
+    if (typeof window !== "undefined") {
+      localStorage.setItem("auth_user", JSON.stringify(user));
     }
   },
-  
+
   remove: () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('auth_user');
-      localStorage.removeItem('session_start');
-      localStorage.removeItem('fcm_token');
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("auth_token");
+      localStorage.removeItem("auth_user");
+      localStorage.removeItem("session_start");
+      localStorage.removeItem("fcm_token");
     }
-  }
+  },
 };
 
 // Session management
 const sessionManager = {
   start: () => {
-    if (typeof window !== 'undefined') {
+    if (typeof window !== "undefined") {
       const now = Date.now();
-      localStorage.setItem('session_start', now.toString());
-      sessionStorage.setItem('session_active', 'true');
+      localStorage.setItem("session_start", now.toString());
+      sessionStorage.setItem("session_active", "true");
     }
   },
-  
+
   getStartTime: () => {
-    if (typeof window !== 'undefined') {
-      const startTime = localStorage.getItem('session_start');
+    if (typeof window !== "undefined") {
+      const startTime = localStorage.getItem("session_start");
       return startTime ? parseInt(startTime) : null;
     }
     return null;
   },
-  
+
   isExpired: () => {
     const startTime = sessionManager.getStartTime();
     if (!startTime) return true;
-    
+
     const elapsed = Date.now() - startTime;
     return elapsed >= SESSION_CONFIG.DURATION;
   },
-  
+
   getTimeRemaining: () => {
     const startTime = sessionManager.getStartTime();
     if (!startTime) return 0;
-    
+
     const elapsed = Date.now() - startTime;
     const remaining = SESSION_CONFIG.DURATION - elapsed;
     return Math.max(0, remaining);
   },
-  
+
   shouldShowWarning: () => {
     const remaining = sessionManager.getTimeRemaining();
     return remaining > 0 && remaining <= SESSION_CONFIG.WARNING_TIME;
   },
-  
+
   clear: () => {
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('session_start');
-      sessionStorage.removeItem('session_active');
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("session_start");
+      sessionStorage.removeItem("session_active");
     }
   },
-  
+
   isNewSession: () => {
-    if (typeof window !== 'undefined') {
-      return !sessionStorage.getItem('session_active');
+    if (typeof window !== "undefined") {
+      return !sessionStorage.getItem("session_active");
     }
     return false;
-  }
+  },
 };
 
 export const AuthProvider = ({ children }) => {
@@ -138,14 +145,14 @@ export const AuthProvider = ({ children }) => {
   // 🔔 Delete FCM token before logout
   const deleteFCMToken = async () => {
     try {
-      const fcmToken = localStorage.getItem('fcm_token');
+      const fcmToken = localStorage.getItem("fcm_token");
       if (fcmToken) {
         await notificationAPI.deleteFCMToken(fcmToken);
-        localStorage.removeItem('fcm_token');
-        console.log('✅ FCM token deleted');
+        localStorage.removeItem("fcm_token");
+        console.log("✅ FCM token deleted");
       }
     } catch (error) {
-      console.error('❌ Failed to delete FCM token:', error);
+      console.error("❌ Failed to delete FCM token:", error);
     }
   };
 
@@ -154,41 +161,41 @@ export const AuthProvider = ({ children }) => {
     if (!tokenManager.get()) return;
 
     if (sessionManager.isExpired()) {
-      console.log('⏰ Session expired - auto logout');
-      
+      console.log("⏰ Session expired - auto logout");
+
       // Delete FCM token
       await deleteFCMToken();
-      
+
       // Clear toast if exists
       if (warningToastIdRef.current) {
         toast.dismiss(warningToastIdRef.current);
       }
-      
+
       // Show expiry message
-      toast.error('Sesi Anda telah berakhir. Silakan login kembali.', {
+      toast.error("Sesi Anda telah berakhir. Silakan login kembali.", {
         autoClose: 5000,
       });
-      
+
       // Logout
       tokenManager.remove();
       userManager.remove();
       sessionManager.clear();
       setUser(null);
       setShowSessionWarning(false);
-      
+
       // Redirect to login
-      if (typeof window !== 'undefined') {
-        window.location.replace('/');
+      if (typeof window !== "undefined") {
+        window.location.replace("/");
       }
     } else if (sessionManager.shouldShowWarning() && !showSessionWarning) {
       setShowSessionWarning(true);
       const remaining = Math.ceil(sessionManager.getTimeRemaining() / 60000);
-      
+
       // Dismiss previous warning if exists
       if (warningToastIdRef.current) {
         toast.dismiss(warningToastIdRef.current);
       }
-      
+
       // Show new warning
       warningToastIdRef.current = toast.warning(
         `Sesi Anda akan berakhir dalam ${remaining} menit. Simpan pekerjaan Anda.`,
@@ -205,13 +212,13 @@ export const AuthProvider = ({ children }) => {
     if (user && tokenManager.get()) {
       // Check immediately
       checkSession();
-      
+
       // Then check periodically
       sessionCheckIntervalRef.current = setInterval(
         checkSession,
         SESSION_CONFIG.CHECK_INTERVAL
       );
-      
+
       return () => {
         if (sessionCheckIntervalRef.current) {
           clearInterval(sessionCheckIntervalRef.current);
@@ -223,29 +230,29 @@ export const AuthProvider = ({ children }) => {
   // Initialize auth state
   useEffect(() => {
     const initializeAuth = async () => {
-      console.log('🔄 Initializing auth...');
+      console.log("🔄 Initializing auth...");
       setLoading(true);
-      
+
       const token = tokenManager.get();
       const savedUser = userManager.get();
-      
+
       // 🔑 Check if this is a new session (browser/tab was closed)
       const isNewSession = sessionManager.isNewSession();
-      
+
       if (isNewSession) {
-        console.log('🆕 New session detected - clearing page state');
+        console.log("🆕 New session detected - clearing page state");
         // Clear current page to reset to dashboard
-        localStorage.removeItem('currentPage');
+        localStorage.removeItem("currentPage");
       }
-      
-      console.log('📦 Token:', token ? 'exists' : 'none');
-      console.log('👤 Saved user:', savedUser ? savedUser.username : 'none');
-      console.log('🆕 Is new session:', isNewSession);
-      
+
+      console.log("📦 Token:", token ? "exists" : "none");
+      console.log("👤 Saved user:", savedUser ? savedUser.username : "none");
+      console.log("🆕 Is new session:", isNewSession);
+
       if (token && savedUser) {
         // Check if session is expired
         if (sessionManager.isExpired()) {
-          console.log('⏰ Session expired on init');
+          console.log("⏰ Session expired on init");
           await deleteFCMToken();
           tokenManager.remove();
           userManager.remove();
@@ -254,18 +261,18 @@ export const AuthProvider = ({ children }) => {
           setLoading(false);
           return;
         }
-        
+
         try {
           // Verify token with server
           const response = await authAPI.me();
-          console.log('✅ Token verified:', response.data?.username);
+          console.log("✅ Token verified:", response.data?.username);
           setUser(response.data);
           userManager.set(response.data);
-          
+
           // Mark session as active
           sessionManager.start();
         } catch (error) {
-          console.error('❌ Token verification failed:', error);
+          console.error("❌ Token verification failed:", error);
           await deleteFCMToken();
           tokenManager.remove();
           userManager.remove();
@@ -273,12 +280,12 @@ export const AuthProvider = ({ children }) => {
           setUser(null);
         }
       } else {
-        console.log('❌ No token or user found');
+        console.log("❌ No token or user found");
         setUser(null);
       }
-      
+
       setLoading(false);
-      console.log('✅ Auth initialization complete');
+      console.log("✅ Auth initialization complete");
     };
 
     initializeAuth();
@@ -286,36 +293,36 @@ export const AuthProvider = ({ children }) => {
 
   // Login function
   const login = useCallback(async (credentials) => {
-    console.log('🔐 Login attempt:', credentials.username);
+    console.log("🔐 Login attempt:", credentials.username);
     setLoading(true);
     try {
       const response = await authAPI.login(credentials);
-      console.log('✅ Login response:', response);
-      
+      console.log("✅ Login response:", response);
+
       if (response.success && response.data) {
         const { token, user: userData } = response.data;
-        
+
         tokenManager.set(token);
         userManager.set(userData);
         sessionManager.start();
         setUser(userData);
-        
-        console.log('✅ User logged in:', userData.username);
-        
+
+        console.log("✅ User logged in:", userData.username);
+
         // Clear current page to start fresh
-        localStorage.removeItem('currentPage');
-        
+        localStorage.removeItem("currentPage");
+
         // Redirect using replace to prevent back navigation
-        if (typeof window !== 'undefined') {
-          window.location.replace('/');
+        if (typeof window !== "undefined") {
+          window.location.replace("/");
         }
-        
+
         return response;
       }
-      
-      throw new Error(response.message || 'Login failed');
+
+      throw new Error(response.message || "Login failed");
     } catch (error) {
-      console.error('❌ Login error:', error);
+      console.error("❌ Login error:", error);
       setUser(null);
       throw error;
     } finally {
@@ -325,22 +332,22 @@ export const AuthProvider = ({ children }) => {
 
   // Logout function
   const logout = useCallback(async () => {
-    console.log('🚪 Logout...');
+    console.log("🚪 Logout...");
     setLoading(true);
-    
+
     // Dismiss any active warnings
     if (warningToastIdRef.current) {
       toast.dismiss(warningToastIdRef.current);
     }
-    
+
     try {
       // Delete FCM token first
       await deleteFCMToken();
-      
+
       // Then logout from server
       await authAPI.logout();
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     } finally {
       // Clear all data
       tokenManager.remove();
@@ -349,17 +356,17 @@ export const AuthProvider = ({ children }) => {
       setUser(null);
       setShowSessionWarning(false);
       setLoading(false);
-      
+
       // Clear session interval
       if (sessionCheckIntervalRef.current) {
         clearInterval(sessionCheckIntervalRef.current);
       }
-      
-      console.log('✅ Logged out');
-      
+
+      console.log("✅ Logged out");
+
       // Redirect using replace
-      if (typeof window !== 'undefined') {
-        window.location.replace('/');
+      if (typeof window !== "undefined") {
+        window.location.replace("/");
       }
     }
   }, []);
@@ -375,7 +382,7 @@ export const AuthProvider = ({ children }) => {
           return response.data;
         }
       } catch (error) {
-        console.error('User refresh failed:', error);
+        console.error("User refresh failed:", error);
         await logout();
         throw error;
       }
@@ -384,25 +391,25 @@ export const AuthProvider = ({ children }) => {
 
   // Helper functions
   const getUserInitials = useCallback(() => {
-    if (!user?.username) return 'U';
+    if (!user?.username) return "U";
     return user.username.substring(0, 2).toUpperCase();
   }, [user]);
 
   const getDisplayName = useCallback(() => {
-    return user?.username || 'User';
+    return user?.username || "User";
   }, [user]);
 
   const formatLastLogin = useCallback(() => {
     if (!user?.last_login_at) return null;
-    
+
     const date = new Date(user.last_login_at);
-    return date.toLocaleString('id-ID', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return date.toLocaleString("id-ID", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   }, [user]);
 
@@ -412,7 +419,8 @@ export const AuthProvider = ({ children }) => {
     login,
     logout,
     refreshUser,
-    isAuthenticated: !!user && !!tokenManager.get() && !sessionManager.isExpired(),
+    isAuthenticated:
+      !!user && !!tokenManager.get() && !sessionManager.isExpired(),
     getUserInitials,
     getDisplayName,
     formatLastLogin,
@@ -420,18 +428,14 @@ export const AuthProvider = ({ children }) => {
     timeRemaining: sessionManager.getTimeRemaining(),
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 // Custom hook to use auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
+    throw new Error("useAuth must be used within AuthProvider");
   }
   return context;
 };

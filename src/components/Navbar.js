@@ -1,9 +1,9 @@
 // src/components/Navbar.js
 "use client";
-import React, { useState, useRef, useEffect } from 'react';
-import { ChevronDown, KeyRound, Settings, LogOut } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
-import NotificationDropdown from './NotificationDropdown';
+import React, { useState, useRef, useEffect } from "react";
+import { ChevronDown, KeyRound, Settings, LogOut } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import NotificationDropdown from "./NotificationDropdown";
 
 const Navbar = ({ onNavigate }) => {
   const { user, logout, getUserInitials, getDisplayName } = useAuth();
@@ -17,15 +17,15 @@ const Navbar = ({ onNavigate }) => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleLogout = async () => {
     try {
       await logout();
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
     }
   };
 
@@ -57,9 +57,11 @@ const Navbar = ({ onNavigate }) => {
               {getDisplayName()}
             </p>
           </div>
-          <ChevronDown className={`w-4 h-4 text-gray-400 hidden lg:block transition-transform duration-200 ${
-            profileDropdownOpen ? 'rotate-180' : ''
-          }`} />
+          <ChevronDown
+            className={`w-4 h-4 text-gray-400 hidden lg:block transition-transform duration-200 ${
+              profileDropdownOpen ? "rotate-180" : ""
+            }`}
+          />
         </button>
 
         {profileDropdownOpen && (
@@ -78,27 +80,27 @@ const Navbar = ({ onNavigate }) => {
                 </div>
               </div>
             </div>
-            
+
             <div className="py-2">
-              <button 
-                onClick={() => handleMenuClick('ubah-password')}
+              <button
+                onClick={() => handleMenuClick("ubah-password")}
                 className="w-full flex items-center space-x-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
               >
                 <KeyRound className="w-4 h-4 text-gray-500" />
                 <span>Ubah Password</span>
               </button>
-              
-              <button 
-                onClick={() => handleMenuClick('pengaturan')}
+
+              <button
+                onClick={() => handleMenuClick("pengaturan")}
                 className="w-full flex items-center space-x-3 px-4 py-3 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
               >
                 <Settings className="w-4 h-4 text-gray-500" />
                 <span>Pengaturan</span>
               </button>
-              
+
               <hr className="my-2 border-gray-100" />
-              
-              <button 
+
+              <button
                 onClick={handleLogout}
                 className="w-full flex items-center space-x-3 px-4 py-3 text-sm text-red-600 hover:bg-red-50 transition-colors duration-200"
               >

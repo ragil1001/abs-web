@@ -1,8 +1,18 @@
 "use client";
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import {
-  Plus, Search, Download, Upload, Edit, Trash2,
-  ChevronUp, ChevronDown, X, ChevronLeft, ChevronRight, Loader2
+  Plus,
+  Search,
+  Download,
+  Upload,
+  Edit,
+  Trash2,
+  ChevronUp,
+  ChevronDown,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import { useApi } from "@/hooks/useApi";
@@ -30,10 +40,10 @@ const DataDivisi = () => {
   const [formErrors, setFormErrors] = useState({});
   const [importFile, setImportFile] = useState(null);
   const [importLoading, setImportLoading] = useState(false);
-  
+
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
-  
+
   const { loading: fetchLoading, error: fetchError, call } = useApi();
 
   // Memoized filtered and sorted data
@@ -42,9 +52,10 @@ const DataDivisi = () => {
 
     if (searchTerm.trim()) {
       const search = searchTerm.toLowerCase().trim();
-      filtered = allDivisions.filter(division =>
-        division.nama.toLowerCase().includes(search) ||
-        division.id.toString().toLowerCase().includes(search)
+      filtered = allDivisions.filter(
+        (division) =>
+          division.nama.toLowerCase().includes(search) ||
+          division.id.toString().toLowerCase().includes(search)
       );
     }
 
@@ -52,7 +63,7 @@ const DataDivisi = () => {
       let aValue = a[sortField];
       let bValue = b[sortField];
 
-      if (typeof aValue === 'string') {
+      if (typeof aValue === "string") {
         aValue = aValue.toLowerCase();
         bValue = bValue.toLowerCase();
       }
@@ -82,61 +93,67 @@ const DataDivisi = () => {
         per_page: itemsPerPage,
         total: totalItems,
         last_page: totalPages,
-      }
+      },
     };
   }, [processedData, currentPage, itemsPerPage]);
 
   // 🚀 FIXED: Fetch all data with proper cache clearing
-  const fetchAllData = useCallback(async (forceFresh = false) => {
-    try {
-      // 🔥 CRITICAL: Always clear cache before fetching
-      if (forceFresh) {
-        clearApiCache('/divisis');
-        // Also clear localStorage cache if exists
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('divisi_cache');
-          localStorage.removeItem('divisi_cache_timestamp');
+  const fetchAllData = useCallback(
+    async (forceFresh = false) => {
+      try {
+        // 🔥 CRITICAL: Always clear cache before fetching
+        if (forceFresh) {
+          clearApiCache("/divisis");
+          // Also clear localStorage cache if exists
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("divisi_cache");
+            localStorage.removeItem("divisi_cache_timestamp");
+          }
         }
+
+        const response = await call(divisiAPI.getAll, {
+          per_page: 1000,
+          _t: Date.now(), // Add timestamp to prevent browser caching
+        });
+
+        if (response.success) {
+          const data = response.data.data || response.data || [];
+          console.log("📊 Fetched divisions:", data.length);
+          setAllDivisions(data);
+          setCurrentPage(1);
+        }
+      } catch (err) {
+        console.error("Fetch error:", err);
+        setAllDivisions([]);
+        toast.error("Gagal mengambil data penempatan", { autoClose: 3000 });
+      } finally {
+        setInitialLoadComplete(true);
       }
-      
-      const response = await call(divisiAPI.getAll, {
-        per_page: 1000,
-        _t: Date.now() // Add timestamp to prevent browser caching
-      });
-      
-      if (response.success) {
-        const data = response.data.data || response.data || [];
-        console.log('📊 Fetched divisions:', data.length);
-        setAllDivisions(data);
-        setCurrentPage(1);
-      }
-    } catch (err) {
-      console.error('Fetch error:', err);
-      setAllDivisions([]);
-      toast.error('Gagal mengambil data penempatan', { autoClose: 3000 });
-    } finally {
-      setInitialLoadComplete(true);
-    }
-  }, [call]);
+    },
+    [call]
+  );
 
   // 🚀 FIXED: Initial data load with force refresh
   useEffect(() => {
     if (isAuthenticated && !initialLoadComplete) {
-      console.log('🔄 Initial load - clearing all caches');
+      console.log("🔄 Initial load - clearing all caches");
       fetchAllData(true); // Force fresh data on initial load
     }
   }, [isAuthenticated, initialLoadComplete, fetchAllData]);
 
   // Handle sort
-  const handleSort = useCallback((field) => {
-    if (sortField === field) {
-      setSortDirection(current => current === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
-    setCurrentPage(1);
-  }, [sortField]);
+  const handleSort = useCallback(
+    (field) => {
+      if (sortField === field) {
+        setSortDirection((current) => (current === "asc" ? "desc" : "asc"));
+      } else {
+        setSortField(field);
+        setSortDirection("asc");
+      }
+      setCurrentPage(1);
+    },
+    [sortField]
+  );
 
   // Handle search
   const handleSearchChange = useCallback((value) => {
@@ -151,12 +168,15 @@ const DataDivisi = () => {
   }, []);
 
   // Handle page change
-  const handlePageChange = useCallback((page) => {
-    const totalPages = paginationData.pagination.last_page;
-    if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  }, [paginationData.pagination.last_page]);
+  const handlePageChange = useCallback(
+    (page) => {
+      const totalPages = paginationData.pagination.last_page;
+      if (page >= 1 && page <= totalPages) {
+        setCurrentPage(page);
+      }
+    },
+    [paginationData.pagination.last_page]
+  );
 
   // Reset form
   const resetForm = useCallback(() => {
@@ -182,12 +202,15 @@ const DataDivisi = () => {
   }, [resetForm]);
 
   // Open edit modal
-  const handleOpenEditModal = useCallback((division) => {
-    resetForm();
-    setSelectedDivision(division);
-    setFormData({ nama: division.nama });
-    setShowEditModal(true);
-  }, [resetForm]);
+  const handleOpenEditModal = useCallback(
+    (division) => {
+      resetForm();
+      setSelectedDivision(division);
+      setFormData({ nama: division.nama });
+      setShowEditModal(true);
+    },
+    [resetForm]
+  );
 
   // Close modal
   const handleCloseModal = useCallback(() => {
@@ -208,9 +231,11 @@ const DataDivisi = () => {
       return;
     }
 
-    const title = selectedDivision ? 'Konfirmasi Update' : 'Konfirmasi Simpan';
-    const message = selectedDivision 
-      ? `Apakah Anda yakin ingin memperbarui penempatan <b>${selectedDivision.nama}</b> menjadi <b>${formData.nama.trim()}</b>?`
+    const title = selectedDivision ? "Konfirmasi Update" : "Konfirmasi Simpan";
+    const message = selectedDivision
+      ? `Apakah Anda yakin ingin memperbarui penempatan <b>${
+          selectedDivision.nama
+        }</b> menjadi <b>${formData.nama.trim()}</b>?`
       : `Apakah Anda yakin ingin menyimpan penempatan <b>${formData.nama.trim()}</b>?`;
 
     const result = await Swal.fire({
@@ -220,7 +245,7 @@ const DataDivisi = () => {
       showCancelButton: true,
       confirmButtonColor: "#ea580c",
       cancelButtonColor: "#6b7280",
-      confirmButtonText: "Ya, " + (selectedDivision ? 'Update' : 'Simpan'),
+      confirmButtonText: "Ya, " + (selectedDivision ? "Update" : "Simpan"),
       cancelButtonText: "Batal",
     });
 
@@ -236,7 +261,7 @@ const DataDivisi = () => {
 
     try {
       const payload = { nama: formData.nama.trim() };
-      
+
       if (selectedDivision) {
         await call(divisiAPI.update, selectedDivision.id, payload);
         toast.success(MESSAGES.UPDATE_SUCCESS);
@@ -246,25 +271,25 @@ const DataDivisi = () => {
       }
 
       // 🔥 CRITICAL: Aggressive cache clearing
-      clearApiCache('/divisis');
+      clearApiCache("/divisis");
       clearApiCache(); // Clear all cache
-      
+
       // Clear localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('divisi_cache');
-        localStorage.removeItem('divisi_cache_timestamp');
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("divisi_cache");
+        localStorage.removeItem("divisi_cache_timestamp");
       }
-      
+
       // Wait a bit for backend to process
-      await new Promise(resolve => setTimeout(resolve, 300));
-      
+      await new Promise((resolve) => setTimeout(resolve, 300));
+
       // Force refresh with new data
       await fetchAllData(true);
       handleCloseModal();
     } catch (err) {
-      console.error('Submit error:', err);
-      
-      if (err.type === 'validation_error' && err.errors) {
+      console.error("Submit error:", err);
+
+      if (err.type === "validation_error" && err.errors) {
         setFormErrors(err.errors);
         toast.error(getFirstError(err.errors), { autoClose: 5000 });
       } else {
@@ -291,20 +316,22 @@ const DataDivisi = () => {
         try {
           await call(divisiAPI.delete, division.id);
           toast.success(MESSAGES.DELETE_SUCCESS);
-          
+
           // 🔥 CRITICAL: Aggressive cache clearing
-          clearApiCache('/divisis');
+          clearApiCache("/divisis");
           clearApiCache();
-          
-          if (typeof window !== 'undefined') {
-            localStorage.removeItem('divisi_cache');
-            localStorage.removeItem('divisi_cache_timestamp');
+
+          if (typeof window !== "undefined") {
+            localStorage.removeItem("divisi_cache");
+            localStorage.removeItem("divisi_cache_timestamp");
           }
-          
-          await new Promise(resolve => setTimeout(resolve, 300));
+
+          await new Promise((resolve) => setTimeout(resolve, 300));
           await fetchAllData(true);
         } catch (err) {
-          toast.error(err.message || MESSAGES.SERVER_ERROR, { autoClose: 5000 });
+          toast.error(err.message || MESSAGES.SERVER_ERROR, {
+            autoClose: 5000,
+          });
         }
       }
     });
@@ -315,19 +342,24 @@ const DataDivisi = () => {
     const file = e.target.files[0];
     if (file) {
       const allowedTypes = [
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'application/vnd.ms-excel'
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        "application/vnd.ms-excel",
       ];
-      
+
       if (!allowedTypes.includes(file.type)) {
-        toast.error("Format file tidak valid. Gunakan file Excel (.xlsx atau .xls)", { autoClose: 5000 });
-        e.target.value = '';
+        toast.error(
+          "Format file tidak valid. Gunakan file Excel (.xlsx atau .xls)",
+          { autoClose: 5000 }
+        );
+        e.target.value = "";
         return;
       }
 
       if (file.size > 2 * 1024 * 1024) {
-        toast.error("Ukuran file terlalu besar. Maksimal 2MB", { autoClose: 5000 });
-        e.target.value = '';
+        toast.error("Ukuran file terlalu besar. Maksimal 2MB", {
+          autoClose: 5000,
+        });
+        e.target.value = "";
         return;
       }
 
@@ -339,24 +371,25 @@ const DataDivisi = () => {
   const processImportData = async (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      
+
       reader.onload = (e) => {
         try {
           const data = new Uint8Array(e.target.result);
-          const workbook = XLSX.read(data, { type: 'array' });
+          const workbook = XLSX.read(data, { type: "array" });
           const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
           const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-          
+
           if (jsonData.length < 2) {
             reject(new Error("File Excel kosong atau tidak memiliki data"));
             return;
           }
 
           const [headers, ...rows] = jsonData;
-          const namaIndex = headers.findIndex(header => 
-            header && header.toString().toLowerCase().includes('nama')
+          const namaIndex = headers.findIndex(
+            (header) =>
+              header && header.toString().toLowerCase().includes("nama")
           );
-          
+
           if (namaIndex === -1) {
             reject(new Error("Kolom 'Nama Penempatan' tidak ditemukan"));
             return;
@@ -364,31 +397,33 @@ const DataDivisi = () => {
 
           const validData = [];
           const errors = [];
-          const existingNames = allDivisions.map(d => d.nama.toLowerCase());
+          const existingNames = allDivisions.map((d) => d.nama.toLowerCase());
           const seenNames = new Set();
 
           rows.forEach((row, index) => {
             const rowNumber = index + 2;
             const nama = row[namaIndex];
-            
-            if (!nama || nama.toString().trim() === '') {
+
+            if (!nama || nama.toString().trim() === "") {
               errors.push(`Baris ${rowNumber}: Nama penempatan kosong`);
               return;
             }
 
             const namaClean = nama.toString().trim();
             const namaLower = namaClean.toLowerCase();
-            
+
             if (existingNames.includes(namaLower)) {
-              errors.push(`Baris ${rowNumber}: Penempatan "${namaClean}" sudah ada`);
+              errors.push(
+                `Baris ${rowNumber}: Penempatan "${namaClean}" sudah ada`
+              );
               return;
             }
-            
+
             if (seenNames.has(namaLower)) {
               errors.push(`Baris ${rowNumber}: Duplikat dalam file`);
               return;
             }
-            
+
             if (namaClean.length > 255) {
               errors.push(`Baris ${rowNumber}: Nama terlalu panjang`);
               return;
@@ -403,7 +438,7 @@ const DataDivisi = () => {
           reject(new Error("Gagal membaca file Excel: " + error.message));
         }
       };
-      
+
       reader.onerror = () => reject(new Error("Gagal membaca file"));
       reader.readAsArrayBuffer(file);
     });
@@ -420,7 +455,7 @@ const DataDivisi = () => {
 
     try {
       const { validData, errors } = await processImportData(importFile);
-      
+
       if (validData.length === 0) {
         toast.error("Tidak ada data valid untuk diimport", { autoClose: 5000 });
         setImportLoading(false);
@@ -428,11 +463,11 @@ const DataDivisi = () => {
       }
 
       const result = await Swal.fire({
-        title: 'Konfirmasi Import',
+        title: "Konfirmasi Import",
         text: `${validData.length} penempatan akan diimport`,
-        icon: 'question',
+        icon: "question",
         showCancelButton: true,
-        confirmButtonColor: '#ea580c',
+        confirmButtonColor: "#ea580c",
       });
 
       if (result.isConfirmed) {
@@ -441,22 +476,24 @@ const DataDivisi = () => {
         }
 
         // 🔥 CRITICAL: Aggressive cache clearing
-        clearApiCache('/divisis');
+        clearApiCache("/divisis");
         clearApiCache();
-        
-        if (typeof window !== 'undefined') {
-          localStorage.removeItem('divisi_cache');
-          localStorage.removeItem('divisi_cache_timestamp');
+
+        if (typeof window !== "undefined") {
+          localStorage.removeItem("divisi_cache");
+          localStorage.removeItem("divisi_cache_timestamp");
         }
-        
-        toast.success(`${validData.length} penempatan berhasil diimport`, { autoClose: 5000 });
-        
-        await new Promise(resolve => setTimeout(resolve, 300));
+
+        toast.success(`${validData.length} penempatan berhasil diimport`, {
+          autoClose: 5000,
+        });
+
+        await new Promise((resolve) => setTimeout(resolve, 300));
         await fetchAllData(true);
         handleCloseModal();
       }
     } catch (err) {
-      console.error('Import error:', err);
+      console.error("Import error:", err);
       toast.error(err.message || "Gagal mengimport file", { autoClose: 5000 });
     } finally {
       setImportLoading(false);
@@ -467,39 +504,46 @@ const DataDivisi = () => {
   const exportToExcel = async () => {
     try {
       Swal.fire({
-        title: 'Mengekspor Data',
-        text: 'Sedang menyiapkan file export...',
+        title: "Mengekspor Data",
+        text: "Sedang menyiapkan file export...",
         allowOutsideClick: false,
         allowEscapeKey: false,
         showConfirmButton: false,
-        didOpen: () => Swal.showLoading()
+        didOpen: () => Swal.showLoading(),
       });
-      
-      const token = localStorage.getItem("auth_token");
-      if (!token) throw new Error('Token tidak ditemukan');
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/divisis/export`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        },
-      });
-      
-      if (!response.ok) throw new Error(`Export gagal (Status: ${response.status})`);
-      
+      const token = localStorage.getItem("auth_token");
+      if (!token) throw new Error("Token tidak ditemukan");
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/divisis/export`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            Accept:
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          },
+        }
+      );
+
+      if (!response.ok)
+        throw new Error(`Export gagal (Status: ${response.status})`);
+
       const blob = await response.blob();
-      if (blob.size === 0) throw new Error('File export kosong');
-      
+      if (blob.size === 0) throw new Error("File export kosong");
+
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `data-penempatan-${new Date().toISOString().slice(0, 10)}.xlsx`;
+      a.download = `data-penempatan-${new Date()
+        .toISOString()
+        .slice(0, 10)}.xlsx`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
-      
+
       Swal.close();
       toast.success("Data berhasil diekspor!");
     } catch (err) {
@@ -511,7 +555,12 @@ const DataDivisi = () => {
   // Download template
   const downloadTemplate = () => {
     try {
-      const ws = XLSX.utils.aoa_to_sheet([["Nama Penempatan"], ["IT"], ["HRD"], ["Finance"]]);
+      const ws = XLSX.utils.aoa_to_sheet([
+        ["Nama Penempatan"],
+        ["IT"],
+        ["HRD"],
+        ["Finance"],
+      ]);
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "Template");
       XLSX.writeFile(wb, `template-penempatan.xlsx`);
@@ -551,7 +600,7 @@ const DataDivisi = () => {
                 <div className="h-8 bg-gray-200 rounded w-48"></div>
               </div>
               <div className="h-12 bg-gray-300 rounded"></div>
-              {[1,2,3,4,5,6,7,8,9,10].map(i => (
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
                 <div key={i} className="h-16 bg-gray-200 rounded"></div>
               ))}
             </div>
@@ -566,7 +615,9 @@ const DataDivisi = () => {
       {/* Header */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Data Penempatan</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Data Penempatan
+          </h1>
           <p className="text-gray-600">Kelola daftar penempatan perusahaan</p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -614,11 +665,15 @@ const DataDivisi = () => {
             <span className="text-sm text-gray-600">Tampilkan</span>
             <select
               value={itemsPerPage}
-              onChange={(e) => handleItemsPerPageChange(parseInt(e.target.value))}
+              onChange={(e) =>
+                handleItemsPerPageChange(parseInt(e.target.value))
+              }
               className="px-3 py-1 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
             >
               {VALIDATION.PAGINATION.DEFAULT_LIMITS.map((limit) => (
-                <option key={limit} value={limit}>{limit}</option>
+                <option key={limit} value={limit}>
+                  {limit}
+                </option>
               ))}
             </select>
             <span className="text-sm text-gray-600">entri</span>
@@ -644,8 +699,20 @@ const DataDivisi = () => {
                     <div className="flex items-center gap-2">
                       {col.label}
                       <div className="flex flex-col">
-                        <ChevronUp className={`w-3 h-3 ${sortField === col.key && sortDirection === "asc" ? "text-white" : "text-orange-300"}`} />
-                        <ChevronDown className={`w-3 h-3 -mt-1 ${sortField === col.key && sortDirection === "desc" ? "text-white" : "text-orange-300"}`} />
+                        <ChevronUp
+                          className={`w-3 h-3 ${
+                            sortField === col.key && sortDirection === "asc"
+                              ? "text-white"
+                              : "text-orange-300"
+                          }`}
+                        />
+                        <ChevronDown
+                          className={`w-3 h-3 -mt-1 ${
+                            sortField === col.key && sortDirection === "desc"
+                              ? "text-white"
+                              : "text-orange-300"
+                          }`}
+                        />
                       </div>
                     </div>
                   </th>
@@ -655,8 +722,15 @@ const DataDivisi = () => {
             </thead>
             <tbody>
               {paginationData.items.map((d, index) => (
-                <tr key={d.id} className={`border-b hover:bg-orange-50 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                  <td className="px-6 py-4 font-medium text-gray-900">{d.id}</td>
+                <tr
+                  key={d.id}
+                  className={`border-b hover:bg-orange-50 transition-colors ${
+                    index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                  }`}
+                >
+                  <td className="px-6 py-4 font-medium text-gray-900">
+                    {d.id}
+                  </td>
                   <td className="px-6 py-4 text-gray-900">{d.nama}</td>
                   <td className="px-6 py-4 text-center">
                     <button
@@ -678,8 +752,13 @@ const DataDivisi = () => {
               ))}
               {paginationData.items.length === 0 && (
                 <tr>
-                  <td colSpan="3" className="px-6 py-8 text-center text-gray-500">
-                    {searchTerm.trim() ? 'Tidak ada data yang sesuai dengan pencarian' : 'Belum ada data penempatan'}
+                  <td
+                    colSpan="3"
+                    className="px-6 py-8 text-center text-gray-500"
+                  >
+                    {searchTerm.trim()
+                      ? "Tidak ada data yang sesuai dengan pencarian"
+                      : "Belum ada data penempatan"}
                   </td>
                 </tr>
               )}
@@ -690,47 +769,63 @@ const DataDivisi = () => {
         {/* Pagination */}
         <div className="px-6 py-4 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-sm">
           <div>
-            Halaman {paginationData.pagination.current_page} dari {paginationData.pagination.last_page}
+            Halaman {paginationData.pagination.current_page} dari{" "}
+            {paginationData.pagination.last_page}
           </div>
           <div className="flex items-center gap-2 flex-wrap justify-center">
             <button
-              onClick={() => handlePageChange(Math.max(1, paginationData.pagination.current_page - 1))}
+              onClick={() =>
+                handlePageChange(
+                  Math.max(1, paginationData.pagination.current_page - 1)
+                )
+              }
               disabled={paginationData.pagination.current_page === 1}
               className="p-2 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 rounded-lg transition-colors"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
-            
+
             {(() => {
               const totalPages = paginationData.pagination.last_page;
               const currentPage = paginationData.pagination.current_page;
               const pages = [];
-              
+
               if (totalPages <= 7) {
                 for (let i = 1; i <= totalPages; i++) pages.push(i);
               } else {
                 pages.push(1);
-                if (currentPage > 3) pages.push('...');
-                for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) {
+                if (currentPage > 3) pages.push("...");
+                for (
+                  let i = Math.max(2, currentPage - 1);
+                  i <= Math.min(totalPages - 1, currentPage + 1);
+                  i++
+                ) {
                   if (!pages.includes(i)) pages.push(i);
                 }
-                if (currentPage < totalPages - 2) pages.push('...');
+                if (currentPage < totalPages - 2) pages.push("...");
                 if (!pages.includes(totalPages)) pages.push(totalPages);
               }
-              
+
               return pages.map((page, index) => {
-                if (page === '...') {
-                  return <span key={`ellipsis-${index}`} className="px-3 py-1 text-gray-400">...</span>;
+                if (page === "...") {
+                  return (
+                    <span
+                      key={`ellipsis-${index}`}
+                      className="px-3 py-1 text-gray-400"
+                    >
+                      ...
+                    </span>
+                  );
                 }
-                
+
                 return (
                   <button
                     key={`page-${page}`}
                     onClick={() => handlePageChange(page)}
                     className={`px-3 py-1 rounded-lg transition-colors min-w-[40px] ${
                       paginationData.pagination.current_page === page
-                        ? 'bg-orange-600 text-white font-semibold shadow-sm'
-                        : 'text-gray-600 hover:bg-gray-100'
+                        ? "bg-orange-600 text-white font-semibold shadow-sm"
+                        : "text-gray-600 hover:bg-gray-100"
                     }`}
                   >
                     {page}
@@ -738,10 +833,20 @@ const DataDivisi = () => {
                 );
               });
             })()}
-            
+
             <button
-              onClick={() => handlePageChange(Math.min(paginationData.pagination.last_page, paginationData.pagination.current_page + 1))}
-              disabled={paginationData.pagination.current_page === paginationData.pagination.last_page}
+              onClick={() =>
+                handlePageChange(
+                  Math.min(
+                    paginationData.pagination.last_page,
+                    paginationData.pagination.current_page + 1
+                  )
+                )
+              }
+              disabled={
+                paginationData.pagination.current_page ===
+                paginationData.pagination.last_page
+              }
               className="p-2 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-100 rounded-lg transition-colors"
             >
               <ChevronRight className="w-4 h-4" />
@@ -761,18 +866,30 @@ const DataDivisi = () => {
               </button>
             </div>
             <div className="px-6 py-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nama Penempatan *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Nama Penempatan *
+              </label>
               <input
                 type="text"
                 value={formData.nama}
-                onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, nama: e.target.value })
+                }
                 placeholder="Masukkan nama penempatan"
-                className={`w-full border px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${formErrors.nama ? "border-red-500" : "border-gray-200"}`}
+                className={`w-full border px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${
+                  formErrors.nama ? "border-red-500" : "border-gray-200"
+                }`}
                 disabled={submitLoading}
                 maxLength={255}
               />
-              {formErrors.nama && <p className="text-red-500 text-sm mt-1">{formErrors.nama[0]}</p>}
-              <p className="text-xs text-gray-500 mt-1">Maksimal 255 karakter</p>
+              {formErrors.nama && (
+                <p className="text-red-500 text-sm mt-1">
+                  {formErrors.nama[0]}
+                </p>
+              )}
+              <p className="text-xs text-gray-500 mt-1">
+                Maksimal 255 karakter
+              </p>
             </div>
             <div className="px-6 py-4 border-t flex justify-end gap-2">
               <button
@@ -812,18 +929,30 @@ const DataDivisi = () => {
               </button>
             </div>
             <div className="px-6 py-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Nama Penempatan *</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Nama Penempatan *
+              </label>
               <input
                 type="text"
                 value={formData.nama}
-                onChange={(e) => setFormData({ ...formData, nama: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, nama: e.target.value })
+                }
                 placeholder="Masukkan nama penempatan"
-                className={`w-full border px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${formErrors.nama ? "border-red-500" : "border-gray-200"}`}
+                className={`w-full border px-3 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 ${
+                  formErrors.nama ? "border-red-500" : "border-gray-200"
+                }`}
                 disabled={submitLoading}
                 maxLength={255}
               />
-              {formErrors.nama && <p className="text-red-500 text-sm mt-1">{formErrors.nama[0]}</p>}
-              <p className="text-xs text-gray-500 mt-1">Maksimal 255 karakter</p>
+              {formErrors.nama && (
+                <p className="text-red-500 text-sm mt-1">
+                  {formErrors.nama[0]}
+                </p>
+              )}
+              <p className="text-xs text-gray-500 mt-1">
+                Maksimal 255 karakter
+              </p>
             </div>
             <div className="px-6 py-4 border-t flex justify-end gap-2">
               <button
@@ -857,7 +986,9 @@ const DataDivisi = () => {
         <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-lg">
             <div className="px-6 py-4 border-b flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-gray-900">Import Data Excel</h2>
+              <h2 className="text-xl font-semibold text-gray-900">
+                Import Data Excel
+              </h2>
               <button
                 onClick={() => setShowImportModal(false)}
                 className="p-2 text-gray-400 hover:text-gray-600 rounded-lg transition-colors"
@@ -872,7 +1003,9 @@ const DataDivisi = () => {
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
                   {importFile ? importFile.name : "Pilih file Excel"}
                 </h3>
-                <p className="text-gray-600 mb-4">Format: .xlsx, .xls (Maksimal 2MB)</p>
+                <p className="text-gray-600 mb-4">
+                  Format: .xlsx, .xls (Maksimal 2MB)
+                </p>
                 <input
                   type="file"
                   accept=".xlsx,.xls"
@@ -883,17 +1016,21 @@ const DataDivisi = () => {
                 />
                 <label
                   htmlFor="divisi-import"
-                  className={`px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors cursor-pointer inline-block ${importLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors cursor-pointer inline-block ${
+                    importLoading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                 >
                   {importFile ? "Ganti File" : "Pilih File"}
                 </label>
               </div>
-              
+
               {importFile && (
                 <div className="mt-4 p-4 bg-blue-50 rounded-lg">
                   <div className="flex items-center gap-2 text-blue-700">
                     <Upload className="w-4 h-4" />
-                    <span className="font-medium">File dipilih: {importFile.name}</span>
+                    <span className="font-medium">
+                      File dipilih: {importFile.name}
+                    </span>
                   </div>
                   <p className="text-sm text-blue-600 mt-1">
                     Ukuran: {(importFile.size / 1024 / 1024).toFixed(2)} MB
@@ -902,7 +1039,9 @@ const DataDivisi = () => {
               )}
 
               <div className="mt-4 p-4 bg-yellow-50 rounded-lg">
-                <h4 className="font-medium text-yellow-800 mb-2">Catatan Penting:</h4>
+                <h4 className="font-medium text-yellow-800 mb-2">
+                  Catatan Penting:
+                </h4>
                 <ul className="text-sm text-yellow-700 space-y-1">
                   <li>• Nama penempatan harus unik (tidak boleh duplikat)</li>
                   <li>• Maksimal 255 karakter per nama</li>
@@ -921,7 +1060,9 @@ const DataDivisi = () => {
                 </button>
                 <button
                   onClick={handleImport}
-                  className={`flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${!importFile ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  className={`flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 ${
+                    !importFile ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                   disabled={!importFile || importLoading}
                 >
                   {importLoading ? (

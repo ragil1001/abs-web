@@ -4,33 +4,41 @@ import ExcelJS from "exceljs";
 /**
  * UNIFIED FUNCTION: Generate Excel with identical layout
  * Used for both TEMPLATE (empty shifts) and EXPORT (filled shifts)
- * 
+ *
  * @param {Object} currentProject - Project data with shifts
  * @param {Array} days - Calendar days array
  * @param {Array} employees - Employee data with shifts array
  * @param {String} type - 'template' or 'export'
  */
-async function generateExcelFile({ currentProject, days, employees = [], type = 'export' }) {
+async function generateExcelFile({
+  currentProject,
+  days,
+  employees = [],
+  type = "export",
+}) {
   // Column definitions (1-based ExcelJS)
-  const COL_NO = 1;      // A
-  const COL_NIK = 2;     // B
-  const COL_NAMA = 3;    // C
-  const COL_SHIFT = 4;   // D (SHIFT label merged vertically)
+  const COL_NO = 1; // A
+  const COL_NIK = 2; // B
+  const COL_NAMA = 3; // C
+  const COL_SHIFT = 4; // D (SHIFT label merged vertically)
   const COL_DATES_START = 5; // E onwards (date columns)
-  
+
   const NUM_DAYS = days.length;
   const TOTAL_COLS = COL_DATES_START + NUM_DAYS - 1;
 
   // Row indices (1-based)
-  const R_TITLE = 3;           // Title row
-  const R_COMPANY = 4;         // Company/Month header row
-  const R_HEADER = 6;          // Month header (across all date cols)
-  const R_TANGGAL = 7;         // Date numbers
-  const R_HARI = 8;            // Day names
-  const R_DATA_START = 9;      // Employee data starts
+  const R_TITLE = 3; // Title row
+  const R_COMPANY = 4; // Company/Month header row
+  const R_HEADER = 6; // Month header (across all date cols)
+  const R_TANGGAL = 7; // Date numbers
+  const R_HARI = 8; // Day names
+  const R_DATA_START = 9; // Employee data starts
 
   const numEmployees = employees.length;
-  const lastEmployeeRow = Math.max(R_DATA_START, R_DATA_START + numEmployees - 1);
+  const lastEmployeeRow = Math.max(
+    R_DATA_START,
+    R_DATA_START + numEmployees - 1
+  );
   const legendStartRow = lastEmployeeRow + 4;
 
   // Create workbook
@@ -39,7 +47,7 @@ async function generateExcelFile({ currentProject, days, employees = [], type = 
   wb.created = new Date();
 
   const ws = wb.addWorksheet("Jadwal", {
-    views: [{ state: "normal", showGridLines: true }]
+    views: [{ state: "normal", showGridLines: true }],
   });
 
   // Set column widths
@@ -55,8 +63,18 @@ async function generateExcelFile({ currentProject, days, employees = [], type = 
 
   // ========== TITLE & COMPANY HEADER ==========
   const monthNames = [
-    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
   ];
 
   const startDate = new Date(days[0].fullDate);
@@ -71,12 +89,19 @@ async function generateExcelFile({ currentProject, days, employees = [], type = 
   ws.getRow(R_TITLE).height = 22;
 
   // Company text with month
-  const isSameMonth = startDate.getMonth() === endDate.getMonth() && 
-                      startDate.getFullYear() === endDate.getFullYear();
-  
+  const isSameMonth =
+    startDate.getMonth() === endDate.getMonth() &&
+    startDate.getFullYear() === endDate.getFullYear();
+
   const companyText = isSameMonth
-    ? `BULAN ${monthNames[startDate.getMonth()].toUpperCase()} ${startDate.getFullYear()} PT. QIPRAH MULTI SERVICE`
-    : `BULAN ${monthNames[startDate.getMonth()].toUpperCase()} ${startDate.getFullYear()} - ${monthNames[endDate.getMonth()].toUpperCase()} ${endDate.getFullYear()} PT. QIPRAH MULTI SERVICE`;
+    ? `BULAN ${monthNames[
+        startDate.getMonth()
+      ].toUpperCase()} ${startDate.getFullYear()} PT. QIPRAH MULTI SERVICE`
+    : `BULAN ${monthNames[
+        startDate.getMonth()
+      ].toUpperCase()} ${startDate.getFullYear()} - ${monthNames[
+        endDate.getMonth()
+      ].toUpperCase()} ${endDate.getFullYear()} PT. QIPRAH MULTI SERVICE`;
 
   const companyCell = ws.getRow(R_COMPANY).getCell(COL_NO);
   companyCell.value = companyText;
@@ -89,17 +114,19 @@ async function generateExcelFile({ currentProject, days, employees = [], type = 
   // NO, NIK, NAMA columns (merged vertically from R_HEADER to R_HARI)
   ws.getRow(R_HEADER).getCell(COL_NO).value = "NO";
   ws.mergeCells(R_HEADER, COL_NO, R_HARI, COL_NO);
-  
+
   ws.getRow(R_HEADER).getCell(COL_NIK).value = "NIK";
   ws.mergeCells(R_HEADER, COL_NIK, R_HARI, COL_NIK);
-  
+
   ws.getRow(R_HEADER).getCell(COL_NAMA).value = "NAMA";
   ws.mergeCells(R_HEADER, COL_NAMA, R_HARI, COL_NAMA);
 
   // Month header (merged across SHIFT column to last date column)
   const tableMonthHeader = isSameMonth
     ? `${monthNames[startDate.getMonth()]} ${startDate.getFullYear()}`
-    : `${monthNames[startDate.getMonth()]} ${startDate.getFullYear()} - ${monthNames[endDate.getMonth()]} ${endDate.getFullYear()}`;
+    : `${monthNames[startDate.getMonth()]} ${startDate.getFullYear()} - ${
+        monthNames[endDate.getMonth()]
+      } ${endDate.getFullYear()}`;
 
   ws.getRow(R_HEADER).getCell(COL_SHIFT).value = tableMonthHeader;
   ws.mergeCells(R_HEADER, COL_SHIFT, R_HEADER, TOTAL_COLS);
@@ -124,8 +151,8 @@ async function generateExcelFile({ currentProject, days, employees = [], type = 
   for (let i = 0; i < numEmployees; i++) {
     const r = R_DATA_START + i;
     const emp = employees[i];
-    
-    ws.getRow(r).getCell(COL_NO).value = emp.no || (i + 1);
+
+    ws.getRow(r).getCell(COL_NO).value = emp.no || i + 1;
     ws.getRow(r).getCell(COL_NIK).value = emp.nik || "";
     ws.getRow(r).getCell(COL_NAMA).value = emp.nama || "";
 
@@ -133,12 +160,12 @@ async function generateExcelFile({ currentProject, days, employees = [], type = 
     const shifts = emp.shifts || [];
     for (let j = 0; j < NUM_DAYS; j++) {
       const cell = ws.getRow(r).getCell(COL_DATES_START + j);
-      if (type === 'template') {
+      if (type === "template") {
         cell.value = ""; // Empty for template
       } else {
         // For export: use shift code or dash
         const shiftValue = shifts[j];
-        cell.value = (shiftValue && shiftValue !== '-') ? shiftValue : "";
+        cell.value = shiftValue && shiftValue !== "-" ? shiftValue : "";
       }
     }
   }
@@ -151,15 +178,16 @@ async function generateExcelFile({ currentProject, days, employees = [], type = 
   ws.getRow(legendStartRow + 2).getCell(COL_NIK).value = "JAM KERJA";
 
   // Add shift codes from project
-  const shiftCodes = currentProject.shiftCodes || 
-                     (currentProject.shifts || []).map(s => ({
-                       code: s.kode,
-                       jam: `${s.waktu_mulai} - ${s.waktu_selesai}`
-                     })) ||
-                     (currentProject.shiftProjects || []).map(s => ({
-                       code: s.kode,
-                       jam: `${s.waktu_mulai} - ${s.waktu_selesai}`
-                     }));
+  const shiftCodes =
+    currentProject.shiftCodes ||
+    (currentProject.shifts || []).map((s) => ({
+      code: s.kode,
+      jam: `${s.waktu_mulai} - ${s.waktu_selesai}`,
+    })) ||
+    (currentProject.shiftProjects || []).map((s) => ({
+      code: s.kode,
+      jam: `${s.waktu_mulai} - ${s.waktu_selesai}`,
+    }));
 
   shiftCodes.forEach((s, idx) => {
     const r = legendStartRow + 3 + idx;
@@ -177,12 +205,12 @@ async function generateExcelFile({ currentProject, days, employees = [], type = 
     top: { style: "thin" },
     left: { style: "thin" },
     bottom: { style: "thin" },
-    right: { style: "thin" }
+    right: { style: "thin" },
   };
 
   // Style header columns (NO, NIK, NAMA)
   for (let r = R_HEADER; r <= R_HARI; r++) {
-    [COL_NO, COL_NIK, COL_NAMA].forEach(c => {
+    [COL_NO, COL_NIK, COL_NAMA].forEach((c) => {
       const cell = ws.getRow(r).getCell(c);
       cell.font = { bold: true };
       cell.alignment = { vertical: "middle", horizontal: "center" };
@@ -214,21 +242,21 @@ async function generateExcelFile({ currentProject, days, employees = [], type = 
   // Style SHIFT label (rotated, gray background)
   const shiftCell = ws.getRow(R_DATA_START).getCell(COL_SHIFT);
   shiftCell.font = { bold: true };
-  shiftCell.alignment = { 
-    vertical: "middle", 
-    horizontal: "center", 
-    textRotation: 90 
+  shiftCell.alignment = {
+    vertical: "middle",
+    horizontal: "center",
+    textRotation: 90,
   };
-  shiftCell.fill = { 
-    type: "pattern", 
-    pattern: "solid", 
-    fgColor: { argb: "FFF3F4F6" } 
+  shiftCell.fill = {
+    type: "pattern",
+    pattern: "solid",
+    fgColor: { argb: "FFF3F4F6" },
   };
 
   // Style employee data rows
   for (let r = R_DATA_START; r <= lastEmployeeRow; r++) {
     ws.getRow(r).height = 20;
-    
+
     // NO column (center)
     const noCell = ws.getRow(r).getCell(COL_NO);
     noCell.alignment = { vertical: "middle", horizontal: "center" };
@@ -246,10 +274,10 @@ async function generateExcelFile({ currentProject, days, employees = [], type = 
 
     // SHIFT column (gray background)
     const shiftDataCell = ws.getRow(r).getCell(COL_SHIFT);
-    shiftDataCell.fill = { 
-      type: "pattern", 
-      pattern: "solid", 
-      fgColor: { argb: "FFF3F4F6" } 
+    shiftDataCell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: { argb: "FFF3F4F6" },
     };
     shiftDataCell.border = thinBorder;
 
@@ -262,10 +290,10 @@ async function generateExcelFile({ currentProject, days, employees = [], type = 
   }
 
   // Weekend highlighting (light red background)
-  const weekendFill = { 
-    type: "pattern", 
-    pattern: "solid", 
-    fgColor: { argb: "FFFFE5E5" } 
+  const weekendFill = {
+    type: "pattern",
+    pattern: "solid",
+    fgColor: { argb: "FFFFE5E5" },
   };
 
   for (let i = 0; i < NUM_DAYS; i++) {
@@ -285,7 +313,7 @@ async function generateExcelFile({ currentProject, days, employees = [], type = 
   legendHeaderCell.alignment = { vertical: "middle", horizontal: "center" };
 
   const legendColHeaderRow = legendStartRow + 2;
-  [COL_NO, COL_NIK].forEach(c => {
+  [COL_NO, COL_NIK].forEach((c) => {
     const cell = ws.getRow(legendColHeaderRow).getCell(c);
     cell.font = { bold: true };
     cell.alignment = { vertical: "middle", horizontal: "center" };
@@ -296,7 +324,7 @@ async function generateExcelFile({ currentProject, days, employees = [], type = 
   const totalLegendRows = shiftCodes.length + 1; // +1 for Libur
   for (let i = 0; i < totalLegendRows; i++) {
     const r = legendStartRow + 3 + i;
-    [COL_NO, COL_NIK].forEach(c => {
+    [COL_NO, COL_NIK].forEach((c) => {
       const cell = ws.getRow(r).getCell(c);
       cell.alignment = { vertical: "middle", horizontal: "center" };
       cell.border = thinBorder;
@@ -309,17 +337,19 @@ async function generateExcelFile({ currentProject, days, employees = [], type = 
 /**
  * Generate Excel Template (empty shifts)
  */
-export async function generateExcelTemplate({ 
-  currentProject, 
-  templatePeriodOptions, 
-  dummyEmployees, 
-  templateDate 
+export async function generateExcelTemplate({
+  currentProject,
+  templatePeriodOptions,
+  dummyEmployees,
+  templateDate,
 }) {
   if (!currentProject || !templateDate) {
     throw new Error("currentProject dan templateDate diperlukan");
   }
 
-  const selectedPeriod = (templatePeriodOptions || []).find(p => p.value === templateDate);
+  const selectedPeriod = (templatePeriodOptions || []).find(
+    (p) => p.value === templateDate
+  );
   if (!selectedPeriod) {
     throw new Error("Periode template tidak ditemukan");
   }
@@ -327,7 +357,7 @@ export async function generateExcelTemplate({
   // Build days array
   const startDate = new Date(selectedPeriod.startDate);
   const endDate = new Date(selectedPeriod.endDate);
-  const dayNames = ['Mgg', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+  const dayNames = ["Mgg", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
 
   const days = [];
   let cur = new Date(startDate);
@@ -336,37 +366,49 @@ export async function generateExcelTemplate({
       date: cur.getDate(),
       dayName: dayNames[cur.getDay()],
       isWeekend: cur.getDay() === 0 || cur.getDay() === 6,
-      fullDate: new Date(cur).toISOString().split('T')[0]
+      fullDate: new Date(cur).toISOString().split("T")[0],
     });
     cur.setDate(cur.getDate() + 1);
   }
 
   // Prepare employees with empty shifts
-  const employees = (dummyEmployees || []).map(emp => ({
+  const employees = (dummyEmployees || []).map((emp) => ({
     no: emp.no,
     nik: emp.nik,
     nama: emp.nama,
-    shifts: [] // Empty for template
+    shifts: [], // Empty for template
   }));
 
-  const wb = await generateExcelFile({ 
-    currentProject, 
-    days, 
-    employees, 
-    type: 'template' 
+  const wb = await generateExcelFile({
+    currentProject,
+    days,
+    employees,
+    type: "template",
   });
 
   // Generate filename
   const monthNames = [
-    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
   ];
-  const filename = `Template_Jadwal_${currentProject.nama}_${monthNames[startDate.getMonth()]}_${startDate.getFullYear()}.xlsx`;
+  const filename = `Template_Jadwal_${currentProject.nama}_${
+    monthNames[startDate.getMonth()]
+  }_${startDate.getFullYear()}.xlsx`;
 
   // Download file
   const buffer = await wb.xlsx.writeBuffer();
-  const blob = new Blob([buffer], { 
-    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" 
+  const blob = new Blob([buffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -383,17 +425,19 @@ export async function generateExcelTemplate({
 /**
  * Export Schedule to Excel (filled shifts)
  */
-export default async function exportScheduleToExcel({ 
-  currentProject, 
+export default async function exportScheduleToExcel({
+  currentProject,
   exportPeriodOptions,
   exportDate,
-  employees = []
+  employees = [],
 }) {
   if (!currentProject || !exportDate) {
     throw new Error("currentProject dan exportDate diperlukan");
   }
 
-  const selectedPeriod = (exportPeriodOptions || []).find(p => p.value === exportDate);
+  const selectedPeriod = (exportPeriodOptions || []).find(
+    (p) => p.value === exportDate
+  );
   if (!selectedPeriod) {
     throw new Error("Periode export tidak ditemukan");
   }
@@ -401,7 +445,7 @@ export default async function exportScheduleToExcel({
   // Build days array
   const startDate = new Date(selectedPeriod.startDate);
   const endDate = new Date(selectedPeriod.endDate);
-  const dayNames = ['Mgg', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+  const dayNames = ["Mgg", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
 
   const days = [];
   let cur = new Date(startDate);
@@ -410,37 +454,49 @@ export default async function exportScheduleToExcel({
       date: cur.getDate(),
       dayName: dayNames[cur.getDay()],
       isWeekend: cur.getDay() === 0 || cur.getDay() === 6,
-      fullDate: new Date(cur).toISOString().split('T')[0]
+      fullDate: new Date(cur).toISOString().split("T")[0],
     });
     cur.setDate(cur.getDate() + 1);
   }
 
   // Normalize employees data
   const normalizedEmployees = (employees || []).map((emp, idx) => ({
-    no: emp.no || (idx + 1),
+    no: emp.no || idx + 1,
     nik: emp.nik || "",
     nama: emp.nama || "",
-    shifts: emp.shifts || []
+    shifts: emp.shifts || [],
   }));
 
-  const wb = await generateExcelFile({ 
-    currentProject, 
-    days, 
-    employees: normalizedEmployees, 
-    type: 'export' 
+  const wb = await generateExcelFile({
+    currentProject,
+    days,
+    employees: normalizedEmployees,
+    type: "export",
   });
 
   // Generate filename
   const monthNames = [
-    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
   ];
-  const filename = `Jadwal_${currentProject.nama}_${monthNames[startDate.getMonth()]}_${startDate.getFullYear()}.xlsx`;
+  const filename = `Jadwal_${currentProject.nama}_${
+    monthNames[startDate.getMonth()]
+  }_${startDate.getFullYear()}.xlsx`;
 
   // Download file
   const buffer = await wb.xlsx.writeBuffer();
-  const blob = new Blob([buffer], { 
-    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" 
+  const blob = new Blob([buffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
   });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");

@@ -2,8 +2,12 @@
 "use client";
 import React, { useState } from "react";
 import { Eye, EyeOff, LogIn, AlertCircle } from "lucide-react";
-import { useAuth } from '@/context/AuthContext';
-import { loginValidator, validateForm, getFieldError } from '@/utils/validation';
+import { useAuth } from "@/context/AuthContext";
+import {
+  loginValidator,
+  validateForm,
+  getFieldError,
+} from "@/utils/validation";
 
 export default function LoginPage() {
   const { login, loading } = useAuth();
@@ -14,11 +18,11 @@ export default function LoginPage() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setForm(prev => ({ ...prev, [name]: value }));
-    
+    setForm((prev) => ({ ...prev, [name]: value }));
+
     // Clear errors when user starts typing
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: null }));
+      setErrors((prev) => ({ ...prev, [name]: null }));
     }
     if (apiError) {
       setApiError("");
@@ -41,12 +45,12 @@ export default function LoginPage() {
       // Login successful, AuthContext will handle the state update
       // and the main app will re-render showing the dashboard
     } catch (error) {
-      console.error('Login error:', error);
-      
-      if (error.type === 'validation_error' && error.errors) {
+      console.error("Login error:", error);
+
+      if (error.type === "validation_error" && error.errors) {
         setErrors(error.errors);
       } else {
-        setApiError(error.message || 'Login gagal. Silakan coba lagi.');
+        setApiError(error.message || "Login gagal. Silakan coba lagi.");
       }
     }
   };
@@ -59,9 +63,9 @@ export default function LoginPage() {
           {/* Logo */}
           <div className="flex flex-col items-center mb-8">
             <div className="w-20 h-20 rounded-2xl bg-white shadow-lg flex items-center justify-center mb-4 overflow-hidden border border-gray-100">
-              <img 
-                src="/logo.png" 
-                alt="PT Qiprah Multi Service" 
+              <img
+                src="/logo.png"
+                alt="PT Qiprah Multi Service"
                 className="w-16 h-16 object-contain"
               />
             </div>
@@ -98,14 +102,14 @@ export default function LoginPage() {
                 placeholder="Masukkan username"
                 disabled={loading}
                 className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 disabled:opacity-50 disabled:cursor-not-allowed ${
-                  getFieldError(errors, 'username') 
-                    ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
-                    : 'border-gray-200'
+                  getFieldError(errors, "username")
+                    ? "border-red-300 focus:ring-red-500 focus:border-red-500"
+                    : "border-gray-200"
                 }`}
               />
-              {getFieldError(errors, 'username') && (
+              {getFieldError(errors, "username") && (
                 <p className="mt-1 text-sm text-red-600">
-                  {getFieldError(errors, 'username')}
+                  {getFieldError(errors, "username")}
                 </p>
               )}
             </div>
@@ -125,9 +129,9 @@ export default function LoginPage() {
                   placeholder="Masukkan password"
                   disabled={loading}
                   className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 pr-10 disabled:opacity-50 disabled:cursor-not-allowed ${
-                    getFieldError(errors, 'password') 
-                      ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
-                      : 'border-gray-200'
+                    getFieldError(errors, "password")
+                      ? "border-red-300 focus:ring-red-500 focus:border-red-500"
+                      : "border-gray-200"
                   }`}
                 />
                 <button
@@ -139,9 +143,9 @@ export default function LoginPage() {
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
-              {getFieldError(errors, 'password') && (
+              {getFieldError(errors, "password") && (
                 <p className="mt-1 text-sm text-red-600">
-                  {getFieldError(errors, 'password')}
+                  {getFieldError(errors, "password")}
                 </p>
               )}
             </div>
@@ -169,7 +173,8 @@ export default function LoginPage() {
 
         {/* Footer */}
         <p className="text-center text-sm text-gray-500 mt-6">
-          © {new Date().getFullYear()} PT Qiprah Multi Service. All rights reserved.
+          © {new Date().getFullYear()} PT Qiprah Multi Service. All rights
+          reserved.
         </p>
       </div>
     </div>

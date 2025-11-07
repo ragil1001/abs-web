@@ -1,19 +1,19 @@
 // src/components/NotificationDropdown.js
 "use client";
-import React, { useState, useRef, useEffect } from 'react';
-import { 
-  Bell, 
-  X, 
-  Check, 
-  CheckCheck, 
+import React, { useState, useRef, useEffect } from "react";
+import {
+  Bell,
+  X,
+  Check,
+  CheckCheck,
   Trash2,
   Calendar,
   Clock,
   AlertCircle,
   List,
-  ArrowRightLeft
-} from 'lucide-react';
-import { useNotifications } from '@/hooks/useNotifications';
+  ArrowRightLeft,
+} from "lucide-react";
+import { useNotifications } from "@/hooks/useNotifications";
 
 const NotificationDropdown = () => {
   const {
@@ -23,7 +23,7 @@ const NotificationDropdown = () => {
     markAsRead,
     markAllAsRead,
     deleteNotification,
-    fetchNotifications
+    fetchNotifications,
   } = useNotifications();
 
   const [isOpen, setIsOpen] = useState(false);
@@ -39,8 +39,8 @@ const NotificationDropdown = () => {
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const handleShowAllNotifications = async () => {
@@ -50,13 +50,13 @@ const NotificationDropdown = () => {
 
   const getNotificationIcon = (type) => {
     switch (type) {
-      case 'izin_pending':
-      case 'izin_approved':
-      case 'izin_rejected':
+      case "izin_pending":
+      case "izin_approved":
+      case "izin_rejected":
         return <Calendar className="w-5 h-5 text-blue-500" />;
-      case 'tukar_shift_pending':
-      case 'tukar_shift_approved':
-      case 'tukar_shift_rejected':
+      case "tukar_shift_pending":
+      case "tukar_shift_approved":
+      case "tukar_shift_rejected":
         return <ArrowRightLeft className="w-5 h-5 text-purple-500" />;
       default:
         return <AlertCircle className="w-5 h-5 text-blue-500" />;
@@ -64,22 +64,25 @@ const NotificationDropdown = () => {
   };
 
   const formatTimeAgo = (dateString) => {
-    if (!dateString) return '';
-    
+    if (!dateString) return "";
+
     const date = new Date(dateString);
     const now = new Date();
     const diffInSeconds = Math.floor((now - date) / 1000);
 
-    if (diffInSeconds < 60) return 'Baru saja';
-    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} menit lalu`;
-    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} jam lalu`;
-    if (diffInSeconds < 2592000) return `${Math.floor(diffInSeconds / 86400)} hari lalu`;
-    return date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' });
+    if (diffInSeconds < 60) return "Baru saja";
+    if (diffInSeconds < 3600)
+      return `${Math.floor(diffInSeconds / 60)} menit lalu`;
+    if (diffInSeconds < 86400)
+      return `${Math.floor(diffInSeconds / 3600)} jam lalu`;
+    if (diffInSeconds < 2592000)
+      return `${Math.floor(diffInSeconds / 86400)} hari lalu`;
+    return date.toLocaleDateString("id-ID", { day: "numeric", month: "short" });
   };
 
   const handleNotificationClick = async (notification) => {
-    console.log('🔔 Notification clicked:', notification);
-    
+    console.log("🔔 Notification clicked:", notification);
+
     // Mark as read
     if (!notification.is_read) {
       await markAsRead(notification.id);
@@ -91,40 +94,40 @@ const NotificationDropdown = () => {
 
     // Extract data from notification
     const notifData = notification.data || {};
-    console.log('📦 Notification data:', notifData);
+    console.log("📦 Notification data:", notifData);
 
     // Handle different notification types
     const notifType = notification.type;
 
     // Handle IZIN notifications
-    if (notifType.startsWith('izin_')) {
+    if (notifType.startsWith("izin_")) {
       const pengajuanIzinId = notifData.pengajuan_izin_id;
       const projectId = notifData.project_id;
       const karyawanId = notifData.karyawan_id;
       const karyawanNama = notifData.karyawan_nama;
       const karyawanNik = notifData.karyawan_nik;
       const kategoriIzin = notifData.kategori_izin;
-      
-      // Determine status filter
-      let statusFilter = 'all';
-      if (notifType === 'izin_pending') statusFilter = 'pending';
-      else if (notifType === 'izin_approved') statusFilter = 'disetujui';
-      else if (notifType === 'izin_rejected') statusFilter = 'ditolak';
 
-      console.log('🎯 Navigating to Pengajuan Izin with:', {
+      // Determine status filter
+      let statusFilter = "all";
+      if (notifType === "izin_pending") statusFilter = "pending";
+      else if (notifType === "izin_approved") statusFilter = "disetujui";
+      else if (notifType === "izin_rejected") statusFilter = "ditolak";
+
+      console.log("🎯 Navigating to Pengajuan Izin with:", {
         pengajuanIzinId,
         projectId,
         status: statusFilter,
         kategoriIzin,
         karyawanNama,
-        karyawanNik
+        karyawanNik,
       });
 
       // Dispatch navigation event
-      const navigationEvent = new CustomEvent('navigateToDetail', {
+      const navigationEvent = new CustomEvent("navigateToDetail", {
         detail: {
-          page: 'pengajuan-izin',
-          detailType: 'izin',
+          page: "pengajuan-izin",
+          detailType: "izin",
           detailId: pengajuanIzinId,
           filters: {
             pengajuanIzinId,
@@ -134,47 +137,53 @@ const NotificationDropdown = () => {
             karyawanNik,
             kategoriIzin,
             status: statusFilter,
-            openDetail: true
-          }
-        }
+            openDetail: true,
+          },
+        },
       });
-      
-      console.log('🚀 Dispatching navigateToDetail event:', navigationEvent.detail);
+
+      console.log(
+        "🚀 Dispatching navigateToDetail event:",
+        navigationEvent.detail
+      );
       window.dispatchEvent(navigationEvent);
     }
     // Handle TUKAR SHIFT notifications
-    else if (notifType.startsWith('tukar_shift_')) {
+    else if (notifType.startsWith("tukar_shift_")) {
       const tukarShiftId = notifData.tukar_shift_id;
       const projectId = notifData.project_id;
-      
-      // Determine status filter
-      let statusFilter = 'all';
-      if (notifType === 'tukar_shift_pending') statusFilter = 'pending';
-      else if (notifType === 'tukar_shift_approved') statusFilter = 'disetujui';
-      else if (notifType === 'tukar_shift_rejected') statusFilter = 'ditolak';
 
-      console.log('🎯 Navigating to Tukar Shift with:', {
+      // Determine status filter
+      let statusFilter = "all";
+      if (notifType === "tukar_shift_pending") statusFilter = "pending";
+      else if (notifType === "tukar_shift_approved") statusFilter = "disetujui";
+      else if (notifType === "tukar_shift_rejected") statusFilter = "ditolak";
+
+      console.log("🎯 Navigating to Tukar Shift with:", {
         tukarShiftId,
         projectId,
-        status: statusFilter
+        status: statusFilter,
       });
 
       // Dispatch navigation event
-      const navigationEvent = new CustomEvent('navigateToDetail', {
+      const navigationEvent = new CustomEvent("navigateToDetail", {
         detail: {
-          page: 'tukar-shift',
-          detailType: 'tukar-shift',
+          page: "tukar-shift",
+          detailType: "tukar-shift",
           detailId: tukarShiftId,
           filters: {
             tukarShiftId,
             projectId,
             status: statusFilter,
-            openDetail: true
-          }
-        }
+            openDetail: true,
+          },
+        },
       });
-      
-      console.log('🚀 Dispatching navigateToDetail event:', navigationEvent.detail);
+
+      console.log(
+        "🚀 Dispatching navigateToDetail event:",
+        navigationEvent.detail
+      );
       window.dispatchEvent(navigationEvent);
     }
     // Fallback to click_action URL
@@ -188,8 +197,8 @@ const NotificationDropdown = () => {
     await deleteNotification(notificationId);
   };
 
-  const displayedNotifications = showAllNotifications 
-    ? notifications 
+  const displayedNotifications = showAllNotifications
+    ? notifications
     : notifications.slice(0, 5);
 
   return (
@@ -202,7 +211,7 @@ const NotificationDropdown = () => {
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center animate-pulse">
-            {unreadCount > 9 ? '9+' : unreadCount}
+            {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
       </button>
@@ -213,9 +222,13 @@ const NotificationDropdown = () => {
           {/* Header */}
           <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-10 rounded-t-xl">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Notifikasi</h3>
+              <h3 className="text-lg font-semibold text-gray-900">
+                Notifikasi
+              </h3>
               {unreadCount > 0 && (
-                <p className="text-xs text-gray-500">{unreadCount} belum dibaca</p>
+                <p className="text-xs text-gray-500">
+                  {unreadCount} belum dibaca
+                </p>
               )}
             </div>
             {unreadCount > 0 && (
@@ -231,10 +244,10 @@ const NotificationDropdown = () => {
           </div>
 
           {/* Notification List */}
-          <div 
+          <div
             className="overflow-y-auto"
-            style={{ 
-              maxHeight: showAllNotifications ? '50vh' : '384px'
+            style={{
+              maxHeight: showAllNotifications ? "50vh" : "384px",
             }}
           >
             {loading && notifications.length === 0 ? (
@@ -253,36 +266,40 @@ const NotificationDropdown = () => {
                   key={notification.id}
                   onClick={() => handleNotificationClick(notification)}
                   className={`px-4 py-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
-                    !notification.is_read ? 'bg-orange-50' : ''
+                    !notification.is_read ? "bg-orange-50" : ""
                   }`}
                 >
                   <div className="flex items-start gap-3">
                     <div className="flex-shrink-0 mt-1">
                       {getNotificationIcon(notification.type)}
                     </div>
-                    
+
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2 mb-1">
-                        <h4 className={`text-sm font-medium ${
-                          !notification.is_read ? 'text-gray-900' : 'text-gray-700'
-                        }`}>
+                        <h4
+                          className={`text-sm font-medium ${
+                            !notification.is_read
+                              ? "text-gray-900"
+                              : "text-gray-700"
+                          }`}
+                        >
                           {notification.title}
                         </h4>
                         {!notification.is_read && (
                           <span className="w-2 h-2 bg-orange-500 rounded-full flex-shrink-0 mt-1"></span>
                         )}
                       </div>
-                      
+
                       <p className="text-xs text-gray-600 mb-2 line-clamp-2">
                         {notification.body}
                       </p>
-                      
+
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1 text-xs text-gray-500">
                           <Clock className="w-3 h-3" />
                           {formatTimeAgo(notification.created_at)}
                         </div>
-                        
+
                         <button
                           onClick={(e) => handleDelete(e, notification.id)}
                           className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
@@ -302,7 +319,7 @@ const NotificationDropdown = () => {
           {notifications.length > 0 && (
             <div className="px-4 py-3 border-t border-gray-100 bg-gray-50 rounded-b-xl sticky bottom-0">
               {!showAllNotifications && notifications.length > 5 ? (
-                <button 
+                <button
                   onClick={handleShowAllNotifications}
                   className="w-full text-sm text-orange-600 hover:text-orange-700 font-medium flex items-center justify-center gap-2"
                 >
@@ -312,7 +329,8 @@ const NotificationDropdown = () => {
               ) : showAllNotifications ? (
                 <div className="text-center">
                   <p className="text-xs text-gray-500 mb-2">
-                    Menampilkan {displayedNotifications.length} dari {notifications.length} notifikasi
+                    Menampilkan {displayedNotifications.length} dari{" "}
+                    {notifications.length} notifikasi
                   </p>
                   <button
                     onClick={() => setShowAllNotifications(false)}

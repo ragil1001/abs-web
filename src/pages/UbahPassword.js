@@ -1,10 +1,17 @@
 // src/pages/UbahPassword.js
 "use client";
-import React, { useState } from 'react';
-import { KeyRound, Eye, EyeOff, Save, AlertCircle, CheckCircle } from 'lucide-react';
-import { useAuth } from '@/context/AuthContext';
-import { toast } from 'react-toastify';
-import api from '@/lib/axios';
+import React, { useState } from "react";
+import {
+  KeyRound,
+  Eye,
+  EyeOff,
+  Save,
+  AlertCircle,
+  CheckCircle,
+} from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { toast } from "react-toastify";
+import api from "@/lib/axios";
 
 const UbahPassword = () => {
   const { user } = useAuth();
@@ -12,89 +19,94 @@ const UbahPassword = () => {
   const [showPasswords, setShowPasswords] = useState({
     current: false,
     new: false,
-    confirm: false
+    confirm: false,
   });
-  
+
   const [formData, setFormData] = useState({
-    current_password: '',
-    new_password: '',
-    new_password_confirmation: ''
+    current_password: "",
+    new_password: "",
+    new_password_confirmation: "",
   });
-  
+
   const [errors, setErrors] = useState({});
 
   const togglePasswordVisibility = (field) => {
-    setShowPasswords(prev => ({ ...prev, [field]: !prev[field] }));
+    setShowPasswords((prev) => ({ ...prev, [field]: !prev[field] }));
   };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    
+    setFormData((prev) => ({ ...prev, [name]: value }));
+
     // Clear error when typing
     if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: null }));
+      setErrors((prev) => ({ ...prev, [name]: null }));
     }
   };
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.current_password) {
-      newErrors.current_password = 'Password lama wajib diisi';
+      newErrors.current_password = "Password lama wajib diisi";
     }
-    
+
     if (!formData.new_password) {
-      newErrors.new_password = 'Password baru wajib diisi';
+      newErrors.new_password = "Password baru wajib diisi";
     } else if (formData.new_password.length < 6) {
-      newErrors.new_password = 'Password baru minimal 6 karakter';
+      newErrors.new_password = "Password baru minimal 6 karakter";
     }
-    
+
     if (!formData.new_password_confirmation) {
-      newErrors.new_password_confirmation = 'Konfirmasi password wajib diisi';
+      newErrors.new_password_confirmation = "Konfirmasi password wajib diisi";
     } else if (formData.new_password !== formData.new_password_confirmation) {
-      newErrors.new_password_confirmation = 'Password tidak cocok';
+      newErrors.new_password_confirmation = "Password tidak cocok";
     }
-    
-    if (formData.current_password && formData.new_password && 
-        formData.current_password === formData.new_password) {
-      newErrors.new_password = 'Password baru harus berbeda dengan password lama';
+
+    if (
+      formData.current_password &&
+      formData.new_password &&
+      formData.current_password === formData.new_password
+    ) {
+      newErrors.new_password =
+        "Password baru harus berbeda dengan password lama";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
-    
+
     setLoading(true);
-    
+
     try {
-      const response = await api.post('/admin/change-password', formData);
-      
+      const response = await api.post("/admin/change-password", formData);
+
       if (response.data.success) {
-        toast.success('Password berhasil diubah!', { autoClose: 3000 });
-        
+        toast.success("Password berhasil diubah!", { autoClose: 3000 });
+
         // Reset form
         setFormData({
-          current_password: '',
-          new_password: '',
-          new_password_confirmation: ''
+          current_password: "",
+          new_password: "",
+          new_password_confirmation: "",
         });
       }
     } catch (error) {
-      console.error('Change password error:', error);
-      
+      console.error("Change password error:", error);
+
       if (error.response?.data?.errors) {
         setErrors(error.response.data.errors);
       }
-      
-      const message = error.response?.data?.message || 'Gagal mengubah password';
+
+      const message =
+        error.response?.data?.message || "Gagal mengubah password";
       toast.error(message, { autoClose: 5000 });
     } finally {
       setLoading(false);
@@ -125,7 +137,9 @@ const UbahPassword = () => {
             </span>
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-900">Username saat ini</p>
+            <p className="text-sm font-medium text-gray-900">
+              Username saat ini
+            </p>
             <p className="text-sm text-gray-600">{user?.username}</p>
           </div>
         </div>
@@ -148,16 +162,20 @@ const UbahPassword = () => {
                 placeholder="Masukkan password lama"
                 disabled={loading}
                 className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 pr-10 disabled:opacity-50 disabled:cursor-not-allowed ${
-                  errors.current_password ? 'border-red-300' : 'border-gray-200'
+                  errors.current_password ? "border-red-300" : "border-gray-200"
                 }`}
               />
               <button
                 type="button"
-                onClick={() => togglePasswordVisibility('current')}
+                onClick={() => togglePasswordVisibility("current")}
                 disabled={loading}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
-                {showPasswords.current ? <EyeOff size={18} /> : <Eye size={18} />}
+                {showPasswords.current ? (
+                  <EyeOff size={18} />
+                ) : (
+                  <Eye size={18} />
+                )}
               </button>
             </div>
             {errors.current_password && (
@@ -182,12 +200,12 @@ const UbahPassword = () => {
                 placeholder="Masukkan password baru"
                 disabled={loading}
                 className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 pr-10 disabled:opacity-50 disabled:cursor-not-allowed ${
-                  errors.new_password ? 'border-red-300' : 'border-gray-200'
+                  errors.new_password ? "border-red-300" : "border-gray-200"
                 }`}
               />
               <button
                 type="button"
-                onClick={() => togglePasswordVisibility('new')}
+                onClick={() => togglePasswordVisibility("new")}
                 disabled={loading}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
@@ -217,16 +235,22 @@ const UbahPassword = () => {
                 placeholder="Masukkan ulang password baru"
                 disabled={loading}
                 className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 pr-10 disabled:opacity-50 disabled:cursor-not-allowed ${
-                  errors.new_password_confirmation ? 'border-red-300' : 'border-gray-200'
+                  errors.new_password_confirmation
+                    ? "border-red-300"
+                    : "border-gray-200"
                 }`}
               />
               <button
                 type="button"
-                onClick={() => togglePasswordVisibility('confirm')}
+                onClick={() => togglePasswordVisibility("confirm")}
                 disabled={loading}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
-                {showPasswords.confirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                {showPasswords.confirm ? (
+                  <EyeOff size={18} />
+                ) : (
+                  <Eye size={18} />
+                )}
               </button>
             </div>
             {errors.new_password_confirmation && (

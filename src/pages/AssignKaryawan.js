@@ -11,11 +11,11 @@ const AssignKaryawan = () => {
   useEffect(() => {
     const savedView = localStorage.getItem("assignView");
     const savedProject = localStorage.getItem("assignSelectedProject");
-    
+
     if (savedView) {
       setCurrentView(savedView);
     }
-    
+
     if (savedProject) {
       try {
         setSelectedProject(JSON.parse(savedProject));
@@ -29,7 +29,10 @@ const AssignKaryawan = () => {
   useEffect(() => {
     localStorage.setItem("assignView", currentView);
     if (selectedProject) {
-      localStorage.setItem("assignSelectedProject", JSON.stringify(selectedProject));
+      localStorage.setItem(
+        "assignSelectedProject",
+        JSON.stringify(selectedProject)
+      );
     } else {
       localStorage.removeItem("assignSelectedProject");
     }
@@ -47,19 +50,14 @@ const AssignKaryawan = () => {
 
   if (currentView === "detail" && selectedProject) {
     return (
-      
-      <AssignKaryawanDetail 
-        project={selectedProject} 
-        onBack={handleBackToList} 
+      <AssignKaryawanDetail
+        project={selectedProject}
+        onBack={handleBackToList}
       />
     );
   }
 
-  return (
-    <AssignPage 
-      onNavigateToDetail={handleNavigateToDetail} 
-    />
-  );
+  return <AssignPage onNavigateToDetail={handleNavigateToDetail} />;
 };
 
 export default AssignKaryawan;

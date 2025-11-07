@@ -1,6 +1,6 @@
 // src/hooks/useApi.js
 "use client";
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect } from "react";
 
 // Custom hook for API calls with loading, error handling
 export const useApi = () => {
@@ -36,7 +36,7 @@ export const useApi = () => {
       return result;
     } catch (err) {
       // Don't set error if request was aborted
-      if (err.name !== 'AbortError') {
+      if (err.name !== "AbortError") {
         setError(err);
         throw err;
       }
@@ -54,61 +54,76 @@ export const useApi = () => {
     loading,
     error,
     call,
-    clearError
+    clearError,
   };
 };
 
 // Hook for paginated data
-export const usePaginatedApi = (apiFunction, initialPage = 1, initialLimit = 10) => {
+export const usePaginatedApi = (
+  apiFunction,
+  initialPage = 1,
+  initialLimit = 10
+) => {
   const [data, setData] = useState([]);
   const [pagination, setPagination] = useState({
     current_page: initialPage,
     per_page: initialLimit,
     total: 0,
-    last_page: 1
+    last_page: 1,
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchData = useCallback(async (page = 1, limit = initialLimit, filters = {}) => {
-    setLoading(true);
-    setError(null);
+  const fetchData = useCallback(
+    async (page = 1, limit = initialLimit, filters = {}) => {
+      setLoading(true);
+      setError(null);
 
-    try {
-      const response = await apiFunction({
-        page,
-        per_page: limit,
-        ...filters
-      });
-
-      if (response.success) {
-        setData(response.data.data || response.data);
-        setPagination(response.data.pagination || {
-          current_page: page,
+      try {
+        const response = await apiFunction({
+          page,
           per_page: limit,
-          total: response.data.length || 0,
-          last_page: Math.ceil((response.data.length || 0) / limit)
+          ...filters,
         });
+
+        if (response.success) {
+          setData(response.data.data || response.data);
+          setPagination(
+            response.data.pagination || {
+              current_page: page,
+              per_page: limit,
+              total: response.data.length || 0,
+              last_page: Math.ceil((response.data.length || 0) / limit),
+            }
+          );
+        }
+      } catch (err) {
+        setError(err);
+        setData([]);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError(err);
-      setData([]);
-    } finally {
-      setLoading(false);
-    }
-  }, [apiFunction, initialLimit]);
+    },
+    [apiFunction, initialLimit]
+  );
 
   const refresh = useCallback(() => {
     fetchData(pagination.current_page, pagination.per_page);
   }, [fetchData, pagination.current_page, pagination.per_page]);
 
-  const goToPage = useCallback((page) => {
-    fetchData(page, pagination.per_page);
-  }, [fetchData, pagination.per_page]);
+  const goToPage = useCallback(
+    (page) => {
+      fetchData(page, pagination.per_page);
+    },
+    [fetchData, pagination.per_page]
+  );
 
-  const changeLimit = useCallback((limit) => {
-    fetchData(1, limit);
-  }, [fetchData]);
+  const changeLimit = useCallback(
+    (limit) => {
+      fetchData(1, limit);
+    },
+    [fetchData]
+  );
 
   return {
     data,
@@ -118,7 +133,7 @@ export const usePaginatedApi = (apiFunction, initialPage = 1, initialLimit = 10)
     fetchData,
     refresh,
     goToPage,
-    changeLimit
+    changeLimit,
   };
 };
 
@@ -128,22 +143,25 @@ export const useFormApi = (submitFunction) => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
-  const submit = useCallback(async (formData) => {
-    setLoading(true);
-    setError(null);
-    setSuccess(false);
+  const submit = useCallback(
+    async (formData) => {
+      setLoading(true);
+      setError(null);
+      setSuccess(false);
 
-    try {
-      const result = await submitFunction(formData);
-      setSuccess(true);
-      return result;
-    } catch (err) {
-      setError(err);
-      throw err;
-    } finally {
-      setLoading(false);
-    }
-  }, [submitFunction]);
+      try {
+        const result = await submitFunction(formData);
+        setSuccess(true);
+        return result;
+      } catch (err) {
+        setError(err);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [submitFunction]
+  );
 
   const clearState = useCallback(() => {
     setError(null);
@@ -155,7 +173,7 @@ export const useFormApi = (submitFunction) => {
     error,
     success,
     submit,
-    clearState
+    clearState,
   };
 };
 
