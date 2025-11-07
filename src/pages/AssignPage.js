@@ -174,21 +174,24 @@ const AssignPage = ({ onNavigateToDetail }) => {
     return (
       <div className="p-6 bg-gray-50 min-h-screen">
         <div className="space-y-8">
-                    <div className="bg-white rounded-2xl shadow-sm p-6">
+          {/* Header Skeleton */}
+          <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="animate-pulse space-y-4">
               <div className="h-8 bg-gray-200 rounded w-64"></div>
               <div className="h-4 bg-gray-200 rounded w-48"></div>
             </div>
           </div>
 
-                    <div className="bg-white rounded-2xl shadow-sm p-6">
+          {/* Search Skeleton */}
+          <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="animate-pulse grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="md:col-span-2 h-10 bg-gray-200 rounded"></div>
               <div className="h-10 bg-gray-200 rounded"></div>
             </div>
           </div>
 
-                    <div className="bg-white rounded-2xl shadow-sm">
+          {/* Table Skeleton */}
+          <div className="bg-white rounded-2xl shadow-sm">
             <div className="p-6 animate-pulse space-y-4">
               <div className="flex justify-between">
                 <div className="h-8 bg-gray-200 rounded w-48"></div>
@@ -207,7 +210,8 @@ const AssignPage = ({ onNavigateToDetail }) => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-            <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+      {/* Header */}
+      <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
           <div className="flex-1">
             <h1 className="text-2xl font-bold">Assign Karyawan ke Project</h1>
@@ -216,7 +220,8 @@ const AssignPage = ({ onNavigateToDetail }) => {
         </div>
       </div>
 
-            <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+      {/* Search & Filter */}
+      <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
           <div className="md:col-span-2 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -242,7 +247,8 @@ const AssignPage = ({ onNavigateToDetail }) => {
         </div>
       </div>
 
-            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+      {/* Table */}
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b flex justify-between items-center text-sm text-gray-600">
           <div className="flex items-center gap-2">
             Tampilkan
@@ -346,7 +352,8 @@ const AssignPage = ({ onNavigateToDetail }) => {
                     <td className="px-4 py-3 text-center">
                       <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-full text-sm">
                         <Users className="w-4 h-4" />
-                                                {projectStats[p.id] !== undefined ? projectStats[p.id] : (
+                        {/* 🔥 FIXED: Use real-time count from projectStats */}
+                        {projectStats[p.id] !== undefined ? projectStats[p.id] : (
                           <Loader2 className="w-3 h-3 animate-spin" />
                         )}
                       </span>
@@ -367,7 +374,8 @@ const AssignPage = ({ onNavigateToDetail }) => {
           </table>
         </div>
 
-                <div className="px-6 py-4 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-sm">
+        {/* Fixed Pagination */}
+        <div className="px-6 py-4 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-sm">
           <div>Halaman {paginationData.pagination.current_page} dari {paginationData.pagination.last_page}</div>
           <div className="flex items-center gap-2 flex-wrap justify-center">
             <button

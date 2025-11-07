@@ -135,12 +135,14 @@ export const AuthProvider = ({ children }) => {
   const sessionCheckIntervalRef = useRef(null);
   const warningToastIdRef = useRef(null);
 
+  // 🔔 Delete FCM token before logout
   const deleteFCMToken = async () => {
     try {
       const fcmToken = localStorage.getItem('fcm_token');
       if (fcmToken) {
         await notificationAPI.deleteFCMToken(fcmToken);
         localStorage.removeItem('fcm_token');
+        console.log('✅ FCM token deleted');
       }
     } catch (error) {
       console.error('❌ Failed to delete FCM token:', error);
@@ -152,6 +154,8 @@ export const AuthProvider = ({ children }) => {
     if (!tokenManager.get()) return;
 
     if (sessionManager.isExpired()) {
+      console.log('⏰ Session expired - auto logout');
+      
       // Delete FCM token
       await deleteFCMToken();
       
@@ -219,6 +223,7 @@ export const AuthProvider = ({ children }) => {
   // Initialize auth state
   useEffect(() => {
     const initializeAuth = async () => {
+      console.log('🔄 Initializing auth...');
       setLoading(true);
       
       const token = tokenManager.get();
@@ -228,13 +233,19 @@ export const AuthProvider = ({ children }) => {
       const isNewSession = sessionManager.isNewSession();
       
       if (isNewSession) {
+        console.log('🆕 New session detected - clearing page state');
         // Clear current page to reset to dashboard
         localStorage.removeItem('currentPage');
       }
       
+      console.log('📦 Token:', token ? 'exists' : 'none');
+      console.log('👤 Saved user:', savedUser ? savedUser.username : 'none');
+      console.log('🆕 Is new session:', isNewSession);
+      
       if (token && savedUser) {
         // Check if session is expired
         if (sessionManager.isExpired()) {
+          console.log('⏰ Session expired on init');
           await deleteFCMToken();
           tokenManager.remove();
           userManager.remove();
@@ -247,6 +258,7 @@ export const AuthProvider = ({ children }) => {
         try {
           // Verify token with server
           const response = await authAPI.me();
+          console.log('✅ Token verified:', response.data?.username);
           setUser(response.data);
           userManager.set(response.data);
           
@@ -261,10 +273,12 @@ export const AuthProvider = ({ children }) => {
           setUser(null);
         }
       } else {
+        console.log('❌ No token or user found');
         setUser(null);
       }
       
       setLoading(false);
+      console.log('✅ Auth initialization complete');
     };
 
     initializeAuth();
@@ -272,9 +286,11 @@ export const AuthProvider = ({ children }) => {
 
   // Login function
   const login = useCallback(async (credentials) => {
+    console.log('🔐 Login attempt:', credentials.username);
     setLoading(true);
     try {
       const response = await authAPI.login(credentials);
+      console.log('✅ Login response:', response);
       
       if (response.success && response.data) {
         const { token, user: userData } = response.data;
@@ -283,6 +299,8 @@ export const AuthProvider = ({ children }) => {
         userManager.set(userData);
         sessionManager.start();
         setUser(userData);
+        
+        console.log('✅ User logged in:', userData.username);
         
         // Clear current page to start fresh
         localStorage.removeItem('currentPage');
@@ -297,6 +315,7 @@ export const AuthProvider = ({ children }) => {
       
       throw new Error(response.message || 'Login failed');
     } catch (error) {
+      console.error('❌ Login error:', error);
       setUser(null);
       throw error;
     } finally {
@@ -306,6 +325,7 @@ export const AuthProvider = ({ children }) => {
 
   // Logout function
   const logout = useCallback(async () => {
+    console.log('🚪 Logout...');
     setLoading(true);
     
     // Dismiss any active warnings
@@ -334,6 +354,8 @@ export const AuthProvider = ({ children }) => {
       if (sessionCheckIntervalRef.current) {
         clearInterval(sessionCheckIntervalRef.current);
       }
+      
+      console.log('✅ Logged out');
       
       // Redirect using replace
       if (typeof window !== 'undefined') {

@@ -153,6 +153,8 @@ const InfoTukarShift = ({ navigationDetail = null }) => {
         tukarShifts.length > 0 &&
         processedNavigationId !== navigationDetail.id) {
       
+      console.log('🎯 Processing tukar shift navigation detail:', navigationDetail);
+      
       const { filters } = navigationDetail;
       
       if (filters.projectId) {
@@ -166,8 +168,10 @@ const InfoTukarShift = ({ navigationDetail = null }) => {
         const tukarShift = tukarShifts.find(ts => ts.id === navigationDetail.id);
         
         if (tukarShift) {
+          console.log('✅ Found tukar shift, opening detail:', tukarShift);
           await handleViewDetail(tukarShift);
         } else {
+          console.log('⚠️ Tukar shift not found in current list, fetching directly...');
           try {
             const result = await call(tukarShiftAPI.getById, navigationDetail.id);
             if (result.success) {

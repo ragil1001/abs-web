@@ -29,6 +29,7 @@ export const useNotifications = () => {
             token,
             device_name: navigator.userAgent
           });
+          console.log('✅ FCM token stored successfully');
         }
       }
     } catch (err) {
@@ -51,6 +52,7 @@ export const useNotifications = () => {
       if (response.success) {
         setNotifications(response.data);
         setUnreadCount(response.unread_count);
+        console.log('✅ Notifications refreshed:', response.data.length, 'items');
       }
     } catch (err) {
       setError(err.message);
@@ -66,6 +68,7 @@ export const useNotifications = () => {
       const response = await notificationAPI.getUnreadCount();
       if (response.success) {
         setUnreadCount(response.unread_count);
+        console.log('✅ Unread count refreshed:', response.unread_count);
       }
     } catch (err) {
       // Silently fail for unread count - don't spam console
@@ -90,6 +93,7 @@ export const useNotifications = () => {
           )
         );
         setUnreadCount(prev => Math.max(0, prev - 1));
+        console.log('✅ Notification marked as read:', notificationId);
       }
     } catch (err) {
       console.error('Error marking notification as read:', err);
@@ -109,6 +113,7 @@ export const useNotifications = () => {
           }))
         );
         setUnreadCount(0);
+        console.log('✅ All notifications marked as read');
       }
     } catch (err) {
       console.error('Error marking all as read:', err);
@@ -122,6 +127,7 @@ export const useNotifications = () => {
       if (response.success) {
         setNotifications(prev => prev.filter(notif => notif.id !== notificationId));
         fetchUnreadCount(); // Refresh count
+        console.log('✅ Notification deleted:', notificationId);
       }
     } catch (err) {
       console.error('Error deleting notification:', err);
@@ -136,6 +142,7 @@ export const useNotifications = () => {
       try {
         const payload = await onMessageListener();
         if (payload) {
+          console.log('🔔 Foreground message received:', payload);
           
           // Show browser notification
           if (Notification.permission === 'granted') {
@@ -150,6 +157,7 @@ export const useNotifications = () => {
           }
 
           // 🚀 Immediately refresh notifications
+          console.log('🔄 Auto-refreshing notifications after new message...');
           fetchNotifications();
           fetchUnreadCount();
         }
@@ -176,11 +184,13 @@ export const useNotifications = () => {
 
     // Set up auto-refresh interval (15 seconds)
     const refreshInterval = setInterval(() => {
+      console.log('🔄 Auto-refreshing notifications (15s interval)...');
       fetchUnreadCount(); // Only refresh count to be lightweight
     }, 15000);
 
     // Full refresh every 60 seconds
     const fullRefreshInterval = setInterval(() => {
+      console.log('🔄 Full notification refresh (60s interval)...');
       fetchNotifications({ per_page: 20 });
     }, 60000);
 

@@ -38,8 +38,10 @@ const Navbar = ({ onNavigate }) => {
 
   return (
     <div className="flex items-center space-x-3">
+      {/* Notification Dropdown */}
       <NotificationDropdown />
-      
+
+      {/* Profile Dropdown */}
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setProfileDropdownOpen(!profileDropdownOpen)}

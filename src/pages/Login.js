@@ -54,8 +54,10 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-white to-orange-100 px-4">
       <div className="w-full max-w-md">
-                <div className="bg-white rounded-2xl shadow-xl p-8 border border-orange-100 relative">
-                    <div className="flex flex-col items-center mb-8">
+        {/* Card */}
+        <div className="bg-white rounded-2xl shadow-xl p-8 border border-orange-100 relative">
+          {/* Logo */}
+          <div className="flex flex-col items-center mb-8">
             <div className="w-20 h-20 rounded-2xl bg-white shadow-lg flex items-center justify-center mb-4 overflow-hidden border border-gray-100">
               <img 
                 src="/logo.png" 
@@ -69,7 +71,8 @@ export default function LoginPage() {
             <p className="text-gray-500 text-sm">Sistem Presensi Karyawan</p>
           </div>
 
-                    {apiError && (
+          {/* API Error Alert */}
+          {apiError && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-3">
               <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
               <div>
@@ -79,8 +82,10 @@ export default function LoginPage() {
             </div>
           )}
 
-                    <form onSubmit={handleLogin} className="space-y-5">
-                        <div>
+          {/* Form */}
+          <form onSubmit={handleLogin} className="space-y-5">
+            {/* Username */}
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Username
               </label>
@@ -105,7 +110,8 @@ export default function LoginPage() {
               )}
             </div>
 
-                        <div>
+            {/* Password */}
+            <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Password
               </label>
@@ -140,7 +146,8 @@ export default function LoginPage() {
               )}
             </div>
 
-                        <button
+            {/* Tombol Login */}
+            <button
               type="submit"
               disabled={loading}
               className="w-full py-2.5 px-4 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg font-medium flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:from-orange-600 hover:to-orange-700 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-md disabled:hover:from-orange-500 disabled:hover:to-orange-600"
@@ -160,7 +167,8 @@ export default function LoginPage() {
           </form>
         </div>
 
-                <p className="text-center text-sm text-gray-500 mt-6">
+        {/* Footer */}
+        <p className="text-center text-sm text-gray-500 mt-6">
           © {new Date().getFullYear()} PT Qiprah Multi Service. All rights reserved.
         </p>
       </div>

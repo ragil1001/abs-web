@@ -106,6 +106,7 @@ const DataDivisi = () => {
       
       if (response.success) {
         const data = response.data.data || response.data || [];
+        console.log('📊 Fetched divisions:', data.length);
         setAllDivisions(data);
         setCurrentPage(1);
       }
@@ -121,6 +122,7 @@ const DataDivisi = () => {
   // 🚀 FIXED: Initial data load with force refresh
   useEffect(() => {
     if (isAuthenticated && !initialLoadComplete) {
+      console.log('🔄 Initial load - clearing all caches');
       fetchAllData(true); // Force fresh data on initial load
     }
   }, [isAuthenticated, initialLoadComplete, fetchAllData]);
@@ -561,7 +563,8 @@ const DataDivisi = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+      {/* Header */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Data Penempatan</h1>
           <p className="text-gray-600">Kelola daftar penempatan perusahaan</p>
@@ -588,7 +591,8 @@ const DataDivisi = () => {
         </div>
       </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+      {/* Search */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
           <div className="lg:col-span-2 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -603,7 +607,8 @@ const DataDivisi = () => {
         </div>
       </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      {/* Table */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-600">Tampilkan</span>
@@ -682,7 +687,8 @@ const DataDivisi = () => {
           </table>
         </div>
 
-                <div className="px-6 py-4 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-sm">
+        {/* Pagination */}
+        <div className="px-6 py-4 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-sm">
           <div>
             Halaman {paginationData.pagination.current_page} dari {paginationData.pagination.last_page}
           </div>
@@ -744,7 +750,8 @@ const DataDivisi = () => {
         </div>
       </div>
 
-            {showAddModal && (
+      {/* Add Modal */}
+      {showAddModal && (
         <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
             <div className="px-6 py-4 border-b flex items-center justify-between">
@@ -794,7 +801,8 @@ const DataDivisi = () => {
         </div>
       )}
 
-            {showEditModal && (
+      {/* Edit Modal */}
+      {showEditModal && (
         <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
             <div className="px-6 py-4 border-b flex items-center justify-between">
@@ -844,7 +852,8 @@ const DataDivisi = () => {
         </div>
       )}
 
-            {showImportModal && (
+      {/* Import Modal */}
+      {showImportModal && (
         <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-lg">
             <div className="px-6 py-4 border-b flex items-center justify-between">

@@ -49,7 +49,8 @@ const Pengaturan = () => {
 
   return (
     <div className="max-w-4xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+      {/* Header */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
             <Settings className="w-6 h-6 text-white" />
@@ -61,8 +62,10 @@ const Pengaturan = () => {
         </div>
       </div>
 
-            <div className="space-y-6">
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      {/* Settings Sections */}
+      <div className="space-y-6">
+        {/* Notifikasi */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center gap-3 mb-4">
             <Bell className="w-5 h-5 text-orange-600" />
             <h2 className="text-lg font-semibold text-gray-900">Notifikasi</h2>
@@ -132,7 +135,8 @@ const Pengaturan = () => {
           </div>
         </div>
 
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        {/* Keamanan */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center gap-3 mb-4">
             <Shield className="w-5 h-5 text-orange-600" />
             <h2 className="text-lg font-semibold text-gray-900">Keamanan</h2>
@@ -193,7 +197,8 @@ const Pengaturan = () => {
           </div>
         </div>
 
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        {/* Tampilan */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center gap-3 mb-4">
             <Monitor className="w-5 h-5 text-orange-600" />
             <h2 className="text-lg font-semibold text-gray-900">Tampilan</h2>
@@ -262,7 +267,8 @@ const Pengaturan = () => {
           </div>
         </div>
 
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        {/* Sistem */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center gap-3 mb-4">
             <Database className="w-5 h-5 text-orange-600" />
             <h2 className="text-lg font-semibold text-gray-900">Sistem & Data</h2>
@@ -325,7 +331,8 @@ const Pengaturan = () => {
           </div>
         </div>
 
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        {/* Presensi */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center gap-3 mb-4">
             <MapPin className="w-5 h-5 text-orange-600" />
             <h2 className="text-lg font-semibold text-gray-900">Pengaturan Presensi</h2>
@@ -401,7 +408,8 @@ const Pengaturan = () => {
           </div>
         </div>
 
-                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+        {/* Info Box */}
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
           <div className="flex gap-3">
             <Bell className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <div className="text-sm text-blue-800">
@@ -414,7 +422,8 @@ const Pengaturan = () => {
           </div>
         </div>
 
-                <div className="flex justify-end">
+        {/* Save Button (Disabled) */}
+        <div className="flex justify-end">
           <button
             disabled
             className="px-6 py-2.5 bg-gray-300 text-gray-500 rounded-lg font-medium cursor-not-allowed"

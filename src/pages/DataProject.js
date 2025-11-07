@@ -669,7 +669,8 @@ const DataProject = () => {
         <p className="text-xs text-gray-500 mt-1">Jarak maksimal dari titik lokasi untuk dapat melakukan absensi (10-1000 meter)</p>
       </div>
 
-            <div className="border-t pt-4">
+      {/* Pengecualian Jabatan dari Radius */}
+      <div className="border-t pt-4">
         <div className="flex items-center gap-2 mb-3">
           <Shield className="w-5 h-5 text-orange-600" />
           <label className="block text-sm font-medium text-gray-700">
@@ -722,7 +723,8 @@ const DataProject = () => {
         )}
       </div>
 
-            <div className="border-t pt-4">
+      {/* Konfigurasi Kategori Izin */}
+      <div className="border-t pt-4">
         <div className="flex items-center gap-2 mb-3">
           <FileText className="w-5 h-5 text-orange-600" />
           <label className="block text-sm font-medium text-gray-700">
@@ -730,7 +732,8 @@ const DataProject = () => {
           </label>
         </div>
         
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+        {/* Info Card - Sakit & Izin Otomatis Aktif */}
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
           <div className="flex gap-3">
             <Check className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
             <div className="text-sm text-blue-800">
@@ -747,12 +750,14 @@ const DataProject = () => {
           Pilih kategori izin tambahan yang ingin diaktifkan untuk project ini:
         </p>
 
-                <div className="space-y-3">
+        {/* Kategori Opsional */}
+        <div className="space-y-3">
           <div className="bg-gradient-to-r from-indigo-50 to-indigo-100 border border-indigo-200 rounded-lg p-4">
             <h4 className="text-sm font-semibold text-indigo-900 mb-3">Kategori Tambahan (Opsional)</h4>
             
             <div className="space-y-2">
-                            <label
+              {/* Cuti Tahunan */}
+              <label
                 className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
                   (formData.enabled_izin_categories || []).includes('cuti_tahunan')
                     ? 'bg-indigo-100 border-2 border-indigo-500'
@@ -795,7 +800,8 @@ const DataProject = () => {
                 </div>
               </label>
 
-                            <label
+              {/* Cuti Khusus */}
+              <label
                 className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
                   (formData.enabled_izin_categories || []).includes('cuti_khusus')
                     ? 'bg-purple-100 border-2 border-purple-500'
@@ -841,7 +847,8 @@ const DataProject = () => {
           </div>
         </div>
 
-                {(formData.enabled_izin_categories || []).includes('cuti_khusus') && (
+        {/* Info jika Cuti Khusus aktif */}
+        {(formData.enabled_izin_categories || []).includes('cuti_khusus') && (
           <div className="mt-3 bg-purple-50 border border-purple-200 rounded-lg p-4">
             <div className="flex gap-3">
               <Check className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
@@ -878,7 +885,8 @@ const DataProject = () => {
           </div>
         )}
 
-                <div className="mt-4 bg-amber-50 border border-amber-200 rounded-lg p-4">
+        {/* Summary Info */}
+        <div className="mt-4 bg-amber-50 border border-amber-200 rounded-lg p-4">
           <div className="flex gap-3">
             <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
             <div className="text-sm text-amber-800">
@@ -913,7 +921,8 @@ const DataProject = () => {
         {MapDisplay}
       </div>
 
-            <div>
+      {/* Shifts */}
+      <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Shift Project *</label>
         {formData.shifts.map((s, i) => (
           <div key={`shift-${i}`} className="space-y-2 mb-4 p-4 bg-gray-50 rounded-lg">
@@ -1036,7 +1045,8 @@ const DataProject = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-            <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+      {/* Header */}
+      <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
           <div className="flex-1">
             <h1 className="text-2xl font-bold">Data Project</h1>
@@ -1059,7 +1069,8 @@ const DataProject = () => {
         </div>
       </div>
 
-            <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+      {/* Search */}
+      <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
           <div className="md:col-span-2 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -1085,7 +1096,8 @@ const DataProject = () => {
         </div>
       </div>
 
-            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+      {/* Table */}
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b flex justify-between items-center text-sm text-gray-600">
           <div className="flex items-center gap-2">
             Tampilkan
@@ -1312,7 +1324,8 @@ const DataProject = () => {
         </div>
       </div>
 
-            {showAddModal && (
+      {/* Add Modal */}
+      {showAddModal && (
         <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center sticky top-0 bg-white z-10">
@@ -1352,7 +1365,8 @@ const DataProject = () => {
         </div>
       )}
 
-            {showEditModal && (
+      {/* Edit Modal */}
+      {showEditModal && (
         <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center sticky top-0 bg-white z-10">

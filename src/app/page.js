@@ -40,8 +40,11 @@ export default function MainApp() {
       if (isSessionActive) {
         // Continuing session - restore last page
         const savedPage = localStorage.getItem('currentPage');
+        console.log('🔄 Continuing session - restoring page:', savedPage || 'dashboard');
         return savedPage || 'dashboard';
       } else {
+        // New session - start from dashboard
+        console.log('🆕 New session - starting from dashboard');
         localStorage.removeItem('currentPage');
         return 'dashboard';
       }
@@ -56,6 +59,7 @@ export default function MainApp() {
   useEffect(() => {
     if (typeof window !== 'undefined' && isAuthenticated) {
       localStorage.setItem('currentPage', currentPage);
+      console.log('💾 Saved current page:', currentPage);
     }
   }, [currentPage, isAuthenticated]);
 
@@ -73,6 +77,7 @@ export default function MainApp() {
       
       const handlePopState = () => {
         window.history.pushState(null, '', '/');
+        console.log('⚠️ Browser back disabled');
       };
 
       window.addEventListener('popstate', handlePopState);
@@ -87,6 +92,13 @@ export default function MainApp() {
   useEffect(() => {
     const handleNavigateToDetail = (event) => {
       const { page, detailType, detailId, filters } = event.detail;
+      
+      console.log('🎯 Navigation event received:', {
+        page,
+        detailType,
+        detailId,
+        filters
+      });
       
       // Set page and detail state
       setCurrentPage(page);
@@ -147,6 +159,7 @@ export default function MainApp() {
 
   // Navigate function
   const navigateTo = useCallback((page) => {
+    console.log('📄 Navigate to:', page);
     setCurrentPage(page);
     setNavigationDetail(null); // Clear any navigation detail
   }, []);
@@ -209,6 +222,7 @@ export default function MainApp() {
   // Dashboard layout
   return (
     <div className="flex h-screen bg-gray-50 overflow-hidden">
+      {/* Sidebar */}
       <div
         className={`fixed inset-y-0 left-0 z-50 bg-white shadow-2xl transform transition-transform duration-200 ease-out lg:static lg:inset-0 flex flex-col ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
@@ -223,17 +237,21 @@ export default function MainApp() {
         />
       </div>
 
+      {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Navbar */}
         <header className="bg-white shadow-sm border-b border-gray-200 flex-shrink-0">
   <div className="flex items-center justify-between h-16 px-4 lg:px-5">
     <div className="flex items-center space-x-3">
+      {/* Mobile Menu */}
       <button
         onClick={() => setSidebarOpen(true)}
         className="lg:hidden p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
       >
         <Menu className="w-6 h-6" />
       </button>
-
+      
+      {/* Desktop Collapse */}
       <button
         onClick={toggleSidebarCollapse}
         className="hidden lg:flex w-8 h-8 items-center justify-center rounded-full bg-white shadow-md border border-gray-200 text-gray-600 hover:text-orange-600 hover:border-orange-300 transition-all"
@@ -242,17 +260,20 @@ export default function MainApp() {
       </button>
     </div>
 
+    {/* ✅ Pass onNavigate prop to Navbar */}
     <Navbar onNavigate={navigateTo} />
   </div>
 </header>
 
+        {/* Page Content */}
         <main className="flex-1 overflow-y-auto bg-gray-50">
           <div className="p-4 lg:p-8">
             {renderPage()}
           </div>
         </main>
       </div>
-      
+
+      {/* Mobile Overlay */}
       {sidebarOpen && isMobile && (
         <div
           className="fixed inset-0 bg-gray-900 bg-opacity-50 z-40 transition-opacity duration-200"

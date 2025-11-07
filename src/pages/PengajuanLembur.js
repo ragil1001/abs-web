@@ -225,6 +225,8 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
         submissions.length > 0 &&
         processedNavigationId !== navigationDetail.id) {
       
+      console.log('🎯 Processing navigation detail:', navigationDetail);
+      
       const { filters } = navigationDetail;
       
       if (filters.projectId) {
@@ -420,7 +422,8 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+      {/* Header */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Pengajuan Lembur</h1>
@@ -449,7 +452,8 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
         </div>
       </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+      {/* Filters */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <select
             value={projectFilter}
@@ -496,7 +500,8 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
         </div>
       </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      {/* Table */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <span className="text-sm text-gray-600">Tampilkan</span>
@@ -648,7 +653,8 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
         )}
       </div>
 
-            {showDetailModal && selectedSubmission && (
+      {/* Detail Modal */}
+      {showDetailModal && selectedSubmission && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-10">
@@ -706,7 +712,8 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
                     {getKodeHariBadge(selectedSubmission.kode_hari)}
                   </div>
 
-                                    {selectedSubmission.kode_hari === 'L' && (
+                  {/* Show jam kerja if hari libur */}
+                  {selectedSubmission.kode_hari === 'L' && (
                     <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
                       <p className="text-sm font-medium text-purple-900 mb-2">Jam Kerja Lembur (Hari Libur)</p>
                       <div className="grid grid-cols-2 gap-4">
@@ -722,7 +729,8 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
                     </div>
                   )}
                   
-                                    <div>
+                  {/* File SKL */}
+                  <div>
                     <p className="text-sm text-gray-600 mb-2">File SKL (Surat Keterangan Lembur)</p>
                     {selectedSubmission.file_skl_url ? (
                       <button
@@ -745,7 +753,8 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
                     )}
                   </div>
 
-                                    {selectedSubmission.keterangan_karyawan && (
+                  {/* Keterangan Karyawan */}
+                  {selectedSubmission.keterangan_karyawan && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                       <p className="text-sm font-medium text-blue-900 mb-1">Keterangan dari Karyawan</p>
                       <p className="text-sm text-blue-800 whitespace-pre-wrap">{selectedSubmission.keterangan_karyawan}</p>
@@ -824,7 +833,8 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
         </div>
       )}
 
-            {showConfirmModal && selectedSubmission && (
+      {/* Confirm Modal */}
+      {showConfirmModal && selectedSubmission && (
         <div className="fixed inset-0 bg-gray-900/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
@@ -927,7 +937,8 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
         </div>
       )}
 
-            {showDeleteModal && selectedSubmission && (
+      {/* Delete Modal */}
+      {showDeleteModal && selectedSubmission && (
         <div className="fixed inset-0 bg-gray-900/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
             <div className="px-6 py-4 border-b border-gray-100">

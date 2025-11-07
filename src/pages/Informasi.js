@@ -196,13 +196,15 @@ const KaryawanSelector = ({ selectedIds, onChange, disabled, error }) => {
 
   return (
     <div className="space-y-3">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+      {/* Info Banner */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
         <p className="text-sm text-blue-800">
           💡 <strong>Gunakan filter</strong> untuk menampilkan daftar karyawan. Pilih minimal satu filter (Jabatan, Project, atau Search).
         </p>
       </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+      {/* Filters */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
           <input
@@ -240,7 +242,8 @@ const KaryawanSelector = ({ selectedIds, onChange, disabled, error }) => {
         </select>
       </div>
 
-            {hasAppliedFilter && (
+      {/* Action Buttons */}
+      {hasAppliedFilter && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             {filteredKaryawan.length > 0 && (
@@ -294,7 +297,8 @@ const KaryawanSelector = ({ selectedIds, onChange, disabled, error }) => {
         </div>
       )}
 
-            <div className="border rounded-lg max-h-96 overflow-y-auto">
+      {/* Karyawan List */}
+      <div className="border rounded-lg max-h-96 overflow-y-auto">
         {!hasAppliedFilter ? (
           <div className="p-8 text-center text-gray-500">
             <User className="w-12 h-12 mx-auto mb-2 text-gray-300" />
@@ -1211,7 +1215,8 @@ const Informasi = () => {
                 </div>
               </div>
 
-                            <div className="border-t pt-4">
+              {/* File Lampiran dengan style konsisten seperti Izin/Lembur */}
+              <div className="border-t pt-4">
                 <h4 className="font-semibold text-gray-900 mb-2">File Lampiran</h4>
                 {selectedInformasi.file_url ? (
                   <button

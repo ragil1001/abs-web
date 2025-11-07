@@ -243,6 +243,8 @@ const PengajuanIzin = ({ navigationDetail = null }) => {
         submissions.length > 0 &&
         processedNavigationId !== navigationDetail.id) {
       
+      console.log('🎯 Processing navigation detail:', navigationDetail);
+      
       const { filters } = navigationDetail;
       
       if (filters.projectId) {
@@ -734,7 +736,8 @@ const PengajuanIzin = ({ navigationDetail = null }) => {
         )}
       </div>
 
-            {showDetailModal && selectedSubmission && (
+      {/* Detail Modal */}
+      {showDetailModal && selectedSubmission && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 bg-white z-10">
@@ -807,7 +810,8 @@ const PengajuanIzin = ({ navigationDetail = null }) => {
                     <p className="font-semibold text-gray-900 whitespace-pre-wrap">{selectedSubmission.keterangan || '-'}</p>
                   </div>
                   
-                                    <div>
+                  {/* 🆕 File Pendukung dengan Pengecekan */}
+                  <div>
                     <p className="text-sm text-gray-600 mb-2">File Pendukung</p>
                     {selectedSubmission.file_url ? (
                       <button
@@ -900,7 +904,8 @@ const PengajuanIzin = ({ navigationDetail = null }) => {
         </div>
       )}
 
-            {showConfirmModal && selectedSubmission && (
+      {/* Confirm Modal */}
+      {showConfirmModal && selectedSubmission && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg">
             <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
@@ -998,7 +1003,8 @@ const PengajuanIzin = ({ navigationDetail = null }) => {
         </div>
       )}
 
-            {showDeleteModal && selectedSubmission && (
+      {/* Delete Modal */}
+      {showDeleteModal && selectedSubmission && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
             <div className="px-6 py-4 border-b border-gray-100">

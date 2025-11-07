@@ -59,6 +59,7 @@ const AdminDashboard = ({ onNavigate }) => {
       
       if (result.success && mountedRef.current) {
         setDashboardData(result.data);
+        console.log('✅ Dashboard data refreshed:', result.timestamp);
       }
     } catch (error) {
       console.error('Error fetching dashboard:', error);
@@ -83,6 +84,7 @@ const AdminDashboard = ({ onNavigate }) => {
     // Set new interval for auto-refresh
     autoRefreshIntervalRef.current = setInterval(() => {
       if (mountedRef.current) {
+        console.log('🔄 Auto-refreshing dashboard...');
         fetchDashboardData(false);
       }
     }, 30000); // 30 seconds
@@ -131,12 +133,14 @@ const AdminDashboard = ({ onNavigate }) => {
 
   // 🎯 Manual refresh handler
   const handleManualRefresh = useCallback(() => {
+    console.log('🔄 Manual refresh triggered');
     forceDataRefresh();
     fetchDashboardData(false);
   }, [fetchDashboardData]);
 
   // Navigation handler
   const handleNavigateTo = useCallback((page) => {
+    console.log('📄 Navigating from dashboard to:', page);
     if (onNavigate) {
       onNavigate(page);
     }
@@ -307,6 +311,7 @@ const AdminDashboard = ({ onNavigate }) => {
           <p className="text-gray-600">{currentDate}</p>
         </div>
         
+        {/* 🔄 Manual Refresh Button */}
         <button
           onClick={handleManualRefresh}
           disabled={refreshing}
@@ -320,7 +325,9 @@ const AdminDashboard = ({ onNavigate }) => {
         </button>
       </div>
 
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 lg:gap-6 mb-6">
+        {/* Employee Stats */}
         <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm p-5 lg:p-6 border border-gray-100 hover:shadow-md transition-shadow duration-200">
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1 min-w-0">
@@ -371,6 +378,7 @@ const AdminDashboard = ({ onNavigate }) => {
           </div>
         </div>
 
+        {/* Quick Actions */}
         <div className="lg:col-span-3 bg-white rounded-2xl shadow-sm p-5 lg:p-6 border border-gray-100 hover:shadow-md transition-shadow duration-200">
           <div className="flex items-start justify-between mb-4">
             <div className="flex-1 min-w-0">
@@ -431,7 +439,10 @@ const AdminDashboard = ({ onNavigate }) => {
         </div>
       </div>
 
+      {/* Grid Layout untuk Statistik Absensi dan Submission */}
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
+        
+        {/* Statistik Absensi Hari Ini */}
         <div className={`xl:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 ${attendanceFullscreen ? 'fixed inset-4 z-50 overflow-auto' : ''}`}>
           <div className="p-6 border-b border-gray-100">
             <div className="flex items-center justify-between">
@@ -485,6 +496,7 @@ const AdminDashboard = ({ onNavigate }) => {
           
           <div className="p-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {/* Pie Chart */}
               <div className="flex items-center justify-center">
                 <div className="relative w-64 h-64">
                   <svg viewBox="0 0 200 200" className="w-full h-full transform -rotate-90">
@@ -596,6 +608,7 @@ const AdminDashboard = ({ onNavigate }) => {
                 </div>
               </div>
 
+              {/* Legend */}
               <div className="space-y-4">
                 <div className="space-y-2">
                   {attendanceStats.chart_data.map((item, index) => {
@@ -670,6 +683,7 @@ const AdminDashboard = ({ onNavigate }) => {
           </div>
         </div>
 
+        {/* Submission List */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100">
           <div className="p-6 border-b border-gray-100">
             <div className="flex items-center justify-between">
@@ -721,6 +735,7 @@ const AdminDashboard = ({ onNavigate }) => {
         </div>
       </div>
 
+      {/* Fullscreen Overlay for Attendance */}
       {attendanceFullscreen && (
         <div
           className="fixed inset-0 bg-gray-900 bg-opacity-50 z-40"
@@ -728,6 +743,7 @@ const AdminDashboard = ({ onNavigate }) => {
         />
       )}
 
+      {/* Detail Modal - Keep existing modal code */}
       {showDetailModal && selectedSubmission && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -745,6 +761,7 @@ const AdminDashboard = ({ onNavigate }) => {
             </div>
             
             <div className="p-6 space-y-6">
+              {/* Data Karyawan */}
               <div className="bg-gray-50 rounded-xl p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <User className="w-5 h-5 text-orange-600" />
@@ -770,6 +787,7 @@ const AdminDashboard = ({ onNavigate }) => {
                 </div>
               </div>
 
+              {/* Detail Izin */}
               <div className="bg-gray-50 rounded-xl p-6">
                 <div className="flex items-center gap-3 mb-4">
                   <FileText className="w-5 h-5 text-orange-600" />
@@ -846,6 +864,7 @@ const AdminDashboard = ({ onNavigate }) => {
               </div>
             </div>
 
+            {/* Action Buttons */}
             {selectedSubmission.status === 'pending' && (
               <div className="px-6 py-4 border-t border-gray-100 flex items-center justify-end gap-3 bg-gray-50 sticky bottom-0">
                 <button
@@ -867,7 +886,8 @@ const AdminDashboard = ({ onNavigate }) => {
           </div>
         </div>
       )}
-      
+
+      {/* Confirmation Modal */}
       {showConfirmModal && selectedSubmission && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg">

@@ -761,7 +761,8 @@ const JadwalKaryawan = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-            <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+      {/* Header */}
+      <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-gray-900 mb-2">Jadwal Karyawan</h1>
@@ -770,7 +771,8 @@ const JadwalKaryawan = () => {
         </div>
       </div>
 
-            <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+      {/* Filters */}
+      <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="lg:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -866,7 +868,8 @@ const JadwalKaryawan = () => {
         </div>
       </div>
 
-            {currentProject && (
+      {/* Project Info */}
+      {currentProject && (
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
           <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
             <Building className="w-5 h-5 text-orange-600" />
@@ -929,9 +932,11 @@ const JadwalKaryawan = () => {
         </div>
       )}
 
-            {selectedProject && selectedPeriod && calendarData ? (
+      {/* Schedule Table */}
+      {selectedProject && selectedPeriod && calendarData ? (
         <>
-                    <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+          {/* Shift Legend */}
+          <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <Clock className="w-5 h-5 text-orange-600" />
@@ -961,7 +966,8 @@ const JadwalKaryawan = () => {
           </div>
 
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-                        <div className="px-6 py-4 border-b flex justify-between items-center text-sm text-gray-600">
+            {/* Table Controls */}
+            <div className="px-6 py-4 border-b flex justify-between items-center text-sm text-gray-600">
               <div className="flex items-center gap-2">
                 Tampilkan
                 <select
@@ -981,8 +987,10 @@ const JadwalKaryawan = () => {
               </div>
             </div>
 
-                        <div className="flex">
-                            <div className="flex-none w-[432px] border-r border-gray-100 bg-white">
+            {/* Split Table */}
+            <div className="flex">
+              {/* LEFT: Fixed columns */}
+              <div className="flex-none w-[432px] border-r border-gray-100 bg-white">
                 <table ref={leftTableRef} className="text-sm min-w-full border-collapse">
                   <thead>
                     <tr>
@@ -1069,7 +1077,8 @@ const JadwalKaryawan = () => {
                 </table>
               </div>
 
-                            <div className="flex-1 overflow-x-auto">
+              {/* RIGHT: Calendar area */}
+              <div className="flex-1 overflow-x-auto">
                 <table ref={rightTableRef} className="text-sm min-w-max border-collapse">
                   <thead className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
                     <tr style={{ height: `${HEADER_ROW_HEIGHT}px` }}>
@@ -1185,7 +1194,8 @@ const JadwalKaryawan = () => {
               </div>
             </div>
 
-                        <div className="px-6 py-4 border-t flex justify-between items-center text-sm">
+            {/* Pagination */}
+            <div className="px-6 py-4 border-t flex justify-between items-center text-sm">
               <div>Halaman {currentPage} dari {totalPages}</div>
               <div className="flex gap-1">
                 <button
@@ -1234,7 +1244,8 @@ const JadwalKaryawan = () => {
         </div>
       )}
 
-            {showImportModal && (
+      {/* Import Modal - ✅ DENGAN FILTER INDEPENDEN */}
+      {showImportModal && (
         <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
@@ -1249,7 +1260,8 @@ const JadwalKaryawan = () => {
             </div>
 
             <div className="p-6 space-y-6">
-                            <div className="bg-blue-50 rounded-lg p-4 space-y-4">
+              {/* ✅ FILTER PROJECT UNTUK IMPORT */}
+              <div className="bg-blue-50 rounded-lg p-4 space-y-4">
                 <h3 className="font-semibold text-blue-900">Pilih Project & Periode Import</h3>
                 
                 <div>
@@ -1298,7 +1310,8 @@ const JadwalKaryawan = () => {
                 </div>
               </div>
 
-                            <div className="space-y-4">
+              {/* Template Download Section */}
+              <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">1. Download Template Excel</h3>
                 <p className="text-sm text-gray-600">
                   Template akan berisi daftar karyawan yang sudah di-assign ke project ini dan format jadwal yang sesuai.
@@ -1333,7 +1346,8 @@ const JadwalKaryawan = () => {
                 </button>
               </div>
 
-                            <div className="space-y-4">
+              {/* File Upload Section */}
+              <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">2. Upload File Excel</h3>
                 <p className="text-sm text-gray-600">
                   Upload file Excel yang telah diisi dengan data jadwal karyawan. Pastikan format sesuai dengan template.
@@ -1372,7 +1386,8 @@ const JadwalKaryawan = () => {
                 )}
               </div>
 
-                            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+              {/* Instructions */}
+              <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                 <div className="flex items-start gap-2">
                   <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-yellow-800">
@@ -1392,7 +1407,8 @@ const JadwalKaryawan = () => {
               </div>
             </div>
 
-                        <div className="px-6 py-4 border-t flex justify-end gap-3">
+            {/* Modal Footer */}
+            <div className="px-6 py-4 border-t flex justify-end gap-3">
               <button
                 onClick={resetImportModal}
                 className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
@@ -1422,7 +1438,8 @@ const JadwalKaryawan = () => {
         </div>
       )}
 
-            {showExportModal && (
+      {/* Export Modal */}
+      {showExportModal && (
         <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-xl max-h-[90vh] overflow-y-auto">
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
@@ -1437,12 +1454,14 @@ const JadwalKaryawan = () => {
             </div>
 
             <div className="p-6 space-y-6">
-                            <div className="bg-blue-50 rounded-lg p-4">
+              {/* Project Info */}
+              <div className="bg-blue-50 rounded-lg p-4">
                 <h3 className="font-semibold text-blue-900 mb-2">Project Terpilih</h3>
                 <p className="text-blue-800">{currentProject?.nama}</p>
               </div>
 
-                            <div className="space-y-4">
+              {/* Period Selection */}
+              <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">Pilih Periode Export</h3>
                 <p className="text-sm text-gray-600">
                   Pilih periode yang ingin diekspor. File Excel akan berisi data jadwal karyawan untuk periode tersebut.
@@ -1468,7 +1487,8 @@ const JadwalKaryawan = () => {
                 </div>
               </div>
 
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+              {/* Info */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-start gap-2">
                   <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-blue-800">
@@ -1484,7 +1504,8 @@ const JadwalKaryawan = () => {
               </div>
             </div>
 
-                        <div className="px-6 py-4 border-t flex justify-end gap-3">
+            {/* Modal Footer */}
+            <div className="px-6 py-4 border-t flex justify-end gap-3">
               <button
                 onClick={resetExportModal}
                 className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"

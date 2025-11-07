@@ -103,7 +103,8 @@ const UbahPassword = () => {
 
   return (
     <div className="max-w-2xl mx-auto">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
+      {/* Header */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
             <KeyRound className="w-6 h-6 text-white" />
@@ -115,7 +116,8 @@ const UbahPassword = () => {
         </div>
       </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+      {/* Current User Info */}
+      <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center">
             <span className="text-white font-semibold text-sm">
@@ -129,9 +131,11 @@ const UbahPassword = () => {
         </div>
       </div>
 
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      {/* Form */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <form onSubmit={handleSubmit} className="space-y-5">
-                    <div>
+          {/* Current Password */}
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Password Lama <span className="text-red-500">*</span>
             </label>
@@ -164,7 +168,8 @@ const UbahPassword = () => {
             )}
           </div>
 
-                    <div>
+          {/* New Password */}
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Password Baru <span className="text-red-500">*</span>
             </label>
@@ -198,7 +203,8 @@ const UbahPassword = () => {
             <p className="mt-1 text-xs text-gray-500">Minimal 6 karakter</p>
           </div>
 
-                    <div>
+          {/* Confirm New Password */}
+          <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Konfirmasi Password Baru <span className="text-red-500">*</span>
             </label>
@@ -231,7 +237,8 @@ const UbahPassword = () => {
             )}
           </div>
 
-                    <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+          {/* Info Box */}
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
             <div className="flex gap-3">
               <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <div className="text-sm text-amber-800">
@@ -246,7 +253,8 @@ const UbahPassword = () => {
             </div>
           </div>
 
-                    <div className="flex justify-end pt-4">
+          {/* Submit Button */}
+          <div className="flex justify-end pt-4">
             <button
               type="submit"
               disabled={loading}

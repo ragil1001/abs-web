@@ -143,6 +143,8 @@ function clearRelatedCache(url) {
       cache.delete(key);
     }
   }
+  
+  console.log('🗑️ Cache cleared for:', baseEndpoint);
 }
 
 // 🚀 Clear cache function
@@ -154,12 +156,15 @@ export function clearApiCache(url = null) {
   } else {
     cache.clear();
   }
+  
+  console.log('🗑️ API cache cleared:', url || 'all');
 }
 
 // 🚀 Force data refresh (invalidates all cache)
 export function forceDataRefresh() {
   lastDataChangeTimestamp = Date.now();
   cache.clear();
+  console.log('🔄 Forced data refresh - all cache invalidated');
 }
 
 // Clear expired cache entries

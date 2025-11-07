@@ -252,7 +252,8 @@ const PresensiHarian = () => {
     return (
       <div className="p-6 bg-gray-50 min-h-screen">
         <div className="space-y-8">
-                    <div className="bg-white rounded-2xl shadow-sm p-6">
+          {/* Header Skeleton */}
+          <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="animate-pulse space-y-4">
               <div className="h-8 bg-gray-200 rounded w-64"></div>
               <div className="h-4 bg-gray-200 rounded w-48"></div>
@@ -263,7 +264,8 @@ const PresensiHarian = () => {
             </div>
           </div>
 
-                    <div className="bg-white rounded-2xl shadow-sm p-6">
+          {/* Filters Skeleton */}
+          <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="animate-pulse">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[1,2,3].map(i => (
@@ -273,7 +275,8 @@ const PresensiHarian = () => {
             </div>
           </div>
 
-                    <div className="bg-white rounded-2xl shadow-sm p-6">
+          {/* Project Info Skeleton */}
+          <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="animate-pulse space-y-4">
               <div className="h-6 bg-gray-200 rounded w-48"></div>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -291,7 +294,8 @@ const PresensiHarian = () => {
             </div>
           </div>
 
-                    <div className="bg-white rounded-2xl shadow-sm">
+          {/* Tabs Skeleton */}
+          <div className="bg-white rounded-2xl shadow-sm">
             <div className="flex border-b border-gray-200">
               <div className="flex-1 px-6 py-4">
                 <div className="h-6 bg-gray-200 rounded w-40"></div>
@@ -302,7 +306,8 @@ const PresensiHarian = () => {
             </div>
           </div>
 
-                    <div className="bg-white rounded-2xl shadow-sm">
+          {/* Table Skeleton */}
+          <div className="bg-white rounded-2xl shadow-sm">
             <div className="p-6 animate-pulse space-y-4">
               <div className="h-12 bg-gray-300 rounded"></div>
               {[1,2,3,4,5,6,7,8,9,10].map(i => (
@@ -321,7 +326,8 @@ const PresensiHarian = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-            <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+      {/* Header */}
+      <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
           <div className="flex-1">
             <h1 className="text-2xl font-bold">Presensi Harian</h1>
@@ -347,7 +353,8 @@ const PresensiHarian = () => {
         </div>
       </div>
 
-            <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
+      {/* Filters */}
+      <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -405,7 +412,8 @@ const PresensiHarian = () => {
         </div>
       </div>
 
-            {projectInfo && (
+      {/* Project Info & Statistics */}
+      {projectInfo && (
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
           <h3 className="text-xl font-semibold mb-6 flex items-center gap-2">
             <Building className="w-5 h-5 text-orange-600" />
@@ -413,7 +421,8 @@ const PresensiHarian = () => {
           </h3>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        <div className="space-y-4">
+            {/* Project Information */}
+            <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="bg-gray-50 rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-2">
@@ -465,7 +474,8 @@ const PresensiHarian = () => {
               </div>
             </div>
 
-                        <div>
+            {/* Statistics Grid */}
+            <div>
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
                 <div className="bg-gradient-to-br from-slate-100 to-slate-200 border border-slate-300 rounded-xl p-4 text-center">
                   <div className="text-2xl font-bold text-slate-700">{statistics.total}</div>
@@ -519,7 +529,8 @@ const PresensiHarian = () => {
       <div className="text-xs text-orange-600 mt-1">Lembur</div>
     </div>
 
-        <div className="bg-gradient-to-br from-amber-100 to-amber-200 border border-amber-300 rounded-xl p-4 text-center">
+    {/* ✅ NEW CARD - Bentuk sama dengan card lainnya */}
+    <div className="bg-gradient-to-br from-amber-100 to-amber-200 border border-amber-300 rounded-xl p-4 text-center">
       <div className="text-2xl font-bold text-amber-700">{statistics.pulang.lembur_pending || 0}</div>
       <div className="text-xs text-amber-600 mt-1">Lembur Pending</div>
     </div>
@@ -536,7 +547,8 @@ const PresensiHarian = () => {
         </div>
       )}
 
-            <div className="bg-white rounded-2xl shadow-sm mb-6">
+      {/* Tabs */}
+      <div className="bg-white rounded-2xl shadow-sm mb-6">
         <div className="flex border-b border-gray-200">
           <button
             onClick={() => setActiveTab("masuk")}
@@ -563,9 +575,11 @@ const PresensiHarian = () => {
         </div>
       </div>
 
-            {selectedProject && selectedDate ? (
+      {/* Table */}
+      {selectedProject && selectedDate ? (
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-                    <div className="px-6 py-4 border-b flex justify-between items-center text-sm text-gray-600">
+          {/* Table Controls */}
+          <div className="px-6 py-4 border-b flex justify-between items-center text-sm text-gray-600">
             <div className="flex items-center gap-2">
               Tampilkan
               <select
@@ -584,7 +598,8 @@ const PresensiHarian = () => {
             </div>
           </div>
 
-                    <div className="overflow-x-auto">
+          {/* Table Content */}
+          <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
                 <tr>
@@ -676,7 +691,8 @@ const PresensiHarian = () => {
   {activeTab === "pulang" && (
     <>
       <option value="lembur">Lembur</option>
-      <option value="lembur_pending">Lembur (Pending)</option>       <option value="tidak_presensi_pulang">Tidak Presensi Pulang</option>
+      <option value="lembur_pending">Lembur (Pending)</option> {/* ✅ NEW OPTION */}
+      <option value="tidak_presensi_pulang">Tidak Presensi Pulang</option>
       <option value="pulang_cepat">Pulang Cepat</option>
     </>
   )}
@@ -724,14 +740,16 @@ const PresensiHarian = () => {
             </table>
           </div>
 
-          <div className="flex justify-between items-center mt-6 px-6 pb-6">
+          {/* Pagination */}
+<div className="flex justify-between items-center mt-6 px-6 pb-6">
   <div className="text-sm text-gray-600">
     Menampilkan {Math.min(startIndex + 1, sortedData.length)}–
     {Math.min(startIndex + itemsPerPage, sortedData.length)} dari {sortedData.length} data
   </div>
 
   <div className="flex items-center gap-1">
-        <button
+    {/* Tombol Sebelumnya */}
+    <button
       onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
       disabled={currentPage === 1}
       className="px-3 py-1 border rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -739,7 +757,8 @@ const PresensiHarian = () => {
       <ChevronLeft className="w-4 h-4" />
     </button>
 
-        {(() => {
+    {/* Nomor Halaman dengan Ellipsis (maksimal 3) */}
+    {(() => {
       const buttons = [];
       const maxVisible = 3;
 
@@ -807,7 +826,8 @@ const PresensiHarian = () => {
       return buttons;
     })()}
 
-        <button
+    {/* Tombol Berikutnya */}
+    <button
       onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
       disabled={currentPage === totalPages}
       className="px-3 py-1 border rounded-lg hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -826,7 +846,8 @@ const PresensiHarian = () => {
         </div>
       )}
 
-            {showDetailModal && selectedAttendance && (
+      {/* Detail Modal */}
+      {showDetailModal && selectedAttendance && (
         <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">

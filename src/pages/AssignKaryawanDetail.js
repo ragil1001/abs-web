@@ -536,10 +536,12 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
     });
   };
 
+  // 🚀 CRITICAL: Show loading skeleton until initial load complete
   if (!initialLoadComplete) {
     return (
       <div className="p-6 bg-gray-50 min-h-screen">
         <div className="space-y-8">
+          {/* Header Skeleton */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="animate-pulse space-y-4">
               <div className="flex items-center gap-4">
@@ -564,6 +566,7 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
             </div>
           </div>
 
+          {/* Filters Skeleton */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="animate-pulse">
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
@@ -574,6 +577,7 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
             </div>
           </div>
 
+          {/* Table Skeleton */}
           <div className="bg-white rounded-2xl shadow-sm">
             <div className="p-6 animate-pulse space-y-4">
               <div className="h-12 bg-gray-300 rounded"></div>
@@ -589,6 +593,7 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
+      {/* Header with Back Button */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <div className="flex items-center gap-4 mb-4">
           <button
@@ -603,7 +608,9 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
           </div>
         </div>
 
+        {/* Project Details & Actions Card */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          {/* Left: Project Info */}
           <div className="space-y-4">
             <div className="flex items-start gap-3">
               <Clock className="w-5 h-5 text-orange-600 mt-0.5" />
@@ -640,6 +647,7 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
             </div>
           </div>
 
+          {/* Right: Stats & Actions */}
           <div className="space-y-4">
             <div className="flex items-start gap-3">
   <Users className="w-5 h-5 text-orange-600 mt-0.5" />
@@ -678,6 +686,7 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
         </div>
       </div>
 
+      {/* Filters */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
           <div className="md:col-span-2 relative">
@@ -725,6 +734,7 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
         </div>
       </div>
 
+      {/* Employee List Table */}
       <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b flex justify-between items-center text-sm text-gray-600">
           <div className="flex items-center gap-2">
@@ -831,6 +841,7 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
           </table>
         </div>
 
+        {/* Fixed Smart Pagination */}
         <div className="px-6 py-4 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-sm">
           <div>Halaman {currentPage} dari {totalPages}</div>
           <div className="flex items-center gap-2 flex-wrap justify-center">
@@ -857,6 +868,7 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
         </div>
       </div>
 
+      {/* Add Employee Modal */}
       {showAddEmployeeModal && (
         <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
@@ -987,6 +999,7 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
                 )}
               </div>
 
+              {/* Modal Smart Pagination */}
               <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm">
                 <div>Halaman {modalCurrentPage} dari {modalTotalPages}</div>
                 <div className="flex items-center gap-2 flex-wrap justify-center">
@@ -1040,6 +1053,7 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
         </div>
       )}
 
+      {/* Import Modal */}
       {showImportModal && (
         <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl">
