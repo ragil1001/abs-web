@@ -45,10 +45,8 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
   const [importFile, setImportFile] = useState(null);
   const [importLoading, setImportLoading] = useState(false);
 
-  // 🚀 CRITICAL: Add initial load complete flag
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
-  // Modal states
   const [modalSearchTerm, setModalSearchTerm] = useState("");
   const [modalCurrentPage, setModalCurrentPage] = useState(1);
   const [modalItemsPerPage, setModalItemsPerPage] = useState(10);
@@ -56,9 +54,8 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
   const [modalPositionFilter, setModalPositionFilter] = useState("all");
 
   const { loading, call } = useApi();
-  const [totalActiveKaryawan, setTotalActiveKaryawan] = useState(0); // 🔥 NEW
+  const [totalActiveKaryawan, setTotalActiveKaryawan] = useState(0);
 
-  // 🚀 OPTIMIZED: Fetch assignments dengan cache clearing
   const fetchAssignments = useCallback(async () => {
     try {
       clearApiCache();
@@ -571,7 +568,6 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
 
   const activeCount = totalActiveKaryawan;
 
-  // 🚀 Render Smart Pagination Helper
   const renderPagination = (current, total, onPageChange, disabled = false) => {
     const pages = [];
 
@@ -631,7 +627,6 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
     });
   };
 
-  // 🚀 CRITICAL: Show loading skeleton until initial load complete
   if (!initialLoadComplete) {
     return (
       <div className="p-6 bg-gray-50 min-h-screen">
@@ -661,7 +656,6 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
             </div>
           </div>
 
-          {/* Filters Skeleton */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="animate-pulse">
               <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
@@ -672,7 +666,6 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
             </div>
           </div>
 
-          {/* Table Skeleton */}
           <div className="bg-white rounded-2xl shadow-sm">
             <div className="p-6 animate-pulse space-y-4">
               <div className="h-12 bg-gray-300 rounded"></div>
@@ -688,7 +681,6 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Header with Back Button */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <div className="flex items-center gap-4 mb-4">
           <button
@@ -705,9 +697,7 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
           </div>
         </div>
 
-        {/* Project Details & Actions Card */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-          {/* Left: Project Info */}
           <div className="space-y-4">
             <div className="flex items-start gap-3">
               <Clock className="w-5 h-5 text-orange-600 mt-0.5" />
@@ -754,7 +744,6 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
             </div>
           </div>
 
-          {/* Right: Stats & Actions */}
           <div className="space-y-4">
             <div className="flex items-start gap-3">
               <Users className="w-5 h-5 text-orange-600 mt-0.5" />
@@ -848,7 +837,6 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
         </div>
       </div>
 
-      {/* Employee List Table */}
       <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b flex justify-between items-center text-sm text-gray-600">
           <div className="flex items-center gap-2">
@@ -1000,7 +988,6 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
           </table>
         </div>
 
-        {/* Fixed Smart Pagination */}
         <div className="px-6 py-4 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-sm">
           <div>
             Halaman {currentPage} dari {totalPages}
@@ -1031,7 +1018,6 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
         </div>
       </div>
 
-      {/* Add Employee Modal */}
       {showAddEmployeeModal && (
         <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col">
@@ -1212,7 +1198,6 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
                 )}
               </div>
 
-              {/* Modal Smart Pagination */}
               <div className="mt-4 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm">
                 <div>
                   Halaman {modalCurrentPage} dari {modalTotalPages}
@@ -1279,7 +1264,6 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
         </div>
       )}
 
-      {/* Import Modal */}
       {showImportModal && (
         <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl">
@@ -1319,22 +1303,6 @@ const AssignKaryawanDetail = ({ project, onBack }) => {
                 >
                   {importFile ? "Ganti File" : "Pilih File"}
                 </label>
-              </div>
-
-              <div className="mt-4 p-4 bg-yellow-50 rounded-lg">
-                <h4 className="font-medium text-yellow-800 mb-2">
-                  Format yang diperlukan:
-                </h4>
-                <ul className="text-sm text-yellow-700 space-y-1">
-                  <li>• NIK - untuk mencari karyawan di database</li>
-                  <li>• Nama - untuk konfirmasi (opsional)</li>
-                  <li>• Penempatan - untuk konfirmasi (opsional)</li>
-                  <li>• Jabatan - untuk konfirmasi (opsional)</li>
-                </ul>
-                <p className="text-sm text-yellow-700 mt-2">
-                  * Sistem akan mencari karyawan berdasarkan NIK dan memvalidasi
-                  data penempatan/jabatan
-                </p>
               </div>
 
               <div className="mt-4 flex gap-2">

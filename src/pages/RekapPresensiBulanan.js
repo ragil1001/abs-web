@@ -24,7 +24,6 @@ import { toast } from "react-toastify";
 import exportRekapBulanan from "@/utils/exportFunctions/exportRekapBulanan";
 
 const RekapPresensiBulanan = () => {
-  // State management
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState("");
   const [selectedPeriod, setSelectedPeriod] = useState("");
@@ -34,14 +33,12 @@ const RekapPresensiBulanan = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
 
-  // Backend data
   const [rekapData, setRekapData] = useState([]);
   const [projectInfo, setProjectInfo] = useState(null);
   const [daysInMonth, setDaysInMonth] = useState([]);
 
   const { loading, call } = useApi();
 
-  // Status configurations
   const statusConfig = {
     H: {
       label: "Hadir",
@@ -84,7 +81,7 @@ const RekapPresensiBulanan = () => {
       label: "Lembur*",
       color: "bg-amber-100 text-amber-700",
       fullName: "Lembur Pending",
-    }, // ✅ NEW
+    },
     TPP: {
       label: "Tidak Presensi Pulang",
       color: "bg-red-100 text-red-700",
@@ -97,13 +94,11 @@ const RekapPresensiBulanan = () => {
     },
   };
 
-  // Current project object
   const currentProject = useMemo(
     () => projects.find((p) => p.id === parseInt(selectedProject)),
     [selectedProject, projects]
   );
 
-  // Period options based on project start date
   const periodOptions = useMemo(() => {
     if (!currentProject) return [];
 
@@ -145,19 +140,16 @@ const RekapPresensiBulanan = () => {
     return periods;
   }, [currentProject]);
 
-  // Fetch projects on mount
   useEffect(() => {
     fetchProjects();
   }, []);
 
-  // Auto select first period when project changes
   useEffect(() => {
     if (periodOptions.length > 0 && !selectedPeriod) {
       setSelectedPeriod(periodOptions[0].value);
     }
   }, [periodOptions, selectedPeriod]);
 
-  // Fetch rekap data when project/period changes
   useEffect(() => {
     if (selectedProject && selectedPeriod) {
       fetchRekapData();
@@ -209,7 +201,6 @@ const RekapPresensiBulanan = () => {
     }
   }, [selectedProject, selectedPeriod, periodOptions, call]);
 
-  // Filter and sort employees
   const filteredEmployees = useMemo(() => {
     const filtered = rekapData.filter(
       (emp) =>
@@ -238,7 +229,6 @@ const RekapPresensiBulanan = () => {
     });
   }, [rekapData, searchTerm, sortField, sortDirection]);
 
-  // Pagination
   const totalPages = Math.ceil(filteredEmployees.length / itemsPerPage) || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedEmployees = filteredEmployees.slice(
@@ -246,7 +236,6 @@ const RekapPresensiBulanan = () => {
     startIndex + itemsPerPage
   );
 
-  // Handle sorting
   const handleSort = useCallback(
     (field) => {
       if (sortField === field) {
@@ -259,7 +248,6 @@ const RekapPresensiBulanan = () => {
     [sortField]
   );
 
-  // Open Google Maps
   const openGoogleMaps = useCallback((lat, lng) => {
     if (lat && lng) {
       const url = `https://www.google.com/maps?q=${lat},${lng}`;
@@ -284,15 +272,13 @@ const RekapPresensiBulanan = () => {
         rightRow.style.height = `${maxHeight}px`;
       });
     };
-    // Jalankan setelah render
+
     setTimeout(syncRowHeights, 100);
 
-    // Jalankan ulang saat window resize atau data berubah
     window.addEventListener("resize", syncRowHeights);
     return () => window.removeEventListener("resize", syncRowHeights);
   }, [paginatedEmployees, daysInMonth]);
 
-  // Export to Excel
   const handleExport = useCallback(async () => {
     if (!selectedProject || !selectedPeriod || rekapData.length === 0) {
       toast.warning("Tidak ada data untuk diekspor");
@@ -342,7 +328,6 @@ const RekapPresensiBulanan = () => {
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
-      {/* Header */}
       <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-3">
           <div className="flex-1">
@@ -375,7 +360,6 @@ const RekapPresensiBulanan = () => {
         </div>
       </div>
 
-      {/* Filters */}
       <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div>
@@ -441,7 +425,6 @@ const RekapPresensiBulanan = () => {
         </div>
       </div>
 
-      {/* Project Info */}
       {currentProject && (
         <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
           <h3 className="text-base font-semibold mb-3 flex items-center gap-2">
@@ -524,7 +507,6 @@ const RekapPresensiBulanan = () => {
         </div>
       )}
 
-      {/* Status Legend */}
       <div className="bg-white rounded-xl shadow-sm p-4 mb-4">
         <h3 className="text-sm font-semibold mb-3">Keterangan Status</h3>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
@@ -554,10 +536,8 @@ const RekapPresensiBulanan = () => {
         </div>
       </div>
 
-      {/* Table */}
       {selectedProject && selectedPeriod ? (
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-          {/* Table Controls */}
           <div className="px-4 py-2 border-b flex justify-between items-center text-xs text-gray-600">
             <div className="flex items-center gap-2">
               Tampilkan
@@ -583,10 +563,8 @@ const RekapPresensiBulanan = () => {
             </div>
           </div>
 
-          {/* Fixed + Scrollable Table */}
           <div className="relative">
             <div className="flex">
-              {/* Fixed Left Columns */}
               <div className="flex-shrink-0 border-r-2 border-gray-200">
                 <table ref={leftTableRef} className="text-xs">
                   <thead className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
@@ -810,7 +788,6 @@ const RekapPresensiBulanan = () => {
                 </table>
               </div>
 
-              {/* Scrollable Right Columns (Calendar Days) */}
               <div className="flex-1 overflow-x-auto">
                 <table ref={rightTableRef} className="text-xs min-w-full">
                   <thead className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
@@ -901,7 +878,6 @@ const RekapPresensiBulanan = () => {
             </div>
           </div>
 
-          {/* Pagination */}
           <div className="px-4 py-2 border-t flex justify-between items-center text-xs">
             <div>
               Halaman {currentPage} dari {totalPages}

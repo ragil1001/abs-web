@@ -1,14 +1,10 @@
-// src/utils/constants.js
-
-// API Configuration
 export const API_CONFIG = {
   BASE_URL: process.env.NEXT_PUBLIC_API_URL,
   APP_URL: process.env.NEXT_PUBLIC_APP_URL,
   APP_NAME: process.env.NEXT_PUBLIC_APP_NAME || "Admin Presensi",
-  TIMEOUT: 100000, // 30 seconds
+  TIMEOUT: 100000,
 };
 
-// Application Routes
 export const ROUTES = {
   HOME: "/",
   DASHBOARD: "/dashboard",
@@ -22,7 +18,6 @@ export const ROUTES = {
   REKAP_BULANAN: "/bulanan",
 };
 
-// Storage Keys
 export const STORAGE_KEYS = {
   AUTH_TOKEN: "auth_token",
   AUTH_USER: "auth_user",
@@ -32,14 +27,12 @@ export const STORAGE_KEYS = {
   CURRENT_PAGE: "currentPage",
 };
 
-// API Response Status
 export const API_STATUS = {
   SUCCESS: "success",
   ERROR: "error",
   LOADING: "loading",
 };
 
-// HTTP Status Codes
 export const HTTP_STATUS = {
   OK: 200,
   CREATED: 201,
@@ -51,14 +44,12 @@ export const HTTP_STATUS = {
   INTERNAL_SERVER_ERROR: 500,
 };
 
-// Pagination
 export const PAGINATION = {
   DEFAULT_PAGE: 1,
   DEFAULT_LIMIT: 10,
   DEFAULT_LIMITS: [10, 25, 50, 100],
 };
 
-// Date Formats
 export const DATE_FORMATS = {
   API_DATE: "YYYY-MM-DD",
   API_DATETIME: "YYYY-MM-DD HH:mm:ss",
@@ -67,7 +58,6 @@ export const DATE_FORMATS = {
   DISPLAY_TIME: "HH:mm",
 };
 
-// Status Types
 export const STATUS_TYPES = {
   AKTIF: "aktif",
   NONAKTIF: "nonaktif",
@@ -76,13 +66,11 @@ export const STATUS_TYPES = {
   REJECTED: "rejected",
 };
 
-// Employee Status
 export const EMPLOYEE_STATUS = {
   AKTIF: { value: "aktif", label: "Aktif", color: "green" },
   NONAKTIF: { value: "nonaktif", label: "Non-Aktif", color: "red" },
 };
 
-// Attendance Types
 export const ATTENDANCE_TYPES = {
   HADIR: { value: "hadir", label: "Hadir", color: "green" },
   TERLAMBAT: { value: "terlambat", label: "Terlambat", color: "yellow" },
@@ -91,20 +79,17 @@ export const ATTENDANCE_TYPES = {
   ALPHA: { value: "alpha", label: "Alpha", color: "red" },
 };
 
-// Gender Types
 export const GENDER_TYPES = {
   LAKI_LAKI: { value: "L", label: "Laki-laki" },
   PEREMPUAN: { value: "P", label: "Perempuan" },
 };
 
-// Shift Types
 export const SHIFT_TYPES = {
   PAGI: { value: "pagi", label: "Shift Pagi", time: "07:00-15:00" },
   SORE: { value: "sore", label: "Shift Sore", time: "15:00-23:00" },
   MALAM: { value: "malam", label: "Shift Malam", time: "23:00-07:00" },
 };
 
-// Form Validation
 export const VALIDATION = {
   MIN_PASSWORD_LENGTH: 6,
   MAX_USERNAME_LENGTH: 255,
@@ -113,11 +98,10 @@ export const VALIDATION = {
   PHONE_REGEX: /^(\+62|62|0)8[1-9][0-9]{6,11}$/,
   EMAIL_REGEX: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
   PAGINATION: {
-    DEFAULT_LIMITS: [10, 25, 50, 100], // Added pagination limits
+    DEFAULT_LIMITS: [10, 25, 50, 100],
   },
 };
 
-// Message Types
 export const MESSAGE_TYPES = {
   SUCCESS: "success",
   ERROR: "error",
@@ -125,7 +109,6 @@ export const MESSAGE_TYPES = {
   INFO: "info",
 };
 
-// Default Messages
 export const MESSAGES = {
   LOGIN_SUCCESS: "Login berhasil",
   LOGIN_ERROR: "Username atau password salah",
@@ -141,14 +124,12 @@ export const MESSAGES = {
   NOT_FOUND: "Data tidak ditemukan.",
 };
 
-// Animation Durations
 export const ANIMATION = {
   FAST: 150,
   NORMAL: 300,
   SLOW: 500,
 };
 
-// Breakpoints (Tailwind CSS)
 export const BREAKPOINTS = {
   SM: 640,
   MD: 768,
@@ -174,7 +155,6 @@ export const KATEGORI_IZIN_TYPES = {
   },
 };
 
-// Sub Kategori Cuti Khusus
 export const SUB_KATEGORI_CUTI_KHUSUS = {
   PERNIKAHAN_KARYAWAN: {
     value: "pernikahan_karyawan",

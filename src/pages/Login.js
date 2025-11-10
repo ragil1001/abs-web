@@ -1,4 +1,3 @@
-// src/pages/Login.js
 "use client";
 import React, { useState } from "react";
 import { Eye, EyeOff, LogIn, AlertCircle } from "lucide-react";
@@ -20,7 +19,6 @@ export default function LoginPage() {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
 
-    // Clear errors when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: null }));
     }
@@ -33,7 +31,6 @@ export default function LoginPage() {
     e.preventDefault();
     setApiError("");
 
-    // Validate form
     const validation = validateForm(form, loginValidator);
     if (!validation.isValid) {
       setErrors(validation.errors);
@@ -42,8 +39,6 @@ export default function LoginPage() {
 
     try {
       await login(form);
-      // Login successful, AuthContext will handle the state update
-      // and the main app will re-render showing the dashboard
     } catch (error) {
       console.error("Login error:", error);
 
@@ -58,9 +53,7 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 via-white to-orange-100 px-4">
       <div className="w-full max-w-md">
-        {/* Card */}
         <div className="bg-white rounded-2xl shadow-xl p-8 border border-orange-100 relative">
-          {/* Logo */}
           <div className="flex flex-col items-center mb-8">
             <div className="w-20 h-20 rounded-2xl bg-white shadow-lg flex items-center justify-center mb-4 overflow-hidden border border-gray-100">
               <img
@@ -75,7 +68,6 @@ export default function LoginPage() {
             <p className="text-gray-500 text-sm">Sistem Presensi Karyawan</p>
           </div>
 
-          {/* API Error Alert */}
           {apiError && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start space-x-3">
               <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
@@ -86,9 +78,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          {/* Form */}
           <form onSubmit={handleLogin} className="space-y-5">
-            {/* Username */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Username
@@ -114,7 +104,6 @@ export default function LoginPage() {
               )}
             </div>
 
-            {/* Password */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Password
@@ -150,7 +139,6 @@ export default function LoginPage() {
               )}
             </div>
 
-            {/* Tombol Login */}
             <button
               type="submit"
               disabled={loading}
@@ -171,7 +159,6 @@ export default function LoginPage() {
           </form>
         </div>
 
-        {/* Footer */}
         <p className="text-center text-sm text-gray-500 mt-6">
           © {new Date().getFullYear()} PT Qiprah Multi Service. All rights
           reserved.

@@ -1,4 +1,3 @@
-// src/components/NotificationDropdown.js
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import {
@@ -81,25 +80,17 @@ const NotificationDropdown = () => {
   };
 
   const handleNotificationClick = async (notification) => {
-    console.log("🔔 Notification clicked:", notification);
-
-    // Mark as read
     if (!notification.is_read) {
       await markAsRead(notification.id);
     }
 
-    // Close dropdown
     setIsOpen(false);
     setShowAllNotifications(false);
 
-    // Extract data from notification
     const notifData = notification.data || {};
-    console.log("📦 Notification data:", notifData);
 
-    // Handle different notification types
     const notifType = notification.type;
 
-    // Handle IZIN notifications
     if (notifType.startsWith("izin_")) {
       const pengajuanIzinId = notifData.pengajuan_izin_id;
       const projectId = notifData.project_id;
@@ -108,20 +99,10 @@ const NotificationDropdown = () => {
       const karyawanNik = notifData.karyawan_nik;
       const kategoriIzin = notifData.kategori_izin;
 
-      // Determine status filter
       let statusFilter = "all";
       if (notifType === "izin_pending") statusFilter = "pending";
       else if (notifType === "izin_approved") statusFilter = "disetujui";
       else if (notifType === "izin_rejected") statusFilter = "ditolak";
-
-      console.log("🎯 Navigating to Pengajuan Izin with:", {
-        pengajuanIzinId,
-        projectId,
-        status: statusFilter,
-        kategoriIzin,
-        karyawanNama,
-        karyawanNik,
-      });
 
       // Dispatch navigation event
       const navigationEvent = new CustomEvent("navigateToDetail", {
@@ -142,10 +123,6 @@ const NotificationDropdown = () => {
         },
       });
 
-      console.log(
-        "🚀 Dispatching navigateToDetail event:",
-        navigationEvent.detail
-      );
       window.dispatchEvent(navigationEvent);
     }
     // Handle TUKAR SHIFT notifications
@@ -159,13 +136,6 @@ const NotificationDropdown = () => {
       else if (notifType === "tukar_shift_approved") statusFilter = "disetujui";
       else if (notifType === "tukar_shift_rejected") statusFilter = "ditolak";
 
-      console.log("🎯 Navigating to Tukar Shift with:", {
-        tukarShiftId,
-        projectId,
-        status: statusFilter,
-      });
-
-      // Dispatch navigation event
       const navigationEvent = new CustomEvent("navigateToDetail", {
         detail: {
           page: "tukar-shift",
@@ -180,14 +150,8 @@ const NotificationDropdown = () => {
         },
       });
 
-      console.log(
-        "🚀 Dispatching navigateToDetail event:",
-        navigationEvent.detail
-      );
       window.dispatchEvent(navigationEvent);
-    }
-    // Fallback to click_action URL
-    else if (notifData.click_action) {
+    } else if (notifData.click_action) {
       window.location.href = notifData.click_action;
     }
   };
@@ -203,7 +167,6 @@ const NotificationDropdown = () => {
 
   return (
     <div className="relative" ref={dropdownRef}>
-      {/* Bell Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="relative p-2.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors duration-200"
@@ -216,7 +179,6 @@ const NotificationDropdown = () => {
         )}
       </button>
 
-      {/* Dropdown */}
       {isOpen && (
         <div className="absolute right-0 top-full mt-2 w-96 bg-white border border-gray-200 rounded-xl shadow-xl z-50">
           {/* Header */}
@@ -243,7 +205,6 @@ const NotificationDropdown = () => {
             )}
           </div>
 
-          {/* Notification List */}
           <div
             className="overflow-y-auto"
             style={{
@@ -315,7 +276,6 @@ const NotificationDropdown = () => {
             )}
           </div>
 
-          {/* Footer */}
           {notifications.length > 0 && (
             <div className="px-4 py-3 border-t border-gray-100 bg-gray-50 rounded-b-xl sticky bottom-0">
               {!showAllNotifications && notifications.length > 5 ? (

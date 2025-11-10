@@ -1,9 +1,5 @@
-// src/utils/exportPresensiHarian.js
 import ExcelJS from "exceljs";
 
-/**
- * Export Presensi Harian to Excel dengan 2 sheets (Masuk & Pulang)
- */
 export default async function exportPresensiHarian({
   data,
   projectInfo,
@@ -18,7 +14,6 @@ export default async function exportPresensiHarian({
   wb.creator = "Aplikasi Presensi Karyawan";
   wb.created = new Date();
 
-  // Format tanggal Indonesia
   const tanggalObj = new Date(tanggal);
   const hariNama = [
     "Minggu",
@@ -50,7 +45,6 @@ export default async function exportPresensiHarian({
   const tahun = tanggalObj.getFullYear();
   const tanggalFormatted = `${hari}, ${tanggalStr} ${bulan} ${tahun}`;
 
-  // Create Sheet 1: Presensi Masuk
   createPresensiMasukSheet(
     wb,
     data,
@@ -59,7 +53,6 @@ export default async function exportPresensiHarian({
     tanggalFormatted
   );
 
-  // Create Sheet 2: Presensi Pulang
   createPresensiPulangSheet(
     wb,
     data,
@@ -68,11 +61,9 @@ export default async function exportPresensiHarian({
     tanggalFormatted
   );
 
-  // Generate filename
   const projectName = projectInfo.nama.replace(/[^a-zA-Z0-9]/g, "_");
   const filename = `Presensi_Harian_${projectName}_${tanggal}.xlsx`;
 
-  // Download file
   const buffer = await wb.xlsx.writeBuffer();
   const blob = new Blob([buffer], {
     type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
@@ -89,9 +80,6 @@ export default async function exportPresensiHarian({
   return true;
 }
 
-/**
- * Create Presensi Masuk Sheet
- */
 function createPresensiMasukSheet(
   wb,
   data,
@@ -101,23 +89,21 @@ function createPresensiMasukSheet(
 ) {
   const ws = wb.addWorksheet("Presensi Masuk");
 
-  // Column widths
   ws.columns = [
-    { width: 15 }, // A: NIK
-    { width: 25 }, // B: Nama
-    { width: 20 }, // C: Divisi
-    { width: 20 }, // D: Jabatan
-    { width: 20 }, // E: Shift
-    { width: 12 }, // F: Waktu Masuk
-    { width: 15 }, // G: Status
-    { width: 35 }, // H: Keterangan
-    { width: 50 }, // I: Foto (link)
-    { width: 40 }, // J: Lokasi (Google Maps link)
+    { width: 15 },
+    { width: 25 },
+    { width: 20 },
+    { width: 20 },
+    { width: 20 },
+    { width: 12 },
+    { width: 15 },
+    { width: 35 },
+    { width: 50 },
+    { width: 40 },
   ];
 
   let currentRow = 1;
 
-  // Title
   ws.mergeCells(`A${currentRow}:J${currentRow}`);
   const titleCell = ws.getCell(`A${currentRow}`);
   titleCell.value = "REKAP PRESENSI MASUK";
@@ -131,7 +117,6 @@ function createPresensiMasukSheet(
   ws.getRow(currentRow).height = 25;
   currentRow += 2;
 
-  // Project Name
   ws.mergeCells(`A${currentRow}:J${currentRow}`);
   const projectNameCell = ws.getCell(`A${currentRow}`);
   projectNameCell.value = projectInfo.nama;
@@ -139,7 +124,6 @@ function createPresensiMasukSheet(
   projectNameCell.alignment = { horizontal: "center" };
   currentRow++;
 
-  // Date
   ws.mergeCells(`A${currentRow}:J${currentRow}`);
   const dateCell = ws.getCell(`A${currentRow}`);
   dateCell.value = `${tanggalFormatted} - PT. QIPRAH MULTI SERVICE`;
@@ -147,7 +131,6 @@ function createPresensiMasukSheet(
   dateCell.alignment = { horizontal: "center" };
   currentRow += 2;
 
-  // Project Info
   ws.getCell(`A${currentRow}`).value = "Nama Project";
   ws.getCell(`A${currentRow}`).font = { bold: true };
   ws.getCell(`B${currentRow}`).value = projectInfo.nama;
@@ -163,7 +146,6 @@ function createPresensiMasukSheet(
   ws.getCell(`B${currentRow}`).value = projectInfo.total_karyawan;
   currentRow += 2;
 
-  // Statistics Header
   ws.mergeCells(`A${currentRow}:B${currentRow}`);
   const statHeaderCell = ws.getCell(`A${currentRow}`);
   statHeaderCell.value = "STATISTIK PRESENSI MASUK";
@@ -176,7 +158,6 @@ function createPresensiMasukSheet(
   statHeaderCell.alignment = { horizontal: "center" };
   currentRow++;
 
-  // Statistics Table Header
   ws.getCell(`A${currentRow}`).value = "Status";
   ws.getCell(`B${currentRow}`).value = "Jumlah";
   ws.getRow(currentRow).font = { bold: true };
@@ -188,7 +169,6 @@ function createPresensiMasukSheet(
   applyBorder(ws, `A${currentRow}:B${currentRow}`);
   currentRow++;
 
-  // Statistics Data
   const stats = [
     ["Hadir", statistikMasuk.hadir],
     ["Terlambat", statistikMasuk.terlambat],
@@ -205,7 +185,6 @@ function createPresensiMasukSheet(
   });
   currentRow++;
 
-  // Table Header
   const tableHeaderRow = currentRow;
   const headers = [
     "NIK",
@@ -233,7 +212,6 @@ function createPresensiMasukSheet(
   applyBorder(ws, `A${tableHeaderRow}:J${tableHeaderRow}`);
   currentRow++;
 
-  // Data Rows
   data.forEach((item) => {
     const presensi = item.presensi_masuk;
     const status = presensi
@@ -251,7 +229,6 @@ function createPresensiMasukSheet(
     ws.getCell(`G${currentRow}`).value = status;
     ws.getCell(`H${currentRow}`).value = presensi?.keterangan || "-";
 
-    // Foto link
     if (presensi?.foto) {
       const fotoCell = ws.getCell(`I${currentRow}`);
       fotoCell.value = {
@@ -264,7 +241,6 @@ function createPresensiMasukSheet(
       ws.getCell(`I${currentRow}`).value = "-";
     }
 
-    // Lokasi (Google Maps with pin)
     if (presensi?.latitude && presensi?.longitude) {
       const mapsUrl = `https://www.google.com/maps?q=${presensi.latitude},${presensi.longitude}`;
       const lokasiCell = ws.getCell(`J${currentRow}`);
@@ -278,7 +254,6 @@ function createPresensiMasukSheet(
       ws.getCell(`J${currentRow}`).value = "-";
     }
 
-    // Alignment
     ws.getCell(`A${currentRow}`).alignment = {
       horizontal: "center",
       vertical: "middle",
@@ -305,9 +280,6 @@ function createPresensiMasukSheet(
   });
 }
 
-/**
- * Create Presensi Pulang Sheet
- */
 function createPresensiPulangSheet(
   wb,
   data,
@@ -317,23 +289,21 @@ function createPresensiPulangSheet(
 ) {
   const ws = wb.addWorksheet("Presensi Pulang");
 
-  // Column widths
   ws.columns = [
-    { width: 15 }, // A: NIK
-    { width: 25 }, // B: Nama
-    { width: 20 }, // C: Divisi
-    { width: 20 }, // D: Jabatan
-    { width: 20 }, // E: Shift
-    { width: 12 }, // F: Waktu Pulang
-    { width: 20 }, // G: Status
-    { width: 35 }, // H: Keterangan
-    { width: 50 }, // I: Foto (link)
-    { width: 40 }, // J: Lokasi (Google Maps link)
+    { width: 15 },
+    { width: 25 },
+    { width: 20 },
+    { width: 20 },
+    { width: 20 },
+    { width: 12 },
+    { width: 20 },
+    { width: 35 },
+    { width: 50 },
+    { width: 40 },
   ];
 
   let currentRow = 1;
 
-  // Title
   ws.mergeCells(`A${currentRow}:J${currentRow}`);
   const titleCell = ws.getCell(`A${currentRow}`);
   titleCell.value = "REKAP PRESENSI PULANG";
@@ -347,7 +317,6 @@ function createPresensiPulangSheet(
   ws.getRow(currentRow).height = 25;
   currentRow += 2;
 
-  // Project Name
   ws.mergeCells(`A${currentRow}:J${currentRow}`);
   const projectNameCell = ws.getCell(`A${currentRow}`);
   projectNameCell.value = projectInfo.nama;
@@ -355,7 +324,6 @@ function createPresensiPulangSheet(
   projectNameCell.alignment = { horizontal: "center" };
   currentRow++;
 
-  // Date
   ws.mergeCells(`A${currentRow}:J${currentRow}`);
   const dateCell = ws.getCell(`A${currentRow}`);
   dateCell.value = `${tanggalFormatted} - PT. QIPRAH MULTI SERVICE`;
@@ -363,7 +331,6 @@ function createPresensiPulangSheet(
   dateCell.alignment = { horizontal: "center" };
   currentRow += 2;
 
-  // Project Info
   ws.getCell(`A${currentRow}`).value = "Nama Project";
   ws.getCell(`A${currentRow}`).font = { bold: true };
   ws.getCell(`B${currentRow}`).value = projectInfo.nama;
@@ -379,7 +346,6 @@ function createPresensiPulangSheet(
   ws.getCell(`B${currentRow}`).value = projectInfo.total_karyawan;
   currentRow += 2;
 
-  // Statistics Header
   ws.mergeCells(`A${currentRow}:B${currentRow}`);
   const statHeaderCell = ws.getCell(`A${currentRow}`);
   statHeaderCell.value = "STATISTIK PRESENSI PULANG";
@@ -392,7 +358,6 @@ function createPresensiPulangSheet(
   statHeaderCell.alignment = { horizontal: "center" };
   currentRow++;
 
-  // Statistics Table Header
   ws.getCell(`A${currentRow}`).value = "Status";
   ws.getCell(`B${currentRow}`).value = "Jumlah";
   ws.getRow(currentRow).font = { bold: true };
@@ -404,7 +369,6 @@ function createPresensiPulangSheet(
   applyBorder(ws, `A${currentRow}:B${currentRow}`);
   currentRow++;
 
-  // Statistics Data
   const stats = [
     ["Hadir", statistikPulang.hadir],
     ["Lembur", statistikPulang.lembur],
@@ -424,7 +388,6 @@ function createPresensiPulangSheet(
   });
   currentRow++;
 
-  // Table Header
   const tableHeaderRow = currentRow;
   const headers = [
     "NIK",
@@ -452,7 +415,6 @@ function createPresensiPulangSheet(
   applyBorder(ws, `A${tableHeaderRow}:J${tableHeaderRow}`);
   currentRow++;
 
-  // Data Rows
   data.forEach((item) => {
     const presensi = item.presensi_pulang;
     const status = presensi
@@ -470,7 +432,6 @@ function createPresensiPulangSheet(
     ws.getCell(`G${currentRow}`).value = status;
     ws.getCell(`H${currentRow}`).value = presensi?.keterangan || "-";
 
-    // Foto link
     if (presensi?.foto) {
       const fotoCell = ws.getCell(`I${currentRow}`);
       fotoCell.value = {
@@ -483,7 +444,6 @@ function createPresensiPulangSheet(
       ws.getCell(`I${currentRow}`).value = "-";
     }
 
-    // Lokasi (Google Maps with pin)
     if (presensi?.latitude && presensi?.longitude) {
       const mapsUrl = `https://www.google.com/maps?q=${presensi.latitude},${presensi.longitude}`;
       const lokasiCell = ws.getCell(`J${currentRow}`);
@@ -497,7 +457,6 @@ function createPresensiPulangSheet(
       ws.getCell(`J${currentRow}`).value = "-";
     }
 
-    // Alignment
     ws.getCell(`A${currentRow}`).alignment = {
       horizontal: "center",
       vertical: "middle",
@@ -524,9 +483,6 @@ function createPresensiPulangSheet(
   });
 }
 
-/**
- * Apply border to a range
- */
 function applyBorder(ws, range) {
   const border = {
     top: { style: "thin" },
@@ -557,9 +513,6 @@ function applyBorder(ws, range) {
   }
 }
 
-/**
- * Get status text for masuk
- */
 function getStatusText(status) {
   const statusMap = {
     hadir: "Hadir",
@@ -571,9 +524,6 @@ function getStatusText(status) {
   return statusMap[status] || status;
 }
 
-/**
- * Get status text for pulang
- */
 function getStatusTextPulang(status) {
   const statusMap = {
     hadir: "Hadir",

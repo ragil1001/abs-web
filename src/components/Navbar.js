@@ -1,4 +1,3 @@
-// src/components/Navbar.js
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { ChevronDown, KeyRound, Settings, LogOut } from "lucide-react";

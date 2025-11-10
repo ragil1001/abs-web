@@ -1,14 +1,11 @@
-// src/hooks/useApi.js
 "use client";
 import { useState, useCallback, useRef, useEffect } from "react";
 
-// Custom hook for API calls with loading, error handling
 export const useApi = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const abortControllerRef = useRef(null);
 
-  // Cleanup function to abort pending requests
   useEffect(() => {
     return () => {
       if (abortControllerRef.current) {
@@ -17,14 +14,11 @@ export const useApi = () => {
     };
   }, []);
 
-  // Generic API call function
   const call = useCallback(async (apiFunction, ...args) => {
-    // Cancel previous request if still pending
     if (abortControllerRef.current) {
       abortControllerRef.current.abort();
     }
 
-    // Create new abort controller
     abortControllerRef.current = new AbortController();
 
     setLoading(true);
@@ -35,7 +29,6 @@ export const useApi = () => {
       abortControllerRef.current = null;
       return result;
     } catch (err) {
-      // Don't set error if request was aborted
       if (err.name !== "AbortError") {
         setError(err);
         throw err;
@@ -45,7 +38,6 @@ export const useApi = () => {
     }
   }, []);
 
-  // Clear error function
   const clearError = useCallback(() => {
     setError(null);
   }, []);
@@ -58,7 +50,6 @@ export const useApi = () => {
   };
 };
 
-// Hook for paginated data
 export const usePaginatedApi = (
   apiFunction,
   initialPage = 1,
@@ -137,7 +128,6 @@ export const usePaginatedApi = (
   };
 };
 
-// Hook for form submissions
 export const useFormApi = (submitFunction) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);

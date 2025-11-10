@@ -1,7 +1,5 @@
-// src/lib/auth.js
 import { authAPI } from "./api";
 
-// Token management
 export const tokenManager = {
   get: () => {
     if (typeof window !== "undefined") {
@@ -24,7 +22,6 @@ export const tokenManager = {
   },
 };
 
-// User data management
 export const userManager = {
   get: () => {
     if (typeof window !== "undefined") {
@@ -47,9 +44,7 @@ export const userManager = {
   },
 };
 
-// Authentication functions
 export const auth = {
-  // Login function
   login: async (credentials) => {
     try {
       const response = await authAPI.login(credentials);
@@ -57,7 +52,6 @@ export const auth = {
       if (response.success && response.data) {
         const { token, user } = response.data;
 
-        // Store token and user data
         tokenManager.set(token);
         userManager.set(user);
 
@@ -78,30 +72,25 @@ export const auth = {
     }
   },
 
-  // Logout function
   logout: async () => {
     try {
       await authAPI.logout();
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
-      // Always clear local data
       tokenManager.remove();
       userManager.remove();
     }
   },
 
-  // Check if user is authenticated
   isAuthenticated: () => {
     return !!tokenManager.get();
   },
 
-  // Get current user
   getCurrentUser: () => {
     return userManager.get();
   },
 
-  // Verify token with server
   verifyToken: async () => {
     try {
       const response = await authAPI.me();
@@ -118,28 +107,23 @@ export const auth = {
   },
 };
 
-// Auth helpers
 export const authHelpers = {
-  // Check if user has specific role (for future use)
   hasRole: (role) => {
     const user = userManager.get();
     return user?.role === role;
   },
 
-  // Get user initials for avatar
   getUserInitials: () => {
     const user = userManager.get();
     if (!user?.username) return "U";
     return user.username.substring(0, 2).toUpperCase();
   },
 
-  // Get display name
   getDisplayName: () => {
     const user = userManager.get();
     return user?.username || "User";
   },
 
-  // Format last login time
   formatLastLogin: () => {
     const user = userManager.get();
     if (!user?.last_login_at) return null;

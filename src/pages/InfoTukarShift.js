@@ -97,13 +97,11 @@ const InfoTukarShift = ({ navigationDetail = null }) => {
     return periods;
   }, [currentProject]);
 
-  // ✅ Helper to format shift display
   const formatShiftDisplay = useCallback((jadwalShift) => {
     if (!jadwalShift) return "-";
 
     const { shift_code, waktu_mulai, waktu_selesai } = jadwalShift;
 
-    // Format waktu jika ada
     if (waktu_mulai && waktu_selesai) {
       const timeRange = timeHelpers.formatShiftRange(
         waktu_mulai,

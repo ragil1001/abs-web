@@ -47,7 +47,6 @@ const STATUS_TYPES = {
   terkirim: { label: "Terkirim", color: "green" },
 };
 
-// Komponen Karyawan Selector yang Dioptimalkan
 const KaryawanSelector = ({ selectedIds, onChange, disabled, error }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [karyawanList, setKaryawanList] = useState([]);
@@ -60,11 +59,9 @@ const KaryawanSelector = ({ selectedIds, onChange, disabled, error }) => {
   const [hasAppliedFilter, setHasAppliedFilter] = useState(false);
   const { call } = useApi();
 
-  // Fetch filter options
   useEffect(() => {
     const fetchFilterOptions = async () => {
       try {
-        // Fetch jabatan
         const jabatanResponse = await call(
           informasiAPI.getTargetOptions,
           "jabatan"
@@ -73,7 +70,6 @@ const KaryawanSelector = ({ selectedIds, onChange, disabled, error }) => {
           setJabatanList(jabatanResponse.data || []);
         }
 
-        // Fetch project
         const projectResponse = await call(
           informasiAPI.getTargetOptions,
           "project"
@@ -89,10 +85,8 @@ const KaryawanSelector = ({ selectedIds, onChange, disabled, error }) => {
     fetchFilterOptions();
   }, [call]);
 
-  // Fetch karyawan when filter applied
   useEffect(() => {
     const fetchKaryawan = async () => {
-      // Jangan fetch jika belum ada filter yang dipilih
       if (
         jabatanFilter === "all" &&
         projectFilter === "all" &&
@@ -110,7 +104,6 @@ const KaryawanSelector = ({ selectedIds, onChange, disabled, error }) => {
       try {
         let data = [];
 
-        // Jika filter by project, ambil dari KaryawanProject yang aktif
         if (projectFilter !== "all") {
           const response = await call(
             karyawanProjectAPI.getByProject,
@@ -122,7 +115,6 @@ const KaryawanSelector = ({ selectedIds, onChange, disabled, error }) => {
           );
 
           if (response.success) {
-            // Extract karyawan dari response
             data = (response.data || []).map((item) => ({
               id: item.karyawan.id,
               nik: item.karyawan.nik,
@@ -132,7 +124,6 @@ const KaryawanSelector = ({ selectedIds, onChange, disabled, error }) => {
             }));
           }
         } else {
-          // Fetch karyawan normal dengan filter
           const params = {
             per_page: 1000,
             status: "aktif",
@@ -152,7 +143,6 @@ const KaryawanSelector = ({ selectedIds, onChange, disabled, error }) => {
           }
         }
 
-        // Apply additional filters for project results
         if (projectFilter !== "all") {
           if (jabatanFilter !== "all") {
             data = data.filter(
@@ -181,7 +171,6 @@ const KaryawanSelector = ({ selectedIds, onChange, disabled, error }) => {
       }
     };
 
-    // Debounce search
     const timeoutId = setTimeout(() => {
       fetchKaryawan();
     }, 500);
@@ -199,7 +188,7 @@ const KaryawanSelector = ({ selectedIds, onChange, disabled, error }) => {
       ? currentIds.filter((id) => id !== idInt)
       : [...currentIds, idInt];
 
-    console.log("Toggle karyawan:", karyawanId, "New IDs:", newIds); // Debug
+    console.log("Toggle karyawan:", karyawanId, "New IDs:", newIds);
     onChange(newIds);
   };
 
@@ -230,7 +219,6 @@ const KaryawanSelector = ({ selectedIds, onChange, disabled, error }) => {
 
   return (
     <div className="space-y-3">
-      {/* Info Banner */}
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
         <p className="text-sm text-blue-800">
           💡 <strong>Gunakan filter</strong> untuk menampilkan daftar karyawan.
@@ -238,7 +226,6 @@ const KaryawanSelector = ({ selectedIds, onChange, disabled, error }) => {
         </p>
       </div>
 
-      {/* Filters */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -281,7 +268,6 @@ const KaryawanSelector = ({ selectedIds, onChange, disabled, error }) => {
         </select>
       </div>
 
-      {/* Action Buttons */}
       {hasAppliedFilter && (
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -337,7 +323,6 @@ const KaryawanSelector = ({ selectedIds, onChange, disabled, error }) => {
         </div>
       )}
 
-      {/* Karyawan List */}
       <div className="border rounded-lg max-h-96 overflow-y-auto">
         {!hasAppliedFilter ? (
           <div className="p-8 text-center text-gray-500">
@@ -598,14 +583,13 @@ const Informasi = () => {
   }, [resetForm]);
 
   const handleOpenEditModal = useCallback((info) => {
-    console.log("Edit modal opened with info:", info); // Debug
+    console.log("Edit modal opened with info:", info);
 
     setSelectedInformasi(info);
 
-    // Normalize target_ids ke array of integers
     const targetIds = normalizeIds(info.target_ids);
 
-    console.log("Normalized target_ids:", targetIds); // Debug
+    console.log("Normalized target_ids:", targetIds);
 
     setFormData({
       judul: info.judul || "",
@@ -1391,7 +1375,6 @@ const Informasi = () => {
                 </div>
               </div>
 
-              {/* File Lampiran dengan style konsisten seperti Izin/Lembur */}
               <div className="border-t pt-4">
                 <h4 className="font-semibold text-gray-900 mb-2">
                   File Lampiran

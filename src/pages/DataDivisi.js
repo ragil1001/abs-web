@@ -46,7 +46,6 @@ const DataDivisi = () => {
 
   const { loading: fetchLoading, error: fetchError, call } = useApi();
 
-  // Memoized filtered and sorted data
   const processedData = useMemo(() => {
     let filtered = allDivisions;
 
@@ -78,7 +77,6 @@ const DataDivisi = () => {
     return filtered;
   }, [allDivisions, searchTerm, sortField, sortDirection]);
 
-  // Memoized pagination data
   const paginationData = useMemo(() => {
     const totalItems = processedData.length;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -97,14 +95,12 @@ const DataDivisi = () => {
     };
   }, [processedData, currentPage, itemsPerPage]);
 
-  // 🚀 FIXED: Fetch all data with proper cache clearing
   const fetchAllData = useCallback(
     async (forceFresh = false) => {
       try {
-        // 🔥 CRITICAL: Always clear cache before fetching
         if (forceFresh) {
           clearApiCache("/divisis");
-          // Also clear localStorage cache if exists
+
           if (typeof window !== "undefined") {
             localStorage.removeItem("divisi_cache");
             localStorage.removeItem("divisi_cache_timestamp");
@@ -113,7 +109,7 @@ const DataDivisi = () => {
 
         const response = await call(divisiAPI.getAll, {
           per_page: 1000,
-          _t: Date.now(), // Add timestamp to prevent browser caching
+          _t: Date.now(),
         });
 
         if (response.success) {
@@ -133,15 +129,13 @@ const DataDivisi = () => {
     [call]
   );
 
-  // 🚀 FIXED: Initial data load with force refresh
   useEffect(() => {
     if (isAuthenticated && !initialLoadComplete) {
       console.log("🔄 Initial load - clearing all caches");
-      fetchAllData(true); // Force fresh data on initial load
+      fetchAllData(true);
     }
   }, [isAuthenticated, initialLoadComplete, fetchAllData]);
 
-  // Handle sort
   const handleSort = useCallback(
     (field) => {
       if (sortField === field) {
@@ -155,19 +149,16 @@ const DataDivisi = () => {
     [sortField]
   );
 
-  // Handle search
   const handleSearchChange = useCallback((value) => {
     setSearchTerm(value);
     setCurrentPage(1);
   }, []);
 
-  // Handle page size change
   const handleItemsPerPageChange = useCallback((newSize) => {
     setItemsPerPage(newSize);
     setCurrentPage(1);
   }, []);
 
-  // Handle page change
   const handlePageChange = useCallback(
     (page) => {
       const totalPages = paginationData.pagination.last_page;
@@ -178,7 +169,6 @@ const DataDivisi = () => {
     [paginationData.pagination.last_page]
   );
 
-  // Reset form
   const resetForm = useCallback(() => {
     setFormData({ nama: "" });
     setFormErrors({});
@@ -188,20 +178,17 @@ const DataDivisi = () => {
     setImportLoading(false);
   }, []);
 
-  // Reset form when modal closes
   useEffect(() => {
     if (!showAddModal && !showEditModal && !showImportModal) {
       resetForm();
     }
   }, [showAddModal, showEditModal, showImportModal, resetForm]);
 
-  // Open add modal
   const handleOpenAddModal = useCallback(() => {
     resetForm();
     setShowAddModal(true);
   }, [resetForm]);
 
-  // Open edit modal
   const handleOpenEditModal = useCallback(
     (division) => {
       resetForm();
@@ -212,7 +199,6 @@ const DataDivisi = () => {
     [resetForm]
   );
 
-  // Close modal
   const handleCloseModal = useCallback(() => {
     setShowAddModal(false);
     setShowEditModal(false);
@@ -220,7 +206,6 @@ const DataDivisi = () => {
     resetForm();
   }, [resetForm]);
 
-  // Handle submit
   const handleSubmit = async () => {
     if (submitLoading) return;
 
@@ -254,7 +239,6 @@ const DataDivisi = () => {
     }
   };
 
-  // 🚀 FIXED: Actual submit with aggressive cache clearing
   const performSubmit = async () => {
     setSubmitLoading(true);
     setFormErrors({});
@@ -270,20 +254,16 @@ const DataDivisi = () => {
         toast.success(MESSAGES.SAVE_SUCCESS);
       }
 
-      // 🔥 CRITICAL: Aggressive cache clearing
       clearApiCache("/divisis");
-      clearApiCache(); // Clear all cache
+      clearApiCache();
 
-      // Clear localStorage
       if (typeof window !== "undefined") {
         localStorage.removeItem("divisi_cache");
         localStorage.removeItem("divisi_cache_timestamp");
       }
 
-      // Wait a bit for backend to process
       await new Promise((resolve) => setTimeout(resolve, 300));
 
-      // Force refresh with new data
       await fetchAllData(true);
       handleCloseModal();
     } catch (err) {
@@ -300,7 +280,6 @@ const DataDivisi = () => {
     }
   };
 
-  // 🚀 FIXED: Handle delete with aggressive cache clearing
   const handleDelete = (division) => {
     Swal.fire({
       title: "Konfirmasi Hapus",
@@ -317,7 +296,6 @@ const DataDivisi = () => {
           await call(divisiAPI.delete, division.id);
           toast.success(MESSAGES.DELETE_SUCCESS);
 
-          // 🔥 CRITICAL: Aggressive cache clearing
           clearApiCache("/divisis");
           clearApiCache();
 
@@ -337,7 +315,6 @@ const DataDivisi = () => {
     });
   };
 
-  // Handle file selection
   const handleFileSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -367,7 +344,6 @@ const DataDivisi = () => {
     }
   };
 
-  // Process import data
   const processImportData = async (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -444,7 +420,6 @@ const DataDivisi = () => {
     });
   };
 
-  // 🚀 FIXED: Handle import with aggressive cache clearing
   const handleImport = async () => {
     if (!importFile) {
       toast.error("Pilih file Excel terlebih dahulu", { autoClose: 3000 });
@@ -475,7 +450,6 @@ const DataDivisi = () => {
           await call(divisiAPI.create, divisi);
         }
 
-        // 🔥 CRITICAL: Aggressive cache clearing
         clearApiCache("/divisis");
         clearApiCache();
 
@@ -500,7 +474,6 @@ const DataDivisi = () => {
     }
   };
 
-  // Export to Excel
   const exportToExcel = async () => {
     try {
       Swal.fire({
@@ -552,7 +525,6 @@ const DataDivisi = () => {
     }
   };
 
-  // Download template
   const downloadTemplate = () => {
     try {
       const ws = XLSX.utils.aoa_to_sheet([
@@ -570,7 +542,6 @@ const DataDivisi = () => {
     }
   };
 
-  // Show loading skeleton
   if (!initialLoadComplete) {
     return (
       <div className="p-6 bg-gray-50 min-h-screen">
@@ -612,7 +583,6 @@ const DataDivisi = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
@@ -642,7 +612,6 @@ const DataDivisi = () => {
         </div>
       </div>
 
-      {/* Search */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
           <div className="lg:col-span-2 relative">
@@ -658,7 +627,6 @@ const DataDivisi = () => {
         </div>
       </div>
 
-      {/* Table */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -766,7 +734,6 @@ const DataDivisi = () => {
           </table>
         </div>
 
-        {/* Pagination */}
         <div className="px-6 py-4 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-sm">
           <div>
             Halaman {paginationData.pagination.current_page} dari{" "}
@@ -855,7 +822,6 @@ const DataDivisi = () => {
         </div>
       </div>
 
-      {/* Add Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
@@ -918,7 +884,6 @@ const DataDivisi = () => {
         </div>
       )}
 
-      {/* Edit Modal */}
       {showEditModal && (
         <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
@@ -981,7 +946,6 @@ const DataDivisi = () => {
         </div>
       )}
 
-      {/* Import Modal */}
       {showImportModal && (
         <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-lg">

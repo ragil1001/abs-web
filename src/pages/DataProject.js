@@ -31,7 +31,6 @@ import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import { clearApiCache } from "@/lib/axios";
 
-// Dynamic import untuk Leaflet components
 let MapContainer, TileLayer, Circle, Popup, Marker;
 let L;
 if (typeof window !== "undefined") {
@@ -70,7 +69,7 @@ const DataProject = () => {
     radius: 50,
     waktu_toleransi: "",
     excluded_jabatan_ids: [],
-    enabled_izin_categories: ["sakit", "izin"], // ✅ Default: sakit & izin selalu aktif
+    enabled_izin_categories: ["sakit", "izin"],
     enabled_sub_kategori_izin: [],
     status: "aktif",
     shifts: [{ id: null, kode: "", waktu_mulai: "", waktu_selesai: "" }],
@@ -80,7 +79,6 @@ const DataProject = () => {
 
   const { loading: fetchLoading, call } = useApi();
 
-  // Fetch all jabatan untuk dropdown
   const fetchAllJabatans = useCallback(async () => {
     try {
       const response = await call(jabatanAPI.getAllSimple);
@@ -119,7 +117,6 @@ const DataProject = () => {
     }
   }, [isAuthenticated, fetchAllData, fetchAllJabatans]);
 
-  // Memoized filtered and sorted data
   const processedData = useMemo(() => {
     let filtered = projects.filter(
       (p) =>
@@ -146,7 +143,6 @@ const DataProject = () => {
     return filtered;
   }, [projects, searchTerm, sortField, sortDirection, statusFilter]);
 
-  // Memoized pagination data
   const paginationData = useMemo(() => {
     const totalItems = processedData.length;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -275,7 +271,7 @@ const DataProject = () => {
       radius: 50,
       waktu_toleransi: "",
       excluded_jabatan_ids: [],
-      enabled_izin_categories: ["sakit", "izin"], // ✅ Reset ke default
+      enabled_izin_categories: ["sakit", "izin"],
       enabled_sub_kategori_izin: [],
       status: "aktif",
       shifts: [{ id: null, kode: "", waktu_mulai: "", waktu_selesai: "" }],
@@ -357,12 +353,10 @@ const DataProject = () => {
     setSubmitLoading(true);
 
     try {
-      // ✅ Pastikan sakit & izin selalu ada
       let categories = [...formData.enabled_izin_categories];
       if (!categories.includes("sakit")) categories.push("sakit");
       if (!categories.includes("izin")) categories.push("izin");
 
-      // ✅ Jika cuti_khusus dipilih, aktifkan semua sub kategori
       let subCategories = [];
       if (categories.includes("cuti_khusus")) {
         subCategories = [
@@ -512,7 +506,6 @@ const DataProject = () => {
         }
       }
 
-      // ✅ Pastikan sakit & izin selalu ada di enabled categories
       let categories = project.enabled_izin_categories || ["sakit", "izin"];
       if (!categories.includes("sakit")) categories.push("sakit");
       if (!categories.includes("izin")) categories.push("izin");
@@ -568,7 +561,6 @@ const DataProject = () => {
     return `${date.getDate()} ${months[date.getMonth()]} ${date.getFullYear()}`;
   };
 
-  // Map Display
   const MapDisplay = useMemo(() => {
     if (typeof window === "undefined" || !MapContainer) return null;
 
@@ -625,7 +617,6 @@ const DataProject = () => {
     );
   }, [formData.lokasi, formData.radius]);
 
-  // Modal Content
   const renderModalContent = useCallback(
     () => (
       <div className="p-6 space-y-6">
@@ -810,7 +801,6 @@ const DataProject = () => {
           </p>
         </div>
 
-        {/* Pengecualian Jabatan dari Radius */}
         <div className="border-t pt-4">
           <div className="flex items-center gap-2 mb-3">
             <Shield className="w-5 h-5 text-orange-600" />
@@ -875,7 +865,6 @@ const DataProject = () => {
             )}
         </div>
 
-        {/* Konfigurasi Kategori Izin */}
         <div className="border-t pt-4">
           <div className="flex items-center gap-2 mb-3">
             <FileText className="w-5 h-5 text-orange-600" />
@@ -884,7 +873,6 @@ const DataProject = () => {
             </label>
           </div>
 
-          {/* Info Card - Sakit & Izin Otomatis Aktif */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
             <div className="flex gap-3">
               <Check className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
@@ -911,7 +899,6 @@ const DataProject = () => {
             ini:
           </p>
 
-          {/* Kategori Opsional */}
           <div className="space-y-3">
             <div className="bg-gradient-to-r from-indigo-50 to-indigo-100 border border-indigo-200 rounded-lg p-4">
               <h4 className="text-sm font-semibold text-indigo-900 mb-3">
@@ -919,7 +906,6 @@ const DataProject = () => {
               </h4>
 
               <div className="space-y-2">
-                {/* Cuti Tahunan */}
                 <label
                   className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
                     (formData.enabled_izin_categories || []).includes(
@@ -952,7 +938,6 @@ const DataProject = () => {
                         );
                       }
 
-                      // Pastikan sakit & izin tetap ada
                       if (!categories.includes("sakit"))
                         categories.push("sakit");
                       if (!categories.includes("izin")) categories.push("izin");
@@ -979,7 +964,6 @@ const DataProject = () => {
                   </div>
                 </label>
 
-                {/* Cuti Khusus */}
                 <label
                   className={`flex items-start gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
                     (formData.enabled_izin_categories || []).includes(
@@ -1012,7 +996,6 @@ const DataProject = () => {
                         );
                       }
 
-                      // Pastikan sakit & izin tetap ada
                       if (!categories.includes("sakit"))
                         categories.push("sakit");
                       if (!categories.includes("izin")) categories.push("izin");
@@ -1043,7 +1026,6 @@ const DataProject = () => {
             </div>
           </div>
 
-          {/* Info jika Cuti Khusus aktif */}
           {(formData.enabled_izin_categories || []).includes("cuti_khusus") && (
             <div className="mt-3 bg-purple-50 border border-purple-200 rounded-lg p-4">
               <div className="flex gap-3">
@@ -1083,7 +1065,6 @@ const DataProject = () => {
             </div>
           )}
 
-          {/* Summary Info */}
           <div className="mt-4 bg-amber-50 border border-amber-200 rounded-lg p-4">
             <div className="flex gap-3">
               <AlertTriangle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
@@ -1135,7 +1116,6 @@ const DataProject = () => {
           {MapDisplay}
         </div>
 
-        {/* Shifts */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Shift Project *
@@ -1256,7 +1236,6 @@ const DataProject = () => {
     ]
   );
 
-  // Loading skeleton
   if (!initialLoadComplete) {
     return (
       <div className="p-6 bg-gray-50 min-h-screen">
@@ -1302,7 +1281,6 @@ const DataProject = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
           <div className="flex-1">
@@ -1331,7 +1309,6 @@ const DataProject = () => {
         </div>
       </div>
 
-      {/* Search */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
           <div className="md:col-span-2 relative">
@@ -1358,7 +1335,6 @@ const DataProject = () => {
         </div>
       </div>
 
-      {/* Table */}
       <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b flex justify-between items-center text-sm text-gray-600">
           <div className="flex items-center gap-2">
@@ -1581,19 +1557,16 @@ const DataProject = () => {
               const pages = [];
 
               if (totalPages <= 7) {
-                // Show all pages if 7 or less
                 for (let i = 1; i <= totalPages; i++) {
                   pages.push(i);
                 }
               } else {
-                // Always show first page
                 pages.push(1);
 
                 if (currentPage > 3) {
                   pages.push("...");
                 }
 
-                // Show pages around current page
                 for (
                   let i = Math.max(2, currentPage - 1);
                   i <= Math.min(totalPages - 1, currentPage + 1);
@@ -1608,7 +1581,6 @@ const DataProject = () => {
                   pages.push("...");
                 }
 
-                // Always show last page
                 if (!pages.includes(totalPages)) {
                   pages.push(totalPages);
                 }
@@ -1660,7 +1632,6 @@ const DataProject = () => {
         </div>
       </div>
 
-      {/* Add Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -1705,7 +1676,6 @@ const DataProject = () => {
         </div>
       )}
 
-      {/* Edit Modal */}
       {showEditModal && (
         <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">

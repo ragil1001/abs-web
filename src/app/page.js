@@ -3,7 +3,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { Menu, ChevronLeft, ChevronRight } from "lucide-react";
 
-// Components
 import Sidebar from "@/components/Sidebar";
 import Navbar from "@/components/Navbar";
 import LoginPage from "@/pages/Login";
@@ -26,20 +25,16 @@ import Informasi from "@/pages/Informasi";
 export default function MainApp() {
   const { isAuthenticated, loading } = useAuth();
 
-  // UI States
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // 🎯 Page state - with smart session handling
   const [currentPage, setCurrentPage] = useState(() => {
     if (typeof window !== "undefined") {
-      // Check if this is a continuing session (refresh) or new session (browser closed)
       const isSessionActive =
         sessionStorage.getItem("session_active") === "true";
 
       if (isSessionActive) {
-        // Continuing session - restore last page
         const savedPage = localStorage.getItem("currentPage");
         console.log(
           "🔄 Continuing session - restoring page:",
@@ -47,7 +42,6 @@ export default function MainApp() {
         );
         return savedPage || "dashboard";
       } else {
-        // New session - start from dashboard
         console.log("🆕 New session - starting from dashboard");
         localStorage.removeItem("currentPage");
         return "dashboard";
@@ -56,10 +50,8 @@ export default function MainApp() {
     return "dashboard";
   });
 
-  // 🎯 Navigation detail state
   const [navigationDetail, setNavigationDetail] = useState(null);
 
-  // 💾 Save current page to localStorage whenever it changes (for refresh)
   useEffect(() => {
     if (typeof window !== "undefined" && isAuthenticated) {
       localStorage.setItem("currentPage", currentPage);
@@ -67,21 +59,18 @@ export default function MainApp() {
     }
   }, [currentPage, isAuthenticated]);
 
-  // 🔒 Mark session as active when authenticated
   useEffect(() => {
     if (typeof window !== "undefined" && isAuthenticated) {
       sessionStorage.setItem("session_active", "true");
     }
   }, [isAuthenticated]);
 
-  // Prevent browser back button
   useEffect(() => {
     if (typeof window !== "undefined") {
       window.history.pushState(null, "", "/");
 
       const handlePopState = () => {
         window.history.pushState(null, "", "/");
-        console.log("⚠️ Browser back disabled");
       };
 
       window.addEventListener("popstate", handlePopState);
@@ -92,19 +81,10 @@ export default function MainApp() {
     }
   }, []);
 
-  // 🔔 Listen for notification navigation events
   useEffect(() => {
     const handleNavigateToDetail = (event) => {
       const { page, detailType, detailId, filters } = event.detail;
 
-      console.log("🎯 Navigation event received:", {
-        page,
-        detailType,
-        detailId,
-        filters,
-      });
-
-      // Set page and detail state
       setCurrentPage(page);
       setNavigationDetail({
         type: detailType,
@@ -112,7 +92,6 @@ export default function MainApp() {
         filters: filters || {},
       });
 
-      // Clear navigation detail after a short delay (to allow page to mount)
       setTimeout(() => {
         setNavigationDetail(null);
       }, 1000);
@@ -125,7 +104,6 @@ export default function MainApp() {
     };
   }, []);
 
-  // Handle responsive
   useEffect(() => {
     const handleResize = () => {
       const mobile = window.innerWidth < 1024;
@@ -138,7 +116,6 @@ export default function MainApp() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  // Load/save sidebar collapsed state
   useEffect(() => {
     if (typeof window !== "undefined" && !isMobile) {
       const saved = localStorage.getItem("sidebarCollapsed");
@@ -155,7 +132,6 @@ export default function MainApp() {
     }
   }, [sidebarCollapsed, isMobile]);
 
-  // Close sidebar on mobile when page changes
   useEffect(() => {
     if (isMobile) setSidebarOpen(false);
   }, [currentPage, isMobile]);
@@ -164,14 +140,11 @@ export default function MainApp() {
     if (!isMobile) setSidebarCollapsed((prev) => !prev);
   }, [isMobile]);
 
-  // Navigate function
   const navigateTo = useCallback((page) => {
-    console.log("📄 Navigate to:", page);
     setCurrentPage(page);
-    setNavigationDetail(null); // Clear any navigation detail
+    setNavigationDetail(null);
   }, []);
 
-  // Render page with navigation detail prop
   const renderPage = () => {
     switch (currentPage) {
       case "dashboard":
@@ -209,7 +182,6 @@ export default function MainApp() {
     }
   };
 
-  // Loading state
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -271,7 +243,6 @@ export default function MainApp() {
               </button>
             </div>
 
-            {/* ✅ Pass onNavigate prop to Navbar */}
             <Navbar onNavigate={navigateTo} />
           </div>
         </header>

@@ -1,4 +1,3 @@
-// src/pages/UbahPassword.js
 "use client";
 import React, { useState } from "react";
 import {
@@ -38,7 +37,6 @@ const UbahPassword = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    // Clear error when typing
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: null }));
     }
@@ -91,7 +89,6 @@ const UbahPassword = () => {
       if (response.data.success) {
         toast.success("Password berhasil diubah!", { autoClose: 3000 });
 
-        // Reset form
         setFormData({
           current_password: "",
           new_password: "",
@@ -115,7 +112,6 @@ const UbahPassword = () => {
 
   return (
     <div className="max-w-2xl mx-auto">
-      {/* Header */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
@@ -128,7 +124,6 @@ const UbahPassword = () => {
         </div>
       </div>
 
-      {/* Current User Info */}
       <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-gradient-to-br from-orange-400 to-orange-600 rounded-full flex items-center justify-center">
@@ -145,10 +140,8 @@ const UbahPassword = () => {
         </div>
       </div>
 
-      {/* Form */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
         <form onSubmit={handleSubmit} className="space-y-5">
-          {/* Current Password */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Password Lama <span className="text-red-500">*</span>
@@ -186,7 +179,6 @@ const UbahPassword = () => {
             )}
           </div>
 
-          {/* New Password */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Password Baru <span className="text-red-500">*</span>
@@ -221,7 +213,6 @@ const UbahPassword = () => {
             <p className="mt-1 text-xs text-gray-500">Minimal 6 karakter</p>
           </div>
 
-          {/* Confirm New Password */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Konfirmasi Password Baru <span className="text-red-500">*</span>
@@ -261,7 +252,6 @@ const UbahPassword = () => {
             )}
           </div>
 
-          {/* Info Box */}
           <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
             <div className="flex gap-3">
               <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
@@ -277,7 +267,6 @@ const UbahPassword = () => {
             </div>
           </div>
 
-          {/* Submit Button */}
           <div className="flex justify-end pt-4">
             <button
               type="submit"

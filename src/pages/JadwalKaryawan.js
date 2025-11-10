@@ -40,7 +40,6 @@ import { clearApiCache } from "@/lib/axios";
 const JadwalKaryawan = () => {
   const HEADER_ROW_HEIGHT = 20;
 
-  // State
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState("");
   const [selectedPeriod, setSelectedPeriod] = useState("");
@@ -55,15 +54,13 @@ const JadwalKaryawan = () => {
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const [scheduleLoading, setScheduleLoading] = useState(false);
 
-  // ✅ IMPORT MODAL STATE - DENGAN FILTER INDEPENDEN
   const [showImportModal, setShowImportModal] = useState(false);
-  const [importProjectId, setImportProjectId] = useState(""); // Filter project untuk import
-  const [importPeriod, setImportPeriod] = useState(""); // Filter periode untuk import
+  const [importProjectId, setImportProjectId] = useState("");
+  const [importPeriod, setImportPeriod] = useState("");
   const [selectedTemplateDate, setSelectedTemplateDate] = useState("");
   const [importFile, setImportFile] = useState(null);
   const [importLoading, setImportLoading] = useState(false);
 
-  // Export modal state
   const [showExportModal, setShowExportModal] = useState(false);
   const [selectedExportDate, setSelectedExportDate] = useState("");
   const [exportLoading, setExportLoading] = useState(false);
@@ -72,19 +69,16 @@ const JadwalKaryawan = () => {
 
   const { loading, call } = useApi();
 
-  // Current project object (untuk display di page)
   const currentProject = useMemo(
     () => projects.find((p) => p.id === parseInt(selectedProject)),
     [selectedProject, projects]
   );
 
-  // ✅ Import project object (untuk import modal)
   const importProject = useMemo(
     () => projects.find((p) => p.id === parseInt(importProjectId)),
     [importProjectId, projects]
   );
 
-  // Period options (untuk display di page)
   const periodOptions = useMemo(() => {
     if (!currentProject) return [];
 
@@ -137,7 +131,6 @@ const JadwalKaryawan = () => {
     return periods;
   }, [currentProject, earliestScheduleDate]);
 
-  // ✅ Import period options (untuk import modal - berdasarkan import project)
   const importPeriodOptions = useMemo(() => {
     if (!importProject) return [];
 
@@ -180,7 +173,6 @@ const JadwalKaryawan = () => {
     return periods;
   }, [importProject]);
 
-  // Calendar data for selected period (page display)
   const calendarData = useMemo(() => {
     if (!selectedPeriod || periodOptions.length === 0) return null;
 
@@ -234,7 +226,6 @@ const JadwalKaryawan = () => {
     return { days, monthHeader, totalDays: days.length };
   }, [selectedPeriod, periodOptions]);
 
-  // Fetch all projects on mount
   const fetchProjects = useCallback(async () => {
     try {
       clearApiCache();
@@ -257,7 +248,6 @@ const JadwalKaryawan = () => {
     fetchProjects();
   }, []);
 
-  // Fetch earliest schedule date for current project
   const fetchEarliestScheduleDate = useCallback(async () => {
     if (!currentProject) return;
 
@@ -308,14 +298,12 @@ const JadwalKaryawan = () => {
     }
   }, [currentProject, fetchEarliestScheduleDate]);
 
-  // Auto select first period when period options change
   useEffect(() => {
     if (periodOptions.length > 0 && !selectedPeriod) {
       setSelectedPeriod(periodOptions[0].value);
     }
   }, [periodOptions, selectedPeriod]);
 
-  // Fetch schedule data when project/period changes
   useEffect(() => {
     if (currentProject && calendarData) {
       fetchScheduleData();
@@ -443,7 +431,6 @@ const JadwalKaryawan = () => {
     }
   }, []);
 
-  // ✅ DOWNLOAD TEMPLATE - Gunakan filter dari modal
   const handleDownloadTemplate = useCallback(async () => {
     if (!selectedTemplateDate || !importProject) {
       toast.warning(
@@ -527,7 +514,6 @@ const JadwalKaryawan = () => {
     }
   }, []);
 
-  // ✅ IMPORT - Gunakan filter dari modal (importProjectId & importPeriod)
   const handleImport = useCallback(async () => {
     if (!importFile || !importProject || !importPeriod) {
       toast.error(
@@ -582,7 +568,6 @@ const JadwalKaryawan = () => {
 
         clearApiCache();
 
-        // ✅ Refresh data jika import project sama dengan current project
         if (currentProject && currentProject.id === importProject.id) {
           await fetchEarliestScheduleDate();
           await fetchScheduleData();
@@ -776,7 +761,6 @@ const JadwalKaryawan = () => {
     setExportLoading(false);
   }, []);
 
-  // ✅ Open import modal - Pre-fill dengan filter page jika ada
   const handleOpenImportModal = useCallback(() => {
     setImportProjectId(selectedProject || "");
     setImportPeriod(selectedPeriod || "");
@@ -784,7 +768,6 @@ const JadwalKaryawan = () => {
     setShowImportModal(true);
   }, [selectedProject, selectedPeriod]);
 
-  // Filter & Pagination
   const filteredEmployees = useMemo(() => {
     const filtered = scheduleData.filter(
       (emp) =>
@@ -879,7 +862,6 @@ const JadwalKaryawan = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
           <div className="flex-1">
@@ -893,7 +875,6 @@ const JadwalKaryawan = () => {
         </div>
       </div>
 
-      {/* Filters */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <div className="lg:col-span-2">
@@ -996,7 +977,6 @@ const JadwalKaryawan = () => {
         </div>
       </div>
 
-      {/* Project Info */}
       {currentProject && (
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
           <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
@@ -1079,10 +1059,8 @@ const JadwalKaryawan = () => {
         </div>
       )}
 
-      {/* Schedule Table */}
       {selectedProject && selectedPeriod && calendarData ? (
         <>
-          {/* Shift Legend */}
           <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-lg font-semibold flex items-center gap-2">
@@ -1120,7 +1098,6 @@ const JadwalKaryawan = () => {
           </div>
 
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            {/* Table Controls */}
             <div className="px-6 py-4 border-b flex justify-between items-center text-sm text-gray-600">
               <div className="flex items-center gap-2">
                 Tampilkan
@@ -1146,9 +1123,7 @@ const JadwalKaryawan = () => {
               </div>
             </div>
 
-            {/* Split Table */}
             <div className="flex">
-              {/* LEFT: Fixed columns */}
               <div className="flex-none w-[432px] border-r border-gray-100 bg-white">
                 <table
                   ref={leftTableRef}
@@ -1279,7 +1254,6 @@ const JadwalKaryawan = () => {
                 </table>
               </div>
 
-              {/* RIGHT: Calendar area */}
               <div className="flex-1 overflow-x-auto">
                 <table
                   ref={rightTableRef}
@@ -1453,7 +1427,6 @@ const JadwalKaryawan = () => {
               </div>
             </div>
 
-            {/* Pagination */}
             <div className="px-6 py-4 border-t flex justify-between items-center text-sm">
               <div>
                 Halaman {currentPage} dari {totalPages}
@@ -1514,7 +1487,6 @@ const JadwalKaryawan = () => {
         </div>
       )}
 
-      {/* Import Modal - ✅ DENGAN FILTER INDEPENDEN */}
       {showImportModal && (
         <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -1530,7 +1502,6 @@ const JadwalKaryawan = () => {
             </div>
 
             <div className="p-6 space-y-6">
-              {/* ✅ FILTER PROJECT UNTUK IMPORT */}
               <div className="bg-blue-50 rounded-lg p-4 space-y-4">
                 <h3 className="font-semibold text-blue-900">
                   Pilih Project & Periode Import
@@ -1585,7 +1556,6 @@ const JadwalKaryawan = () => {
                 </div>
               </div>
 
-              {/* Template Download Section */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">
                   1. Download Template Excel
@@ -1626,7 +1596,6 @@ const JadwalKaryawan = () => {
                 </button>
               </div>
 
-              {/* File Upload Section */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">
                   2. Upload File Excel
@@ -1675,7 +1644,6 @@ const JadwalKaryawan = () => {
                 )}
               </div>
 
-              {/* Instructions */}
               <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                 <div className="flex items-start gap-2">
                   <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
@@ -1712,7 +1680,6 @@ const JadwalKaryawan = () => {
               </div>
             </div>
 
-            {/* Modal Footer */}
             <div className="px-6 py-4 border-t flex justify-end gap-3">
               <button
                 onClick={resetImportModal}
@@ -1748,7 +1715,6 @@ const JadwalKaryawan = () => {
         </div>
       )}
 
-      {/* Export Modal */}
       {showExportModal && (
         <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-xl max-h-[90vh] overflow-y-auto">
@@ -1764,7 +1730,6 @@ const JadwalKaryawan = () => {
             </div>
 
             <div className="p-6 space-y-6">
-              {/* Project Info */}
               <div className="bg-blue-50 rounded-lg p-4">
                 <h3 className="font-semibold text-blue-900 mb-2">
                   Project Terpilih
@@ -1772,7 +1737,6 @@ const JadwalKaryawan = () => {
                 <p className="text-blue-800">{currentProject?.nama}</p>
               </div>
 
-              {/* Period Selection */}
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-gray-900">
                   Pilih Periode Export
@@ -1802,7 +1766,6 @@ const JadwalKaryawan = () => {
                 </div>
               </div>
 
-              {/* Info */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-start gap-2">
                   <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
@@ -1827,7 +1790,6 @@ const JadwalKaryawan = () => {
               </div>
             </div>
 
-            {/* Modal Footer */}
             <div className="px-6 py-4 border-t flex justify-end gap-3">
               <button
                 onClick={resetExportModal}

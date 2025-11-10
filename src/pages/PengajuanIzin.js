@@ -1,4 +1,3 @@
-// src/pages/PengajuanIzin.js
 "use client";
 import React, { useState, useMemo, useEffect, useCallback } from "react";
 import {
@@ -25,20 +24,16 @@ import { pengajuanIzinAPI, projectAPI } from "@/lib/api";
 import { toast } from "react-toastify";
 
 const PengajuanIzin = ({ navigationDetail = null }) => {
-  // CRITICAL: Add initial load complete flag
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
-  // 📍 Track if we've processed navigation detail
   const [processedNavigationId, setProcessedNavigationId] = useState(null);
 
-  // State untuk data
   const [submissions, setSubmissions] = useState([]);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [summary, setSummary] = useState(null);
 
-  // State untuk filter dan pagination
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [kategoriIzinFilter, setKategoriIzinFilter] = useState("all");
@@ -50,7 +45,6 @@ const PengajuanIzin = ({ navigationDetail = null }) => {
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
-  // State untuk modal
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -59,7 +53,6 @@ const PengajuanIzin = ({ navigationDetail = null }) => {
   const [adminNote, setAdminNote] = useState("");
   const [processing, setProcessing] = useState(false);
 
-  // Fetch projects
   const fetchProjects = useCallback(async () => {
     try {
       const result = await projectAPI.getAll();
@@ -71,7 +64,6 @@ const PengajuanIzin = ({ navigationDetail = null }) => {
     }
   }, []);
 
-  // Fetch submissions (all projects or single project)
   const fetchSubmissions = useCallback(async () => {
     if (!projects.length) return;
 
@@ -81,7 +73,6 @@ const PengajuanIzin = ({ navigationDetail = null }) => {
     try {
       let allData = [];
 
-      // Fetch data based on project filter
       if (projectFilter === "all") {
         const promises = projects.map((project) =>
           pengajuanIzinAPI
@@ -124,7 +115,6 @@ const PengajuanIzin = ({ navigationDetail = null }) => {
         }
       }
 
-      // Apply filters
       let filteredData = [...allData];
 
       if (statusFilter !== "all") {
@@ -148,7 +138,6 @@ const PengajuanIzin = ({ navigationDetail = null }) => {
         );
       }
 
-      // Apply custom sorting
       filteredData.sort((a, b) => {
         const aIsPending = a.status === "pending";
         const bIsPending = b.status === "pending";
@@ -163,7 +152,6 @@ const PengajuanIzin = ({ navigationDetail = null }) => {
         return new Date(b.created_at) - new Date(a.created_at);
       });
 
-      // Apply pagination
       const startIndex = (currentPage - 1) * itemsPerPage;
       const endIndex = startIndex + itemsPerPage;
       const paginatedData = filteredData.slice(startIndex, endIndex);
@@ -195,7 +183,6 @@ const PengajuanIzin = ({ navigationDetail = null }) => {
     initialLoadComplete,
   ]);
 
-  // Fetch summary
   const fetchSummary = useCallback(async () => {
     if (projectFilter === "all") {
       if (!projects.length) return;
@@ -276,7 +263,6 @@ const PengajuanIzin = ({ navigationDetail = null }) => {
     }
   }, [projectFilter, projects.length, fetchSummary]);
 
-  // Handle navigation detail from notification
   useEffect(() => {
     if (
       navigationDetail &&
@@ -479,7 +465,6 @@ const PengajuanIzin = ({ navigationDetail = null }) => {
     return options.filter(Boolean);
   }, [submissions]);
 
-  // CRITICAL: Show full loading skeleton until initial load is complete
   if (!initialLoadComplete) {
     return (
       <div className="p-6 bg-gray-50 min-h-screen">
@@ -855,7 +840,6 @@ const PengajuanIzin = ({ navigationDetail = null }) => {
         )}
       </div>
 
-      {/* Detail Modal */}
       {showDetailModal && selectedSubmission && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
@@ -951,7 +935,6 @@ const PengajuanIzin = ({ navigationDetail = null }) => {
                     </p>
                   </div>
 
-                  {/* 🆕 File Pendukung dengan Pengecekan */}
                   <div>
                     <p className="text-sm text-gray-600 mb-2">File Pendukung</p>
                     {selectedSubmission.file_url ? (
@@ -1063,7 +1046,6 @@ const PengajuanIzin = ({ navigationDetail = null }) => {
         </div>
       )}
 
-      {/* Confirm Modal */}
       {showConfirmModal && selectedSubmission && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg">
@@ -1190,7 +1172,6 @@ const PengajuanIzin = ({ navigationDetail = null }) => {
         </div>
       )}
 
-      {/* Delete Modal */}
       {showDeleteModal && selectedSubmission && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">

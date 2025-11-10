@@ -1,4 +1,3 @@
-// src/pages/Pengaturan.js
 "use client";
 import React, { useState } from "react";
 import {
@@ -17,7 +16,6 @@ import {
 
 const Pengaturan = () => {
   const [settings, setSettings] = useState({
-    // Notifikasi
     emailNotifications: true,
     pushNotifications: true,
     notifyNewEmployee: true,
@@ -25,23 +23,19 @@ const Pengaturan = () => {
     notifyOvertimeRequest: true,
     notifyShiftSwap: true,
 
-    // Keamanan
     sessionTimeout: "8",
     requirePasswordChange: false,
     passwordChangeInterval: "90",
 
-    // Tampilan
     theme: "light",
     language: "id",
     dateFormat: "DD/MM/YYYY",
     timeFormat: "24",
 
-    // Sistem
     autoBackup: true,
     backupFrequency: "daily",
     dataRetention: "365",
 
-    // Presensi
     attendanceRadius: "100",
     lateThreshold: "15",
     autoClockOut: true,
@@ -58,7 +52,6 @@ const Pengaturan = () => {
 
   return (
     <div className="max-w-4xl mx-auto">
-      {/* Header */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl flex items-center justify-center">
@@ -73,9 +66,7 @@ const Pengaturan = () => {
         </div>
       </div>
 
-      {/* Settings Sections */}
       <div className="space-y-6">
-        {/* Notifikasi */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center gap-3 mb-4">
             <Bell className="w-5 h-5 text-orange-600" />
@@ -167,7 +158,6 @@ const Pengaturan = () => {
           </div>
         </div>
 
-        {/* Keamanan */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center gap-3 mb-4">
             <Shield className="w-5 h-5 text-orange-600" />
@@ -241,7 +231,6 @@ const Pengaturan = () => {
           </div>
         </div>
 
-        {/* Tampilan */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center gap-3 mb-4">
             <Monitor className="w-5 h-5 text-orange-600" />
@@ -315,7 +304,6 @@ const Pengaturan = () => {
           </div>
         </div>
 
-        {/* Sistem */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center gap-3 mb-4">
             <Database className="w-5 h-5 text-orange-600" />
@@ -391,7 +379,6 @@ const Pengaturan = () => {
           </div>
         </div>
 
-        {/* Presensi */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center gap-3 mb-4">
             <MapPin className="w-5 h-5 text-orange-600" />
@@ -480,7 +467,6 @@ const Pengaturan = () => {
           </div>
         </div>
 
-        {/* Info Box */}
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
           <div className="flex gap-3">
             <Bell className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
@@ -495,7 +481,6 @@ const Pengaturan = () => {
           </div>
         </div>
 
-        {/* Save Button (Disabled) */}
         <div className="flex justify-end">
           <button
             disabled

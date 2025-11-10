@@ -1,20 +1,16 @@
-// src/utils/validation.js
 import { VALIDATION } from "./constants";
 
-// Base validation class
 class Validator {
   constructor() {
     this.errors = {};
     this.rules = {};
   }
 
-  // Add validation rule
   addRule(field, rules) {
     this.rules[field] = Array.isArray(rules) ? rules : [rules];
     return this;
   }
 
-  // Validate data
   validate(data) {
     this.errors = {};
 
@@ -44,7 +40,6 @@ class Validator {
     };
   }
 
-  // Add error
   addError(field, message) {
     if (!this.errors[field]) {
       this.errors[field] = [];
@@ -52,14 +47,12 @@ class Validator {
     this.errors[field].push(message);
   }
 
-  // Clear errors
   clearErrors() {
     this.errors = {};
     return this;
   }
 }
 
-// Common validation rules
 export const validationRules = {
   required:
     (message = "Field ini wajib diisi") =>
@@ -79,7 +72,7 @@ export const validationRules = {
   minLength:
     (min, message = null) =>
     (value) => {
-      if (!value) return true; // Skip if empty (use required rule for that)
+      if (!value) return true;
       if (value.length < min) {
         return message || `Minimal ${min} karakter`;
       }
@@ -256,7 +249,6 @@ export const validationRules = {
     },
 };
 
-// Predefined validators for common forms
 export const loginValidator = new Validator()
   .addRule("username", [
     validationRules.required("Username wajib diisi"),
@@ -356,7 +348,6 @@ export const projectValidator = new Validator()
     }),
   ]);
 
-// Utility functions
 export const validateForm = (data, validator) => {
   return validator.validate(data);
 };
@@ -374,6 +365,5 @@ export const getFieldError = (errors, field) => {
   return hasError(errors, field) ? errors[field][0] : null;
 };
 
-// Export main validator class
 export { Validator };
 export default validationRules;

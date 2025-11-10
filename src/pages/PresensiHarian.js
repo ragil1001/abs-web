@@ -38,10 +38,8 @@ import exportPresensiHarian from "@/utils/exportFunctions/exportPresensiHarian";
 import Swal from "sweetalert2";
 
 const PresensiHarian = () => {
-  // CRITICAL: Add initial load complete flag
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
-  // State management
   const [projects, setProjects] = useState([]);
   const [selectedProject, setSelectedProject] = useState("");
   const [selectedDate, setSelectedDate] = useState(
@@ -56,7 +54,6 @@ const PresensiHarian = () => {
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedAttendance, setSelectedAttendance] = useState(null);
 
-  // Backend data
   const [attendanceData, setAttendanceData] = useState([]);
   const [projectInfo, setProjectInfo] = useState(null);
   const [statistics, setStatistics] = useState({
@@ -76,7 +73,6 @@ const PresensiHarian = () => {
 
   const { loading, call } = useApi();
 
-  // Status configurations
   const statusConfig = {
     hadir: {
       label: "Hadir",
@@ -104,7 +100,7 @@ const PresensiHarian = () => {
       label: "Lembur (Pending)",
       color: "bg-amber-100 text-amber-700",
       icon: Timer,
-    }, // ✅ NEW
+    },
     tidak_presensi_pulang: {
       label: "Tidak Presensi Pulang",
       color: "bg-red-100 text-red-700",
@@ -117,12 +113,10 @@ const PresensiHarian = () => {
     },
   };
 
-  // Fetch projects on mount
   useEffect(() => {
     fetchProjects();
   }, []);
 
-  // Fetch attendance data when project/date changes
   useEffect(() => {
     if (selectedProject && selectedDate) {
       fetchAttendanceData();
@@ -137,7 +131,7 @@ const PresensiHarian = () => {
       });
       if (response.success) {
         setProjects(response.data || []);
-        // Mark initial load as complete after projects are loaded
+
         setInitialLoadComplete(true);
       }
     } catch (err) {
@@ -169,13 +163,11 @@ const PresensiHarian = () => {
     }
   }, [selectedProject, selectedDate, call]);
 
-  // Get current project info
   const currentProject = useMemo(
     () => projects.find((p) => p.id === parseInt(selectedProject)),
     [selectedProject, projects]
   );
 
-  // Filter data
   const filteredData = useMemo(() => {
     return attendanceData.filter(
       (item) =>
@@ -186,7 +178,6 @@ const PresensiHarian = () => {
     );
   }, [attendanceData, searchTerm]);
 
-  // Sort data
   const sortedData = useMemo(() => {
     return [...filteredData].sort((a, b) => {
       let aValue = a[sortField];
@@ -207,12 +198,10 @@ const PresensiHarian = () => {
     });
   }, [filteredData, sortField, sortDirection]);
 
-  // Pagination
   const totalPages = Math.ceil(sortedData.length / itemsPerPage) || 1;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = sortedData.slice(startIndex, startIndex + itemsPerPage);
 
-  // Handlers
   const handleSort = useCallback(
     (field) => {
       if (sortField === field) {
@@ -321,7 +310,6 @@ const PresensiHarian = () => {
     }
   }, [selectedDate, attendanceData, projectInfo, statistics]);
 
-  // Get status for display
   const getDisplayStatus = useCallback(
     (item) => {
       const presensiField =
@@ -337,12 +325,10 @@ const PresensiHarian = () => {
     [activeTab]
   );
 
-  // CRITICAL: Show full loading skeleton until initial load is complete
   if (!initialLoadComplete) {
     return (
       <div className="p-6 bg-gray-50 min-h-screen">
         <div className="space-y-8">
-          {/* Header Skeleton */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="animate-pulse space-y-4">
               <div className="h-8 bg-gray-200 rounded w-64"></div>
@@ -354,7 +340,6 @@ const PresensiHarian = () => {
             </div>
           </div>
 
-          {/* Filters Skeleton */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="animate-pulse">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -365,7 +350,6 @@ const PresensiHarian = () => {
             </div>
           </div>
 
-          {/* Project Info Skeleton */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="animate-pulse space-y-4">
               <div className="h-6 bg-gray-200 rounded w-48"></div>
@@ -384,7 +368,6 @@ const PresensiHarian = () => {
             </div>
           </div>
 
-          {/* Tabs Skeleton */}
           <div className="bg-white rounded-2xl shadow-sm">
             <div className="flex border-b border-gray-200">
               <div className="flex-1 px-6 py-4">
@@ -396,7 +379,6 @@ const PresensiHarian = () => {
             </div>
           </div>
 
-          {/* Table Skeleton */}
           <div className="bg-white rounded-2xl shadow-sm">
             <div className="p-6 animate-pulse space-y-4">
               <div className="h-12 bg-gray-300 rounded"></div>
@@ -416,7 +398,6 @@ const PresensiHarian = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
           <div className="flex-1">
@@ -449,7 +430,6 @@ const PresensiHarian = () => {
         </div>
       </div>
 
-      {/* Filters */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
@@ -508,7 +488,6 @@ const PresensiHarian = () => {
         </div>
       </div>
 
-      {/* Project Info & Statistics */}
       {projectInfo && (
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
           <h3 className="text-xl font-semibold mb-6 flex items-center gap-2">
@@ -518,7 +497,6 @@ const PresensiHarian = () => {
           </h3>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Project Information */}
             <div className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="bg-gray-50 rounded-xl p-4">
@@ -594,7 +572,6 @@ const PresensiHarian = () => {
               </div>
             </div>
 
-            {/* Statistics Grid */}
             <div>
               <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
                 <div className="bg-gradient-to-br from-slate-100 to-slate-200 border border-slate-300 rounded-xl p-4 text-center">
@@ -667,7 +644,6 @@ const PresensiHarian = () => {
                       <div className="text-xs text-orange-600 mt-1">Lembur</div>
                     </div>
 
-                    {/* ✅ NEW CARD - Bentuk sama dengan card lainnya */}
                     <div className="bg-gradient-to-br from-amber-100 to-amber-200 border border-amber-300 rounded-xl p-4 text-center">
                       <div className="text-2xl font-bold text-amber-700">
                         {statistics.pulang.lembur_pending || 0}
@@ -693,7 +669,6 @@ const PresensiHarian = () => {
         </div>
       )}
 
-      {/* Tabs */}
       <div className="bg-white rounded-2xl shadow-sm mb-6">
         <div className="flex border-b border-gray-200">
           <button
@@ -721,10 +696,8 @@ const PresensiHarian = () => {
         </div>
       </div>
 
-      {/* Table */}
       {selectedProject && selectedDate ? (
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-          {/* Table Controls */}
           <div className="px-6 py-4 border-b flex justify-between items-center text-sm text-gray-600">
             <div className="flex items-center gap-2">
               Tampilkan
@@ -749,7 +722,6 @@ const PresensiHarian = () => {
             </div>
           </div>
 
-          {/* Table Content */}
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
@@ -878,7 +850,6 @@ const PresensiHarian = () => {
                                   <option value="lembur_pending">
                                     Lembur (Pending)
                                   </option>{" "}
-                                  {/* ✅ NEW OPTION */}
                                   <option value="tidak_presensi_pulang">
                                     Tidak Presensi Pulang
                                   </option>
@@ -936,7 +907,6 @@ const PresensiHarian = () => {
             </table>
           </div>
 
-          {/* Pagination */}
           <div className="flex justify-between items-center mt-6 px-6 pb-6">
             <div className="text-sm text-gray-600">
               Menampilkan {Math.min(startIndex + 1, sortedData.length)}–
@@ -945,7 +915,6 @@ const PresensiHarian = () => {
             </div>
 
             <div className="flex items-center gap-1">
-              {/* Tombol Sebelumnya */}
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
                 disabled={currentPage === 1}
@@ -954,21 +923,17 @@ const PresensiHarian = () => {
                 <ChevronLeft className="w-4 h-4" />
               </button>
 
-              {/* Nomor Halaman dengan Ellipsis (maksimal 3) */}
               {(() => {
                 const buttons = [];
                 const maxVisible = 3;
 
-                // Tentukan rentang halaman
                 let start = Math.max(1, currentPage - 1);
                 let end = Math.min(totalPages, currentPage + 1);
 
-                // Pastikan tetap 3 jika bisa
                 if (currentPage === 1) end = Math.min(totalPages, start + 2);
                 if (currentPage === totalPages)
                   start = Math.max(1, totalPages - 2);
 
-                // Halaman pertama
                 if (start > 1) {
                   buttons.push(
                     <button
@@ -991,7 +956,6 @@ const PresensiHarian = () => {
                     );
                 }
 
-                // Halaman tengah
                 for (let i = start; i <= end; i++) {
                   buttons.push(
                     <button
@@ -1008,7 +972,6 @@ const PresensiHarian = () => {
                   );
                 }
 
-                // Halaman terakhir
                 if (end < totalPages) {
                   if (end < totalPages - 1)
                     buttons.push(
@@ -1034,7 +997,6 @@ const PresensiHarian = () => {
                 return buttons;
               })()}
 
-              {/* Tombol Berikutnya */}
               <button
                 onClick={() =>
                   setCurrentPage((prev) => Math.min(prev + 1, totalPages))
@@ -1059,7 +1021,6 @@ const PresensiHarian = () => {
         </div>
       )}
 
-      {/* Detail Modal */}
       {showDetailModal && selectedAttendance && (
         <div className="fixed inset-0 bg-gray-900/50 flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">

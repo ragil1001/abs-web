@@ -129,7 +129,6 @@ const Sidebar = memo(
       []
     );
 
-    // Auto-expand parent menu based on current page
     useEffect(() => {
       if (!collapsed) {
         const parentMenu = menuItems.find(
@@ -143,13 +142,11 @@ const Sidebar = memo(
       }
     }, [currentPage, collapsed, menuItems]);
 
-    // 🚀 Handle menu click (NO router.push!)
     const handleMenuClick = useCallback(
       (item) => {
         if (item.submenu && !collapsed) {
           setExpandedMenu((prev) => (prev === item.id ? null : item.id));
         } else if (item.page) {
-          // Clear API cache before navigation
           if (typeof window !== "undefined") {
             const { clearApiCache } = require("@/lib/axios");
             clearApiCache();
@@ -167,7 +164,6 @@ const Sidebar = memo(
     const handleSubmenuClick = useCallback(
       (subitem) => {
         if (subitem.page) {
-          // Clear API cache before navigation
           if (typeof window !== "undefined") {
             const { clearApiCache } = require("@/lib/axios");
             clearApiCache();
@@ -202,7 +198,6 @@ const Sidebar = memo(
 
     return (
       <>
-        {/* Header */}
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200 bg-gradient-to-r from-orange-500 to-orange-600 flex-shrink-0">
           <div
             className={`flex items-center space-x-3 transition-all duration-300 ${
@@ -235,8 +230,6 @@ const Sidebar = memo(
             </button>
           )}
         </div>
-
-        {/* Navigation */}
         <nav className="flex-1 overflow-y-auto scrollbar-hide px-4 py-6">
           <div className="space-y-2">
             {menuItems.map((item) => {
@@ -279,7 +272,6 @@ const Sidebar = memo(
                     )}
                   </button>
 
-                  {/* Submenu - Inline */}
                   {item.submenu && expandedMenu === item.id && !collapsed && (
                     <div className="mt-2 ml-8 space-y-1">
                       {item.submenu.map((subitem) => (
@@ -305,7 +297,6 @@ const Sidebar = memo(
                     </div>
                   )}
 
-                  {/* Submenu - Floating (collapsed) */}
                   {item.submenu && collapsed && (
                     <div className="absolute left-full top-0 ml-2 w-56 bg-white border border-gray-200 rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-[100]">
                       <div className="p-3">
@@ -338,7 +329,6 @@ const Sidebar = memo(
                     </div>
                   )}
 
-                  {/* Tooltip (collapsed, no submenu) */}
                   {!item.submenu && collapsed && (
                     <div className="absolute left-full top-0 ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 whitespace-nowrap z-[100] pointer-events-none">
                       {item.label}

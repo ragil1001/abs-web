@@ -1,7 +1,6 @@
-// src/lib/api.js
 import api from "./axios";
 
-// 🚀 Helper to add cache buster to params
+// Helper to add cache buster to params
 const addCacheBuster = (params = {}) => {
   return {
     ...params,
@@ -617,7 +616,6 @@ export const informasiAPI = {
   },
 
   update: async (id, data) => {
-    // Gunakan POST dengan _method untuk support FormData
     const response = await api.post(`/informasi/${id}`, data, {
       headers: {
         "Content-Type": "multipart/form-data",

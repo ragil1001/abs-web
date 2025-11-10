@@ -1,25 +1,19 @@
-// src/utils/helpers.js
-
-// Date and Time Helpers
 export const dateHelpers = {
-  // Format date for API
   formatForAPI: (date) => {
     if (!date) return null;
     const d = new Date(date);
-    // ambil tanggal lokal (bukan UTC)
+
     const year = d.getFullYear();
     const month = String(d.getMonth() + 1).padStart(2, "0");
     const day = String(d.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   },
 
-  // Format date for display in Indonesian format
   formatForDisplay: (date, includeTime = false) => {
     if (!date) return "-";
 
     const d = new Date(date);
 
-    // Indonesian month names
     const monthNames = [
       "Januari",
       "Februari",
@@ -48,7 +42,6 @@ export const dateHelpers = {
     return `${day} ${month} ${year}`;
   },
 
-  // Format date for display (short version)
   formatShort: (date) => {
     if (!date) return "-";
     const d = new Date(date);
@@ -59,7 +52,6 @@ export const dateHelpers = {
     });
   },
 
-  // Get relative time (ago)
   getRelativeTime: (date) => {
     if (!date) return "-";
     const now = new Date();
@@ -78,7 +70,6 @@ export const dateHelpers = {
     return dateHelpers.formatForDisplay(date);
   },
 
-  // Check if date is today
   isToday: (date) => {
     if (!date) return false;
     const today = new Date();
@@ -86,7 +77,6 @@ export const dateHelpers = {
     return today.toDateString() === target.toDateString();
   },
 
-  // Get week range
   getWeekRange: (date = new Date()) => {
     const start = new Date(date);
     const day = start.getDay();
@@ -99,7 +89,6 @@ export const dateHelpers = {
     return { start, end };
   },
 
-  // Get month range
   getMonthRange: (date = new Date()) => {
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -108,7 +97,6 @@ export const dateHelpers = {
     return { start, end };
   },
 
-  // Parse date string to Date object
   parseDate: (dateString) => {
     if (!dateString) return null;
     try {
@@ -118,7 +106,6 @@ export const dateHelpers = {
     }
   },
 
-  // Calculate age from birth date
   calculateAge: (birthDate) => {
     if (!birthDate) return null;
     const today = new Date();
@@ -136,7 +123,6 @@ export const dateHelpers = {
     return age;
   },
 
-  // Calculate work duration
   calculateWorkDuration: (startDate, endDate = null) => {
     if (!startDate) return null;
 
@@ -159,20 +145,13 @@ export const dateHelpers = {
   },
 };
 
-// ⭐ Time Helpers for formatting time (NEW)
 export const timeHelpers = {
-  /**
-   * Format time from HH:mm:ss to HH:mm
-   */
   formatToHHMM: (timeString) => {
     if (!timeString) return "";
     if (timeString.length === 5) return timeString;
     return timeString.substring(0, 5);
   },
 
-  /**
-   * Format shift time range for display
-   */
   formatShiftRange: (startTime, endTime) => {
     if (!startTime || !endTime) return "-";
     const start = timeHelpers.formatToHHMM(startTime);
@@ -180,18 +159,12 @@ export const timeHelpers = {
     return `${start} - ${end}`;
   },
 
-  /**
-   * Validate time format HH:mm
-   */
   isValidTimeFormat: (timeString) => {
     if (!timeString) return false;
     const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
     return timeRegex.test(timeString);
   },
 
-  /**
-   * Convert 24-hour time to 12-hour format
-   */
   to12HourFormat: (timeString) => {
     if (!timeString) return "";
     const time = timeHelpers.formatToHHMM(timeString);
@@ -203,9 +176,6 @@ export const timeHelpers = {
     return `${displayHours}:${String(minutes).padStart(2, "0")} ${period}`;
   },
 
-  /**
-   * Add minutes to time
-   */
   addMinutes: (timeString, minutes) => {
     if (!timeString) return "";
     const [hours, mins] = timeString.split(":").map(Number);
@@ -218,9 +188,6 @@ export const timeHelpers = {
     )}`;
   },
 
-  /**
-   * Calculate duration between two times
-   */
   calculateDuration: (startTime, endTime) => {
     if (!startTime || !endTime) return 0;
     const [startHours, startMinutes] = startTime.split(":").map(Number);
@@ -236,9 +203,6 @@ export const timeHelpers = {
     return duration;
   },
 
-  /**
-   * Format duration in minutes to readable format
-   */
   formatDuration: (minutes) => {
     if (!minutes || minutes === 0) return "0 menit";
 
@@ -256,7 +220,6 @@ export const timeHelpers = {
   },
 };
 
-// String Helpers
 export const stringHelpers = {
   capitalize: (str) => {
     if (!str) return "";
@@ -299,7 +262,6 @@ export const stringHelpers = {
   },
 };
 
-// Number Helpers
 export const numberHelpers = {
   formatCurrency: (amount, showSymbol = true) => {
     if (amount === null || amount === undefined) return "-";
@@ -323,7 +285,6 @@ export const numberHelpers = {
   },
 };
 
-// Array Helpers
 export const arrayHelpers = {
   groupBy: (array, key) => {
     return array.reduce((groups, item) => {
@@ -367,7 +328,6 @@ export const arrayHelpers = {
   },
 };
 
-// Object Helpers
 export const objectHelpers = {
   deepClone: (obj) => {
     if (obj === null || typeof obj !== "object") return obj;
@@ -423,7 +383,6 @@ export const objectHelpers = {
   },
 };
 
-// Validation Helpers
 export const validationHelpers = {
   isEmail: (email) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -468,7 +427,6 @@ export const validationHelpers = {
   },
 };
 
-// Storage Helpers
 export const storageHelpers = {
   setItem: (key, value) => {
     try {
@@ -519,7 +477,6 @@ export const storageHelpers = {
   },
 };
 
-// Format helpers for Indonesian locale
 export const formatHelpers = {
   formatGender: (gender) => {
     return gender === "L" ? "Laki-laki" : gender === "P" ? "Perempuan" : "-";
@@ -542,7 +499,6 @@ export const formatHelpers = {
   },
 };
 
-// Export all helpers
 export default {
   dateHelpers,
   timeHelpers,

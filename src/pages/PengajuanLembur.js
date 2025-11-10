@@ -1,4 +1,3 @@
-// src/pages/PengajuanLembur.js
 "use client";
 import React, { useState, useMemo, useEffect, useCallback } from "react";
 import {
@@ -29,14 +28,12 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
   const [processedNavigationId, setProcessedNavigationId] = useState(null);
 
-  // State untuk data
   const [submissions, setSubmissions] = useState([]);
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [summary, setSummary] = useState(null);
 
-  // State untuk filter dan pagination
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [projectFilter, setProjectFilter] = useState("all");
@@ -45,7 +42,6 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
-  // State untuk modal
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -54,7 +50,6 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
   const [adminNote, setAdminNote] = useState("");
   const [processing, setProcessing] = useState(false);
 
-  // Fetch projects
   const fetchProjects = useCallback(async () => {
     try {
       const result = await projectAPI.getAll();
@@ -66,7 +61,6 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
     }
   }, []);
 
-  // Fetch submissions
   const fetchSubmissions = useCallback(async () => {
     if (!projects.length) return;
 
@@ -118,7 +112,6 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
         }
       }
 
-      // Apply filters
       let filteredData = [...allData];
 
       if (statusFilter !== "all") {
@@ -136,7 +129,6 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
         );
       }
 
-      // Apply custom sorting
       filteredData.sort((a, b) => {
         const aIsPending = a.status === "pending";
         const bIsPending = b.status === "pending";
@@ -151,7 +143,6 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
         return new Date(b.created_at) - new Date(a.created_at);
       });
 
-      // Apply pagination
       const startIndex = (currentPage - 1) * itemsPerPage;
       const endIndex = startIndex + itemsPerPage;
       const paginatedData = filteredData.slice(startIndex, endIndex);
@@ -182,7 +173,6 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
     initialLoadComplete,
   ]);
 
-  // Fetch summary
   const fetchSummary = useCallback(async () => {
     if (projectFilter === "all") {
       if (!projects.length) return;
@@ -252,7 +242,6 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
     }
   }, [projectFilter, projects.length, fetchSummary]);
 
-  // Handle navigation detail from notification
   useEffect(() => {
     if (
       navigationDetail &&
@@ -480,7 +469,6 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
@@ -520,7 +508,6 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
         </div>
       </div>
 
-      {/* Filters */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <select
@@ -570,7 +557,6 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
         </div>
       </div>
 
-      {/* Table */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -754,7 +740,6 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
         )}
       </div>
 
-      {/* Detail Modal */}
       {showDetailModal && selectedSubmission && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -829,7 +814,6 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
                     {getKodeHariBadge(selectedSubmission.kode_hari)}
                   </div>
 
-                  {/* Show jam kerja if hari libur */}
                   {selectedSubmission.kode_hari === "L" && (
                     <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
                       <p className="text-sm font-medium text-purple-900 mb-2">
@@ -852,7 +836,6 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
                     </div>
                   )}
 
-                  {/* File SKL */}
                   <div>
                     <p className="text-sm text-gray-600 mb-2">
                       File SKL (Surat Keterangan Lembur)
@@ -883,7 +866,6 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
                     )}
                   </div>
 
-                  {/* Keterangan Karyawan */}
                   {selectedSubmission.keterangan_karyawan && (
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                       <p className="text-sm font-medium text-blue-900 mb-1">
@@ -980,7 +962,6 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
         </div>
       )}
 
-      {/* Confirm Modal */}
       {showConfirmModal && selectedSubmission && (
         <div className="fixed inset-0 bg-gray-900/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg">
@@ -1118,7 +1099,6 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
         </div>
       )}
 
-      {/* Delete Modal */}
       {showDeleteModal && selectedSubmission && (
         <div className="fixed inset-0 bg-gray-900/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">

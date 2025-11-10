@@ -19,7 +19,7 @@ import { clearApiCache } from "@/lib/axios";
 const AssignPage = ({ onNavigateToDetail }) => {
   const { isAuthenticated } = useAuth();
   const [projects, setProjects] = useState([]);
-  const [projectStats, setProjectStats] = useState({}); // 🔥 NEW: Store karyawan count per project
+  const [projectStats, setProjectStats] = useState({});
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("aktif");
   const [sortField, setSortField] = useState("id");
@@ -31,12 +31,10 @@ const AssignPage = ({ onNavigateToDetail }) => {
 
   const { loading: fetchLoading, call } = useApi();
 
-  // 🔥 NEW: Fetch karyawan count for each project
   const fetchProjectStats = useCallback(
     async (projectList) => {
       const stats = {};
 
-      // Fetch count for each project
       const promises = projectList.map(async (project) => {
         try {
           const response = await call(
@@ -44,7 +42,7 @@ const AssignPage = ({ onNavigateToDetail }) => {
             project.id,
             {
               status: "aktif",
-              per_page: 1, // Only need count, not data
+              per_page: 1,
             }
           );
 
@@ -65,7 +63,6 @@ const AssignPage = ({ onNavigateToDetail }) => {
     [call]
   );
 
-  // 🚀 OPTIMIZED: Fetch data dengan initial load flag
   const fetchAllData = useCallback(async () => {
     try {
       clearApiCache();
@@ -76,7 +73,6 @@ const AssignPage = ({ onNavigateToDetail }) => {
         setProjects(projectList);
         setCurrentPage(1);
 
-        // 🔥 Fetch real-time karyawan count
         await fetchProjectStats(projectList);
       }
     } catch (err) {
@@ -96,7 +92,6 @@ const AssignPage = ({ onNavigateToDetail }) => {
     }
   }, [isAuthenticated, fetchAllData]);
 
-  // Memoized filtered and sorted data
   const processedData = useMemo(() => {
     let filtered = projects.filter(
       (p) =>
@@ -123,7 +118,6 @@ const AssignPage = ({ onNavigateToDetail }) => {
     return filtered;
   }, [projects, searchTerm, sortField, sortDirection, statusFilter]);
 
-  // Memoized pagination data
   const paginationData = useMemo(() => {
     const totalItems = processedData.length;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -194,28 +188,22 @@ const AssignPage = ({ onNavigateToDetail }) => {
     }
   };
 
-  // 🚀 CRITICAL: Show loading skeleton until initial load complete
   if (!initialLoadComplete) {
     return (
       <div className="p-6 bg-gray-50 min-h-screen">
         <div className="space-y-8">
-          {/* Header Skeleton */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="animate-pulse space-y-4">
               <div className="h-8 bg-gray-200 rounded w-64"></div>
               <div className="h-4 bg-gray-200 rounded w-48"></div>
             </div>
           </div>
-
-          {/* Search Skeleton */}
           <div className="bg-white rounded-2xl shadow-sm p-6">
             <div className="animate-pulse grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="md:col-span-2 h-10 bg-gray-200 rounded"></div>
               <div className="h-10 bg-gray-200 rounded"></div>
             </div>
           </div>
-
-          {/* Table Skeleton */}
           <div className="bg-white rounded-2xl shadow-sm">
             <div className="p-6 animate-pulse space-y-4">
               <div className="flex justify-between">
@@ -235,7 +223,6 @@ const AssignPage = ({ onNavigateToDetail }) => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
           <div className="flex-1">
@@ -247,7 +234,6 @@ const AssignPage = ({ onNavigateToDetail }) => {
         </div>
       </div>
 
-      {/* Search & Filter */}
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center">
           <div className="md:col-span-2 relative">
@@ -274,7 +260,6 @@ const AssignPage = ({ onNavigateToDetail }) => {
         </div>
       </div>
 
-      {/* Table */}
       <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
         <div className="px-6 py-4 border-b flex justify-between items-center text-sm text-gray-600">
           <div className="flex items-center gap-2">
@@ -432,7 +417,6 @@ const AssignPage = ({ onNavigateToDetail }) => {
                     <td className="px-4 py-3 text-center">
                       <span className="inline-flex items-center gap-1 px-2 py-1 bg-gray-100 rounded-full text-sm">
                         <Users className="w-4 h-4" />
-                        {/* 🔥 FIXED: Use real-time count from projectStats */}
                         {projectStats[p.id] !== undefined ? (
                           projectStats[p.id]
                         ) : (
@@ -456,7 +440,6 @@ const AssignPage = ({ onNavigateToDetail }) => {
           </table>
         </div>
 
-        {/* Fixed Pagination */}
         <div className="px-6 py-4 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-sm">
           <div>
             Halaman {paginationData.pagination.current_page} dari{" "}

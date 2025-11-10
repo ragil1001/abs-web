@@ -22,11 +22,10 @@ const AuthContext = createContext({
   formatLastLogin: () => null,
 });
 
-// ⏰ Session configuration
 const SESSION_CONFIG = {
-  DURATION: 4 * 60 * 60 * 1000, // 8 hours in milliseconds
-  WARNING_TIME: 5 * 60 * 1000, // Show warning 5 minutes before expiry
-  CHECK_INTERVAL: 60 * 1000, // Check every minute
+  DURATION: 4 * 60 * 60 * 1000,
+  WARNING_TIME: 5 * 60 * 1000,
+  CHECK_INTERVAL: 60 * 1000,
 };
 
 // Token management
@@ -142,17 +141,15 @@ export const AuthProvider = ({ children }) => {
   const sessionCheckIntervalRef = useRef(null);
   const warningToastIdRef = useRef(null);
 
-  // 🔔 Delete FCM token before logout
   const deleteFCMToken = async () => {
     try {
       const fcmToken = localStorage.getItem("fcm_token");
       if (fcmToken) {
         await notificationAPI.deleteFCMToken(fcmToken);
         localStorage.removeItem("fcm_token");
-        console.log("✅ FCM token deleted");
       }
     } catch (error) {
-      console.error("❌ Failed to delete FCM token:", error);
+      console.error("Failed to delete FCM token:", error);
     }
   };
 
@@ -161,29 +158,22 @@ export const AuthProvider = ({ children }) => {
     if (!tokenManager.get()) return;
 
     if (sessionManager.isExpired()) {
-      console.log("⏰ Session expired - auto logout");
-
-      // Delete FCM token
       await deleteFCMToken();
 
-      // Clear toast if exists
       if (warningToastIdRef.current) {
         toast.dismiss(warningToastIdRef.current);
       }
 
-      // Show expiry message
       toast.error("Sesi Anda telah berakhir. Silakan login kembali.", {
         autoClose: 5000,
       });
 
-      // Logout
       tokenManager.remove();
       userManager.remove();
       sessionManager.clear();
       setUser(null);
       setShowSessionWarning(false);
 
-      // Redirect to login
       if (typeof window !== "undefined") {
         window.location.replace("/");
       }
@@ -191,12 +181,10 @@ export const AuthProvider = ({ children }) => {
       setShowSessionWarning(true);
       const remaining = Math.ceil(sessionManager.getTimeRemaining() / 60000);
 
-      // Dismiss previous warning if exists
       if (warningToastIdRef.current) {
         toast.dismiss(warningToastIdRef.current);
       }
 
-      // Show new warning
       warningToastIdRef.current = toast.warning(
         `Sesi Anda akan berakhir dalam ${remaining} menit. Simpan pekerjaan Anda.`,
         {
@@ -207,13 +195,10 @@ export const AuthProvider = ({ children }) => {
     }
   }, [showSessionWarning]);
 
-  // Start session monitoring
   useEffect(() => {
     if (user && tokenManager.get()) {
-      // Check immediately
       checkSession();
 
-      // Then check periodically
       sessionCheckIntervalRef.current = setInterval(
         checkSession,
         SESSION_CONFIG.CHECK_INTERVAL
@@ -227,32 +212,21 @@ export const AuthProvider = ({ children }) => {
     }
   }, [user, checkSession]);
 
-  // Initialize auth state
   useEffect(() => {
     const initializeAuth = async () => {
-      console.log("🔄 Initializing auth...");
       setLoading(true);
 
       const token = tokenManager.get();
       const savedUser = userManager.get();
 
-      // 🔑 Check if this is a new session (browser/tab was closed)
       const isNewSession = sessionManager.isNewSession();
 
       if (isNewSession) {
-        console.log("🆕 New session detected - clearing page state");
-        // Clear current page to reset to dashboard
         localStorage.removeItem("currentPage");
       }
 
-      console.log("📦 Token:", token ? "exists" : "none");
-      console.log("👤 Saved user:", savedUser ? savedUser.username : "none");
-      console.log("🆕 Is new session:", isNewSession);
-
       if (token && savedUser) {
-        // Check if session is expired
         if (sessionManager.isExpired()) {
-          console.log("⏰ Session expired on init");
           await deleteFCMToken();
           tokenManager.remove();
           userManager.remove();
@@ -263,16 +237,12 @@ export const AuthProvider = ({ children }) => {
         }
 
         try {
-          // Verify token with server
           const response = await authAPI.me();
-          console.log("✅ Token verified:", response.data?.username);
           setUser(response.data);
           userManager.set(response.data);
 
-          // Mark session as active
           sessionManager.start();
         } catch (error) {
-          console.error("❌ Token verification failed:", error);
           await deleteFCMToken();
           tokenManager.remove();
           userManager.remove();
@@ -280,24 +250,19 @@ export const AuthProvider = ({ children }) => {
           setUser(null);
         }
       } else {
-        console.log("❌ No token or user found");
         setUser(null);
       }
 
       setLoading(false);
-      console.log("✅ Auth initialization complete");
     };
 
     initializeAuth();
   }, []);
 
-  // Login function
   const login = useCallback(async (credentials) => {
-    console.log("🔐 Login attempt:", credentials.username);
     setLoading(true);
     try {
       const response = await authAPI.login(credentials);
-      console.log("✅ Login response:", response);
 
       if (response.success && response.data) {
         const { token, user: userData } = response.data;
@@ -306,13 +271,8 @@ export const AuthProvider = ({ children }) => {
         userManager.set(userData);
         sessionManager.start();
         setUser(userData);
-
-        console.log("✅ User logged in:", userData.username);
-
-        // Clear current page to start fresh
         localStorage.removeItem("currentPage");
 
-        // Redirect using replace to prevent back navigation
         if (typeof window !== "undefined") {
           window.location.replace("/");
         }
@@ -322,7 +282,6 @@ export const AuthProvider = ({ children }) => {
 
       throw new Error(response.message || "Login failed");
     } catch (error) {
-      console.error("❌ Login error:", error);
       setUser(null);
       throw error;
     } finally {
@@ -330,26 +289,20 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // Logout function
   const logout = useCallback(async () => {
-    console.log("🚪 Logout...");
     setLoading(true);
 
-    // Dismiss any active warnings
     if (warningToastIdRef.current) {
       toast.dismiss(warningToastIdRef.current);
     }
 
     try {
-      // Delete FCM token first
       await deleteFCMToken();
 
-      // Then logout from server
       await authAPI.logout();
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
-      // Clear all data
       tokenManager.remove();
       userManager.remove();
       sessionManager.clear();
@@ -357,21 +310,16 @@ export const AuthProvider = ({ children }) => {
       setShowSessionWarning(false);
       setLoading(false);
 
-      // Clear session interval
       if (sessionCheckIntervalRef.current) {
         clearInterval(sessionCheckIntervalRef.current);
       }
 
-      console.log("✅ Logged out");
-
-      // Redirect using replace
       if (typeof window !== "undefined") {
         window.location.replace("/");
       }
     }
   }, []);
 
-  // Refresh user data
   const refreshUser = useCallback(async () => {
     if (tokenManager.get()) {
       try {
@@ -389,7 +337,6 @@ export const AuthProvider = ({ children }) => {
     }
   }, [logout]);
 
-  // Helper functions
   const getUserInitials = useCallback(() => {
     if (!user?.username) return "U";
     return user.username.substring(0, 2).toUpperCase();
@@ -431,7 +378,6 @@ export const AuthProvider = ({ children }) => {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Custom hook to use auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {

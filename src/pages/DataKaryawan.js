@@ -42,12 +42,11 @@ import Swal from "sweetalert2";
 export const dynamic = "force-dynamic";
 
 const DataKaryawan = () => {
-  // STATE MANAGEMENT
   const [employees, setEmployees] = useState([]);
   const [masterData, setMasterData] = useState({
     divisions: [],
     positions: [],
-    projects: [], // ✅ NEW: Add projects
+    projects: [],
   });
   const [pagination, setPagination] = useState({
     current_page: 1,
@@ -62,7 +61,7 @@ const DataKaryawan = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filters, setFilters] = useState({
     status: "aktif",
-    project_id: "all", // ✅ CHANGED: divisi_id → project_id
+    project_id: "all",
     jabatan_id: "all",
     jenis_kelamin: "all",
   });
@@ -137,7 +136,6 @@ const DataKaryawan = () => {
     []
   );
 
-  // ✅ UPDATED: Fetch master data including projects
   useEffect(() => {
     let isMounted = true;
 
@@ -146,14 +144,14 @@ const DataKaryawan = () => {
         const [divResponse, posResponse, projResponse] = await Promise.all([
           call(divisiAPI.getAll, { per_page: 1000 }),
           call(jabatanAPI.getAll, { per_page: 1000 }),
-          call(projectAPI.getAll, { status: "aktif" }), // ✅ NEW: Fetch active projects
+          call(projectAPI.getAll, { status: "aktif" }),
         ]);
 
         if (isMounted) {
           setMasterData({
             divisions: divResponse.data?.data || divResponse.data || [],
             positions: posResponse.data?.data || posResponse.data || [],
-            projects: projResponse.data || [], // ✅ NEW
+            projects: projResponse.data || [],
           });
         }
       } catch (err) {
@@ -171,7 +169,6 @@ const DataKaryawan = () => {
     };
   }, []);
 
-  // ✅ UPDATED: Fetch employees with project filter
   const fetchEmployees = useCallback(
     async (page = 1, showLoader = true) => {
       const params = {
@@ -180,7 +177,7 @@ const DataKaryawan = () => {
         search: searchTerm.trim() || undefined,
         status: filters.status !== "all" ? filters.status : undefined,
         project_id:
-          filters.project_id !== "all" ? filters.project_id : undefined, // ✅ CHANGED
+          filters.project_id !== "all" ? filters.project_id : undefined,
         jabatan_id:
           filters.jabatan_id !== "all" ? filters.jabatan_id : undefined,
         jenis_kelamin:
@@ -370,7 +367,7 @@ const DataKaryawan = () => {
       nik: formData.nik,
       nama: formData.nama,
       no_telepon: formData.no_telepon,
-      // ✅ CHANGED: divisi_id can be null now
+
       divisi_id: formData.divisi_id ? parseInt(formData.divisi_id) : null,
       jabatan_id: parseInt(formData.jabatan_id),
       jenis_kelamin: formData.jenis_kelamin,
@@ -382,7 +379,6 @@ const DataKaryawan = () => {
       status: formData.status,
     };
 
-    // ✅ UPDATED: Remove divisi_id from required fields check
     if (
       !payload.nik ||
       !payload.nama ||
@@ -465,7 +461,7 @@ const DataKaryawan = () => {
         nik: data.nik,
         nama: data.nama,
         no_telepon: data.no_telepon,
-        divisi_id: selectedEmployee.divisi_id, // Keep existing
+        divisi_id: selectedEmployee.divisi_id,
         jabatan_id: selectedEmployee.jabatan_id,
         jenis_kelamin: data.jenis_kelamin,
         tempat_lahir: data.tempat_lahir,
@@ -498,7 +494,7 @@ const DataKaryawan = () => {
         nik: selectedEmployee.nik,
         nama: selectedEmployee.nama,
         no_telepon: selectedEmployee.no_telepon,
-        // ✅ CHANGED: Handle null divisi_id
+
         divisi_id: data.divisi_id ? parseInt(data.divisi_id) : null,
         jabatan_id: parseInt(data.jabatan_id),
         jenis_kelamin: selectedEmployee.jenis_kelamin,
@@ -594,7 +590,6 @@ const DataKaryawan = () => {
     }
   };
 
-  // ðŸš€ OPTIMIZED: File selection with instant size check
   const handleFileSelect = async (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -612,7 +607,6 @@ const DataKaryawan = () => {
         return;
       }
 
-      // âœ… Increased to 50MB
       const maxSize = 50 * 1024 * 1024;
       if (file.size > maxSize) {
         toast.error(
@@ -627,15 +621,12 @@ const DataKaryawan = () => {
 
       setImportFile(file);
 
-      // Show file info with helpful message
       const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
       toast.info(`File dipilih: ${file.name} (${fileSizeMB} MB)`, {
         autoClose: 3000,
       });
 
-      // Show skip validation option for large files
       if (file.size > 10 * 1024 * 1024) {
-        // > 10MB
         toast.info(
           "File besar terdeteksi. Anda bisa langsung import tanpa validasi untuk proses lebih cepat.",
           {
@@ -646,7 +637,6 @@ const DataKaryawan = () => {
     }
   };
 
-  // ðŸš€ NEW: Skip validation and direct import (for large files)
   const handleDirectImport = async () => {
     if (!importFile) {
       toast.error("Pilih file Excel terlebih dahulu", { autoClose: 3000 });
@@ -676,7 +666,6 @@ const DataKaryawan = () => {
     }
   };
 
-  // ðŸš€ OPTIMIZED: Validation with proper error handling
   const validateImportFile = async (file) => {
     setImportLoading(true);
     setImportValidation(null);
@@ -694,7 +683,6 @@ const DataKaryawan = () => {
       const xhr = new XMLHttpRequest();
 
       const uploadPromise = new Promise((resolve, reject) => {
-        // Upload progress
         xhr.upload.addEventListener("progress", (e) => {
           if (e.lengthComputable) {
             const percentComplete = Math.round((e.loaded / e.total) * 100);
@@ -710,7 +698,6 @@ const DataKaryawan = () => {
           }
         });
 
-        // Request complete
         xhr.addEventListener("load", () => {
           if (xhr.status >= 200 && xhr.status < 300) {
             try {
@@ -729,12 +716,10 @@ const DataKaryawan = () => {
           }
         });
 
-        // Request error
         xhr.addEventListener("error", () => {
           reject(new Error("Network error during upload"));
         });
 
-        // Request timeout
         xhr.addEventListener("timeout", () => {
           reject(
             new Error(
@@ -743,16 +728,14 @@ const DataKaryawan = () => {
           );
         });
 
-        // Setup request
         const token = localStorage.getItem("auth_token");
         xhr.open(
           "POST",
           `${process.env.NEXT_PUBLIC_API_URL}/karyawans/validate-import`
         );
         xhr.setRequestHeader("Authorization", `Bearer ${token}`);
-        xhr.timeout = 120000; // 2 minutes for validation
+        xhr.timeout = 120000;
 
-        // Send request
         xhr.send(formDataValidate);
       });
 
@@ -779,7 +762,6 @@ const DataKaryawan = () => {
         }
       }
 
-      // Clear progress after 1 second
       setTimeout(() => {
         setUploadProgress(null);
         setUploadStage(null);
@@ -808,7 +790,6 @@ const DataKaryawan = () => {
     }
   };
 
-  // ðŸš€ OPTIMIZED: Import process with proper progress tracking
   const startImportProcess = async () => {
     if (!importFile) {
       toast.error("Pilih file Excel terlebih dahulu", { autoClose: 3000 });
@@ -830,7 +811,6 @@ const DataKaryawan = () => {
       const xhr = new XMLHttpRequest();
 
       const uploadPromise = new Promise((resolve, reject) => {
-        // Upload progress
         xhr.upload.addEventListener("progress", (e) => {
           if (e.lengthComputable) {
             const percentComplete = Math.round((e.loaded / e.total) * 100);
@@ -846,7 +826,6 @@ const DataKaryawan = () => {
           }
         });
 
-        // Request complete
         xhr.addEventListener("load", () => {
           if (xhr.status >= 200 && xhr.status < 300) {
             try {
@@ -865,7 +844,6 @@ const DataKaryawan = () => {
           }
         });
 
-        // Request error
         xhr.addEventListener("error", () => {
           reject(
             new Error(
@@ -874,7 +852,6 @@ const DataKaryawan = () => {
           );
         });
 
-        // Request timeout
         xhr.addEventListener("timeout", () => {
           reject(
             new Error(
@@ -883,13 +860,11 @@ const DataKaryawan = () => {
           );
         });
 
-        // Setup request
         const token = localStorage.getItem("auth_token");
         xhr.open("POST", `${process.env.NEXT_PUBLIC_API_URL}/karyawans/import`);
         xhr.setRequestHeader("Authorization", `Bearer ${token}`);
-        xhr.timeout = 180000; // 3 minutes timeout for upload
+        xhr.timeout = 180000;
 
-        // Send request
         xhr.send(formDataImport);
       });
 
@@ -902,7 +877,6 @@ const DataKaryawan = () => {
       });
 
       if (response.success && response.type === "queued") {
-        // Import started in background
         const importId = response.import_id;
 
         toast.info(
@@ -912,15 +886,12 @@ const DataKaryawan = () => {
           }
         );
 
-        // Start polling for progress
         startProgressPolling(importId);
 
-        // Close import modal
         setShowImportModal(false);
         setImportFile(null);
         setImportValidation(null);
       } else {
-        // Direct import (small file)
         toast.success(response.message || "Data karyawan berhasil diimport", {
           autoClose: 5000,
         });
@@ -930,7 +901,6 @@ const DataKaryawan = () => {
         handleCloseModal();
       }
 
-      // Clear upload progress after 1 second
       setTimeout(() => {
         setUploadProgress(null);
         setUploadStage(null);
@@ -1018,9 +988,7 @@ const DataKaryawan = () => {
     }
   };
 
-  // 🚀 NEW: Poll import progress with more frequent updates
   const startProgressPolling = (importId) => {
-    // Clear existing interval
     if (pollingInterval) {
       clearInterval(pollingInterval);
     }
@@ -1037,12 +1005,11 @@ const DataKaryawan = () => {
     });
 
     let pollCount = 0;
-    const maxPolls = 300; // 5 minutes max (1 second interval)
+    const maxPolls = 300;
 
     const interval = setInterval(async () => {
       pollCount++;
 
-      // Safety: Stop after max polls
       if (pollCount > maxPolls) {
         clearInterval(interval);
         setPollingInterval(null);
@@ -1072,7 +1039,6 @@ const DataKaryawan = () => {
             total: response.data.data?.total,
           });
 
-          // Check if completed or failed
           if (response.data.status === "completed") {
             clearInterval(interval);
             setPollingInterval(null);
@@ -1081,11 +1047,9 @@ const DataKaryawan = () => {
               autoClose: 5000,
             });
 
-            // Refresh data
             lastFetchParamsRef.current = null;
             await fetchEmployees(1, true);
 
-            // Clear progress after 3 seconds
             setTimeout(() => {
               setImportProgress(null);
             }, 3000);
@@ -1102,14 +1066,12 @@ const DataKaryawan = () => {
         }
       } catch (err) {
         console.error("Progress polling error:", err);
-        // Don't stop polling on error, just log it
       }
-    }, 1000); // Poll every 1 second for more responsive updates
+    }, 1000);
 
     setPollingInterval(interval);
   };
 
-  // ðŸš€ NEW: Download template with proper structure
   const downloadTemplate = () => {
     try {
       const templateHeaders = [
@@ -1122,7 +1084,7 @@ const DataKaryawan = () => {
           "Tanggal Bergabung (YYYY-MM-DD)",
           "Jenis Kelamin (L/P)",
           "Jabatan",
-          // ✅ CHANGED: Add optional note
+
           "Divisi/Penempatan (opsional)",
           "Project (Nama Project)",
           "Tempat Lahir",
@@ -1134,17 +1096,15 @@ const DataKaryawan = () => {
       const availableDivisions = masterData.divisions.map((d) => d.nama);
       const availablePositions = masterData.positions.map((p) => p.nama);
 
-      // ✅ Add example with empty divisi
       const exampleData = [];
       if (availablePositions.length > 0) {
-        // Example 1: With divisi
         if (availableDivisions.length > 0) {
           exampleData.push([
             "3201234567890001",
             "Ahmad Rizki Pratama",
             "08123456789",
             "aktif",
-            "", // Tanggal keluar
+            "",
             "2020-01-10",
             "L",
             availablePositions[0],
@@ -1156,17 +1116,16 @@ const DataKaryawan = () => {
           ]);
         }
 
-        // ✅ NEW: Example 2: Without divisi
         exampleData.push([
           "3201234567890002",
           "Siti Nurhaliza",
           "08123456790",
           "aktif",
-          "", // Tanggal keluar
+          "",
           "2021-05-20",
           "P",
           availablePositions[0],
-          "", // ✅ Empty divisi
+          "",
           "",
           "Bandung",
           "1996-07-22",
@@ -1176,7 +1135,6 @@ const DataKaryawan = () => {
 
       const ws = XLSX.utils.aoa_to_sheet([...templateHeaders, ...exampleData]);
 
-      // Set column widths
       ws["!cols"] = [
         { wch: 18 },
         { wch: 25 },
@@ -1344,7 +1302,6 @@ const DataKaryawan = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
           <div>
@@ -1383,7 +1340,6 @@ const DataKaryawan = () => {
         </div>
       </div>
 
-      {/* ✅ UPDATED: Filters with Project instead of Division */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
           <div className="lg:col-span-2 relative">
@@ -1415,7 +1371,6 @@ const DataKaryawan = () => {
             <option value="all">Semua Status</option>
           </select>
 
-          {/* ✅ NEW: Project Filter */}
           <select
             value={filters.project_id}
             onChange={(e) => handleFilterChange("project_id", e.target.value)}
@@ -1457,7 +1412,6 @@ const DataKaryawan = () => {
         </div>
       </div>
 
-      {/* ✅ UPDATED: Table with Project column */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -1502,7 +1456,7 @@ const DataKaryawan = () => {
                   { key: "nama", label: "Nama" },
                   { key: "no_telepon", label: "No Telepon" },
                   { key: "jabatan", label: "Jabatan" },
-                  { key: "project", label: "Project" }, // ✅ CHANGED: Penempatan → Project
+                  { key: "project", label: "Project" },
                   { key: "jenis_kelamin", label: "JK" },
                   { key: "sisa_cuti_tahunan", label: "Sisa Cuti Tahunan" },
                   { key: "status", label: "Status" },
@@ -1575,7 +1529,7 @@ const DataKaryawan = () => {
                     <td className="px-6 py-4 text-gray-700">
                       {employee.jabatan?.nama || "-"}
                     </td>
-                    {/* ✅ UPDATED: Show project instead of divisi */}
+
                     <td className="px-6 py-4 text-gray-700">
                       {employee.active_project?.project?.nama || (
                         <span className="text-gray-400 italic">
@@ -1631,7 +1585,6 @@ const DataKaryawan = () => {
           </table>
         </div>
 
-        {/* Pagination */}
         <div className="px-6 py-4 border-t border-gray-100 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="text-sm text-gray-600">
             Halaman {pagination.current_page} dari {pagination.last_page}
@@ -1654,19 +1607,16 @@ const DataKaryawan = () => {
               const pages = [];
 
               if (totalPages <= 7) {
-                // Show all pages if 7 or less
                 for (let i = 1; i <= totalPages; i++) {
                   pages.push(i);
                 }
               } else {
-                // Always show first page
                 pages.push(1);
 
                 if (currentPage > 3) {
                   pages.push("...");
                 }
 
-                // Show pages around current page
                 for (
                   let i = Math.max(2, currentPage - 1);
                   i <= Math.min(totalPages - 1, currentPage + 1);
@@ -1681,7 +1631,6 @@ const DataKaryawan = () => {
                   pages.push("...");
                 }
 
-                // Always show last page
                 if (!pages.includes(totalPages)) {
                   pages.push(totalPages);
                 }
@@ -1734,7 +1683,6 @@ const DataKaryawan = () => {
         </div>
       </div>
 
-      {/* Import Excel Modal - OPTIMIZED */}
       {showImportModal && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -1792,7 +1740,6 @@ const DataKaryawan = () => {
                 </div>
               )}
 
-              {/* File size warning */}
               {importFile && importFile.size > 10 * 1024 * 1024 && (
                 <div className="mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
                   <div className="flex gap-3">
@@ -1830,7 +1777,6 @@ const DataKaryawan = () => {
                 </button>
 
                 {importFile && importFile.size > 10 * 1024 * 1024 ? (
-                  // Large file: Show direct import button
                   <button
                     onClick={handleDirectImport}
                     className={`flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-center flex items-center justify-center gap-2`}
@@ -1849,7 +1795,6 @@ const DataKaryawan = () => {
                     )}
                   </button>
                 ) : (
-                  // Small file: Show validate + import
                   <>
                     <button
                       onClick={() => validateImportFile(importFile)}
@@ -1889,7 +1834,6 @@ const DataKaryawan = () => {
                 )}
               </div>
 
-              {/* Validation results */}
               {importValidation && (
                 <div className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg">
                   <div className="flex items-center gap-2 text-green-700 mb-2">
@@ -1928,7 +1872,6 @@ const DataKaryawan = () => {
         </div>
       )}
 
-      {/* Upload Progress Indicator - ENHANCED */}
       {uploadProgress && (
         <div className="fixed bottom-6 right-6 bg-white shadow-2xl rounded-xl border border-gray-200 p-4 w-96 z-50 animate-slide-up">
           <div className="flex items-start justify-between mb-3">
@@ -1991,7 +1934,6 @@ const DataKaryawan = () => {
             </div>
           </div>
 
-          {/* Progress Bar */}
           <div className="space-y-2">
             <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
               <div
@@ -2014,7 +1956,6 @@ const DataKaryawan = () => {
             )}
           </div>
 
-          {/* Stage indicator */}
           <div className="mt-3 flex items-center gap-2 text-xs">
             <div
               className={`w-2 h-2 rounded-full ${
@@ -2036,7 +1977,6 @@ const DataKaryawan = () => {
         </div>
       )}
 
-      {/* Import Progress Indicator - Background Process */}
       {importProgress && (
         <div className="fixed bottom-6 right-6 bg-white shadow-2xl rounded-xl border border-gray-200 p-4 w-96 z-50 animate-slide-up">
           <div className="flex items-start justify-between mb-3">
@@ -2071,7 +2011,6 @@ const DataKaryawan = () => {
             )}
           </div>
 
-          {/* Progress Bar */}
           {importProgress.status === "processing" && (
             <div className="space-y-2">
               <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
@@ -2113,7 +2052,6 @@ const DataKaryawan = () => {
         </div>
       )}
 
-      {/* Validation Modal - Missing Master Data */}
       {showValidationModal && importValidation && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -2131,7 +2069,6 @@ const DataKaryawan = () => {
             </div>
 
             <div className="p-6 space-y-6">
-              {/* Summary */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h3 className="font-semibold text-blue-900 mb-2">
                   Ringkasan File
@@ -2160,7 +2097,6 @@ const DataKaryawan = () => {
                 </div>
               </div>
 
-              {/* Divisi Info */}
               <div className="border border-gray-200 rounded-lg p-4">
                 <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <Building className="w-5 h-5 text-purple-600" />
@@ -2209,7 +2145,6 @@ const DataKaryawan = () => {
                 )}
               </div>
 
-              {/* Jabatan Info */}
               <div className="border border-gray-200 rounded-lg p-4">
                 <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <Briefcase className="w-5 h-5 text-orange-600" />
@@ -2258,7 +2193,6 @@ const DataKaryawan = () => {
                 )}
               </div>
 
-              {/* Project Info */}
               <div className="border border-gray-200 rounded-lg p-4">
                 <h3 className="font-semibold text-gray-900 mb-3 flex items-center gap-2">
                   <FileText className="w-5 h-5 text-indigo-600" />
@@ -2339,7 +2273,6 @@ const DataKaryawan = () => {
                 )}
               </div>
 
-              {/* Action Buttons */}
               <div className="flex items-center justify-between pt-4 border-t">
                 <button
                   onClick={() => {
@@ -2378,7 +2311,6 @@ const DataKaryawan = () => {
         </div>
       )}
 
-      {/* Add Employee Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
@@ -2396,7 +2328,6 @@ const DataKaryawan = () => {
             </div>
 
             <div className="px-6 py-4 space-y-4">
-              {/* Info Auto Generate */}
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <div className="flex items-center gap-2 text-blue-700">
                   <User className="w-4 h-4" />
@@ -2408,7 +2339,6 @@ const DataKaryawan = () => {
                 </p>
               </div>
 
-              {/* NIK */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   NIK *
@@ -2432,7 +2362,6 @@ const DataKaryawan = () => {
                 )}
               </div>
 
-              {/* Nama */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Nama Lengkap *
@@ -2456,7 +2385,6 @@ const DataKaryawan = () => {
                 )}
               </div>
 
-              {/* No Telepon */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   No Telepon *
@@ -2483,7 +2411,6 @@ const DataKaryawan = () => {
                 </p>
               </div>
 
-              {/* Divisi dan Jabatan */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -2515,7 +2442,6 @@ const DataKaryawan = () => {
                   )}
                 </div>
                 <div>
-                  {/* ✅ CHANGED: Remove required indicator (*) */}
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Penempatan
                     <span className="text-gray-400 text-xs ml-2">
@@ -2538,7 +2464,6 @@ const DataKaryawan = () => {
                     }`}
                     disabled={submitLoading}
                   >
-                    {/* ✅ NEW: Add empty option */}
                     <option value="">-- Tidak Ada Penempatan --</option>
                     {masterData.divisions.map((div) => (
                       <option key={div.id} value={div.id}>
@@ -2554,7 +2479,6 @@ const DataKaryawan = () => {
                 </div>
               </div>
 
-              {/* Jenis Kelamin */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Jenis Kelamin *
@@ -2582,7 +2506,6 @@ const DataKaryawan = () => {
                 )}
               </div>
 
-              {/* Tempat Lahir */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Tempat Lahir *
@@ -2608,7 +2531,6 @@ const DataKaryawan = () => {
                 )}
               </div>
 
-              {/* Tanggal Lahir */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Tanggal Lahir *
@@ -2679,7 +2601,6 @@ const DataKaryawan = () => {
                 )}
               </div>
 
-              {/* Tanggal Bergabung */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Tanggal Bergabung *
@@ -2707,7 +2628,6 @@ const DataKaryawan = () => {
                 )}
               </div>
 
-              {/* Sisa Cuti Tahunan */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Sisa Cuti Tahunan
@@ -2792,7 +2712,6 @@ const DataKaryawan = () => {
             </div>
 
             <div className="p-6 space-y-6">
-              {/* Personal Information Section */}
               <div className="bg-gray-50 rounded-xl p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
@@ -3110,7 +3029,6 @@ const DataKaryawan = () => {
                 )}
               </div>
 
-              {/* Work Information Section */}
               <div className="bg-gray-50 rounded-xl p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
@@ -3151,7 +3069,6 @@ const DataKaryawan = () => {
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        {/* ✅ CHANGED: Remove required indicator */}
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Penempatan
                           <span className="text-gray-400 text-xs ml-2">
@@ -3169,7 +3086,6 @@ const DataKaryawan = () => {
                           }}
                           className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                         >
-                          {/* ✅ NEW: Add empty option */}
                           <option value="">-- Tidak Ada Penempatan --</option>
                           {masterData.divisions.map((div) => (
                             <option key={div.id} value={div.id}>
@@ -3305,7 +3221,6 @@ const DataKaryawan = () => {
                 )}
               </div>
 
-              {/* Account Access Section */}
               <div className="bg-gray-50 rounded-xl p-6">
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-3">
