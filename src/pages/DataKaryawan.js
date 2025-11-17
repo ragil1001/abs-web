@@ -567,7 +567,7 @@ const DataKaryawan = () => {
   const handleDeleteEmployee = async (employee) => {
     const result = await Swal.fire({
       title: "Konfirmasi Hapus",
-      html: `Hapus karyawan <b>${employee.nama}</b>?<br><small class="text-red-600">Data tidak dapat dikembalikan!</small>`,
+      html: `Nonaktifkan karyawan <b>${employee.nama}</b>?`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
@@ -1785,7 +1785,7 @@ const DataKaryawan = () => {
                       </button>
                       <button
                         onClick={() => {
-                          /* handleDeleteEmployee */
+                          handleDeleteEmployee(employee);
                         }}
                         className="p-1.5 text-red-600 hover:bg-red-100 rounded-lg ml-2 transition-colors"
                         title="Hapus"
