@@ -5,6 +5,7 @@ import {
   requestNotificationPermission,
   getFCMToken,
   onMessageListener,
+  isMessagingSupported,
 } from "@/lib/firebase";
 
 export const useNotifications = () => {
@@ -16,16 +17,28 @@ export const useNotifications = () => {
 
   const initializeFCM = useCallback(async () => {
     try {
+      // Check if Firebase Messaging is supported
+      if (!isMessagingSupported()) {
+        return;
+      }
+
       const hasPermission = await requestNotificationPermission();
 
       if (hasPermission) {
         const token = await getFCMToken();
         if (token) {
           setFcmToken(token);
-          await notificationAPI.storeFCMToken({
-            token,
-            device_name: navigator.userAgent,
-          });
+
+          // Store token in backend
+          try {
+            await notificationAPI.storeFCMToken({
+              token,
+              device_name: navigator.userAgent,
+            });
+            console.log("FCM token stored successfully");
+          } catch (err) {
+            console.error("Error storing FCM token:", err);
+          }
         }
       }
     } catch (err) {
@@ -104,7 +117,6 @@ export const useNotifications = () => {
     }
   }, []);
 
-  // Delete notification
   const deleteNotification = useCallback(
     async (notificationId) => {
       try {
@@ -122,28 +134,42 @@ export const useNotifications = () => {
     [fetchUnreadCount]
   );
 
+  // Setup message listener only if messaging is supported
   useEffect(() => {
-    let unsubscribe;
+    if (!isMessagingSupported()) {
+      console.log("Skipping message listener setup - messaging not supported");
+      return;
+    }
+
+    let isActive = true;
 
     const setupListener = async () => {
       try {
-        const payload = await onMessageListener();
-        if (payload) {
-          if (Notification.permission === "granted") {
-            new Notification(
-              payload.notification?.title || "New Notification",
-              {
-                body: payload.notification?.body || "",
-                icon: "/icon.png",
-                badge: "/badge.png",
-                tag: payload.data?.type || "default",
-                requireInteraction: true,
-                data: payload.data,
-              }
-            );
+        while (isActive) {
+          const payload = await onMessageListener();
+
+          if (!isActive) break;
+
+          if (payload) {
+            // Show browser notification if permission granted
+            if (Notification.permission === "granted") {
+              new Notification(
+                payload.notification?.title || "New Notification",
+                {
+                  body: payload.notification?.body || "",
+                  icon: "/icon.png",
+                  badge: "/badge.png",
+                  tag: payload.data?.type || "default",
+                  requireInteraction: true,
+                  data: payload.data,
+                }
+              );
+            }
+
+            // Refresh notifications
+            fetchNotifications();
+            fetchUnreadCount();
           }
-          fetchNotifications();
-          fetchUnreadCount();
         }
       } catch (err) {
         console.error("Error in message listener:", err);
@@ -153,20 +179,25 @@ export const useNotifications = () => {
     setupListener();
 
     return () => {
-      if (unsubscribe && typeof unsubscribe === "function") {
-        unsubscribe();
-      }
+      isActive = false;
     };
   }, [fetchNotifications, fetchUnreadCount]);
 
+  // Initialize on mount
   useEffect(() => {
+    // Initialize FCM (will gracefully fail if not supported)
     initializeFCM();
+
+    // Always fetch notifications (works without FCM)
     fetchNotifications();
     fetchUnreadCount();
+
+    // Refresh unread count periodically
     const refreshInterval = setInterval(() => {
       fetchUnreadCount();
     }, 15000);
 
+    // Full refresh periodically
     const fullRefreshInterval = setInterval(() => {
       fetchNotifications({ per_page: 20 });
     }, 60000);
@@ -189,6 +220,7 @@ export const useNotifications = () => {
     markAllAsRead,
     deleteNotification,
     initializeFCM,
+    isMessagingSupported: isMessagingSupported(),
   };
 };
 

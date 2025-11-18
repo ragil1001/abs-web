@@ -1,5 +1,10 @@
 import { initializeApp } from "firebase/app";
-import { getMessaging, getToken, onMessage } from "firebase/messaging";
+import {
+  getMessaging,
+  getToken,
+  onMessage,
+  isSupported,
+} from "firebase/messaging";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -11,21 +16,55 @@ const firebaseConfig = {
 };
 
 let app;
-let messaging;
+let messaging = null;
+let messagingSupported = false;
 
+// Initialize Firebase only in browser
 if (typeof window !== "undefined") {
   app = initializeApp(firebaseConfig);
-  messaging = getMessaging(app);
+
+  // Check if messaging is supported before initializing
+  isSupported()
+    .then((supported) => {
+      messagingSupported = supported;
+      if (supported) {
+        try {
+          messaging = getMessaging(app);
+          console.log("Firebase Messaging initialized successfully");
+        } catch (error) {
+          console.warn(
+            "Firebase Messaging initialization failed:",
+            error.message
+          );
+          messaging = null;
+        }
+      } else {
+        console.warn("Firebase Messaging is not supported in this browser");
+      }
+    })
+    .catch((error) => {
+      console.warn("Error checking Firebase Messaging support:", error.message);
+    });
 }
+
+export const isMessagingSupported = () => {
+  return messagingSupported && messaging !== null;
+};
 
 export const requestNotificationPermission = async () => {
   try {
+    // Check if notifications are supported
+    if (!("Notification" in window)) {
+      console.warn("sNotifications not supported in this browser");
+      return false;
+    }
+
     const permission = await Notification.requestPermission();
     if (permission === "granted") {
-      console.log("Notification permission granted.");
+      console.log("Notification permission granted");
       return true;
     } else {
-      console.log("Notification permission denied.");
+      console.log("Notification permission denied");
       return false;
     }
   } catch (error) {
@@ -36,6 +75,11 @@ export const requestNotificationPermission = async () => {
 
 export const getFCMToken = async () => {
   try {
+    if (!isMessagingSupported()) {
+      console.warn("Messaging not supported - skipping token retrieval");
+      return null;
+    }
+
     if (!messaging) {
       throw new Error("Firebase Messaging not initialized");
     }
@@ -45,29 +89,35 @@ export const getFCMToken = async () => {
     });
 
     if (currentToken) {
-      console.log("FCM Token:", currentToken);
+      console.log("FCM Token retrieved successfully");
       return currentToken;
     } else {
-      console.log("No registration token available.");
+      console.log("No registration token available");
       return null;
     }
   } catch (error) {
-    console.error("An error occurred while retrieving token:", error);
+    console.error("Error retrieving FCM token:", error.message);
     return null;
   }
 };
 
 export const onMessageListener = () =>
   new Promise((resolve) => {
-    if (!messaging) {
+    if (!isMessagingSupported() || !messaging) {
+      console.warn("Message listener not available - messaging not supported");
       resolve(null);
       return;
     }
 
-    onMessage(messaging, (payload) => {
-      console.log("Message received:", payload);
-      resolve(payload);
-    });
+    try {
+      onMessage(messaging, (payload) => {
+        console.log("Message received:", payload);
+        resolve(payload);
+      });
+    } catch (error) {
+      console.error("Error setting up message listener:", error);
+      resolve(null);
+    }
   });
 
 export { messaging };

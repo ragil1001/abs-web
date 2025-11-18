@@ -567,7 +567,7 @@ const DataKaryawan = () => {
   const handleDeleteEmployee = async (employee) => {
     const result = await Swal.fire({
       title: "Konfirmasi Hapus",
-      html: `Hapus karyawan <b>${employee.nama}</b>?<br><small class="text-red-600">Data tidak dapat dikembalikan!</small>`,
+      html: `Nonaktifkan karyawan <b>${employee.nama}</b>?`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
@@ -1181,14 +1181,14 @@ const DataKaryawan = () => {
       const token = localStorage.getItem("auth_token");
       if (!token) throw new Error("Token tidak ditemukan");
 
+      // Fetch all data tanpa pagination
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/karyawans/export`,
+        `${process.env.NEXT_PUBLIC_API_URL}/karyawans?per_page=10000`,
         {
           method: "GET",
           headers: {
             Authorization: `Bearer ${token}`,
-            Accept:
-              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            Accept: "application/json",
           },
         }
       );
@@ -1196,22 +1196,241 @@ const DataKaryawan = () => {
       if (!response.ok)
         throw new Error(`Export gagal (Status: ${response.status})`);
 
-      const blob = await response.blob();
-      if (blob.size === 0) throw new Error("File export kosong");
+      const result = await response.json();
+      const allEmployees = result.data || [];
 
+      if (allEmployees.length === 0) {
+        Swal.close();
+        toast.warning("Tidak ada data karyawan untuk diekspor");
+        return;
+      }
+
+      // Import ExcelJS dynamically
+      const ExcelJS = await import("exceljs");
+      const wb = new ExcelJS.Workbook();
+      wb.creator = "Aplikasi Karyawan";
+      wb.created = new Date();
+
+      const ws = wb.addWorksheet("Data Karyawan");
+
+      // Set column widths
+      ws.columns = [
+        { width: 8 }, // ID
+        { width: 18 }, // NIK
+        { width: 25 }, // Nama
+        { width: 15 }, // No Telepon
+        { width: 20 }, // Jabatan
+        { width: 25 }, // Project
+        { width: 20 }, // Divisi/Penempatan
+        { width: 12 }, // JK
+        { width: 15 }, // Tempat Lahir
+        { width: 15 }, // Tanggal Lahir
+        { width: 15 }, // Tanggal Bergabung
+        { width: 15 }, // Tanggal Keluar
+        { width: 15 }, // Sisa Cuti Tahunan
+        { width: 12 }, // Status
+      ];
+
+      // Header row
+      const headerRow = 1;
+      const headers = [
+        "ID",
+        "NIK",
+        "Nama",
+        "No Telepon",
+        "Jabatan",
+        "Project",
+        "Divisi/Penempatan",
+        "Jenis Kelamin",
+        "Tempat Lahir",
+        "Tanggal Lahir",
+        "Tanggal Bergabung",
+        "Tanggal Keluar",
+        "Sisa Cuti Tahunan",
+        "Status",
+      ];
+
+      headers.forEach((header, idx) => {
+        const cell = ws.getCell(headerRow, idx + 1);
+        cell.value = header;
+        cell.font = {
+          name: "Arial",
+          bold: true,
+          color: { argb: "FFFFFFFF" },
+          size: 11,
+        };
+        cell.fill = {
+          type: "pattern",
+          pattern: "solid",
+          fgColor: { argb: "FFEA580C" },
+        };
+        cell.alignment = { vertical: "middle", horizontal: "center" };
+        cell.border = {
+          top: { style: "thin" },
+          left: { style: "thin" },
+          bottom: { style: "thin" },
+          right: { style: "thin" },
+        };
+      });
+      ws.getRow(headerRow).height = 22;
+
+      // Data rows
+      allEmployees.forEach((emp, idx) => {
+        const row = headerRow + 1 + idx;
+
+        // ID
+        ws.getCell(row, 1).value = emp.id;
+        ws.getCell(row, 1).alignment = {
+          horizontal: "center",
+          vertical: "middle",
+        };
+
+        // NIK (format as text to prevent scientific notation)
+        const nikCell = ws.getCell(row, 2);
+        nikCell.value = emp.nik || "";
+        nikCell.numFmt = "@"; // Format as text
+        nikCell.alignment = { horizontal: "left", vertical: "middle" };
+
+        // Nama
+        ws.getCell(row, 3).value = emp.nama || "";
+        ws.getCell(row, 3).alignment = {
+          horizontal: "left",
+          vertical: "middle",
+        };
+
+        // No Telepon (format as text)
+        const phoneCell = ws.getCell(row, 4);
+        phoneCell.value = emp.no_telepon || "";
+        phoneCell.numFmt = "@";
+        phoneCell.alignment = { horizontal: "left", vertical: "middle" };
+
+        // Jabatan
+        ws.getCell(row, 5).value = emp.jabatan?.nama || "-";
+        ws.getCell(row, 5).alignment = {
+          horizontal: "left",
+          vertical: "middle",
+        };
+
+        // Project
+        ws.getCell(row, 6).value = emp.active_project?.project?.nama || "-";
+        ws.getCell(row, 6).alignment = {
+          horizontal: "left",
+          vertical: "middle",
+        };
+
+        // Divisi/Penempatan
+        ws.getCell(row, 7).value = emp.divisi?.nama || "-";
+        ws.getCell(row, 7).alignment = {
+          horizontal: "left",
+          vertical: "middle",
+        };
+
+        // Jenis Kelamin
+        ws.getCell(row, 8).value =
+          emp.jenis_kelamin === "L" ? "Laki-laki" : "Perempuan";
+        ws.getCell(row, 8).alignment = {
+          horizontal: "center",
+          vertical: "middle",
+        };
+
+        // Tempat Lahir
+        ws.getCell(row, 9).value = emp.tempat_lahir || "-";
+        ws.getCell(row, 9).alignment = {
+          horizontal: "left",
+          vertical: "middle",
+        };
+
+        // Tanggal Lahir
+        ws.getCell(row, 10).value = formatDateID(emp.tanggal_lahir);
+        ws.getCell(row, 10).alignment = {
+          horizontal: "center",
+          vertical: "middle",
+        };
+
+        // Tanggal Bergabung
+        ws.getCell(row, 11).value = formatDateID(emp.tanggal_bergabung);
+        ws.getCell(row, 11).alignment = {
+          horizontal: "center",
+          vertical: "middle",
+        };
+
+        // Tanggal Keluar
+        ws.getCell(row, 12).value = emp.tanggal_keluar
+          ? formatDateID(emp.tanggal_keluar)
+          : "-";
+        ws.getCell(row, 12).alignment = {
+          horizontal: "center",
+          vertical: "middle",
+        };
+
+        // Sisa Cuti Tahunan
+        ws.getCell(row, 13).value =
+          emp.sisa_cuti_tahunan != null ? emp.sisa_cuti_tahunan : 0;
+        ws.getCell(row, 13).alignment = {
+          horizontal: "center",
+          vertical: "middle",
+        };
+
+        // Status
+        ws.getCell(row, 14).value =
+          emp.status === "aktif" ? "Aktif" : "Tidak Aktif";
+        ws.getCell(row, 14).alignment = {
+          horizontal: "center",
+          vertical: "middle",
+        };
+
+        // Apply borders and alternating row colors
+        const bgColor = idx % 2 === 0 ? "FFFFFFFF" : "FFF9FAFB";
+        for (let col = 1; col <= 14; col++) {
+          const cell = ws.getCell(row, col);
+          cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: bgColor },
+          };
+          cell.border = {
+            top: { style: "thin", color: { argb: "FFE5E7EB" } },
+            left: { style: "thin", color: { argb: "FFE5E7EB" } },
+            bottom: { style: "thin", color: { argb: "FFE5E7EB" } },
+            right: { style: "thin", color: { argb: "FFE5E7EB" } },
+          };
+          cell.font = { name: "Arial", size: 10 };
+        }
+      });
+
+      // Freeze panes: Freeze columns A-C (ID, NIK, Nama) and row 1 (header)
+      ws.views = [
+        {
+          state: "frozen",
+          xSplit: 3, // Freeze first 3 columns (A, B, C)
+          ySplit: 1, // Freeze first row (header)
+          topLeftCell: "D2",
+          activeCell: "A1",
+        },
+      ];
+
+      const filename = `data-karyawan-${new Date()
+        .toISOString()
+        .slice(0, 10)}.xlsx`;
+
+      const buffer = await wb.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `data-karyawan-${new Date()
-        .toISOString()
-        .slice(0, 10)}.xlsx`;
+      a.download = filename;
       a.click();
       window.URL.revokeObjectURL(url);
 
       Swal.close();
-      toast.success("Data berhasil diekspor!");
+      toast.success(
+        `Data berhasil diekspor! Total: ${allEmployees.length} karyawan`
+      );
     } catch (err) {
       Swal.close();
+      console.error("Export error:", err);
       toast.error("Gagal mengekspor data: " + err.message, { autoClose: 5000 });
     }
   };
@@ -1319,18 +1538,14 @@ const DataKaryawan = () => {
               Import
             </button>
             <button
-              onClick={() => {
-                /* exportToExcel function */
-              }}
+              onClick={exportToExcel}
               className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center gap-2"
             >
               <Download className="w-4 h-4" />
               Export
             </button>
             <button
-              onClick={() => {
-                /* handleOpenAddModal */
-              }}
+              onClick={handleOpenAddModal}
               className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors flex items-center gap-2"
             >
               <Plus className="w-4 h-4" />
@@ -1570,7 +1785,7 @@ const DataKaryawan = () => {
                       </button>
                       <button
                         onClick={() => {
-                          /* handleDeleteEmployee */
+                          handleDeleteEmployee(employee);
                         }}
                         className="p-1.5 text-red-600 hover:bg-red-100 rounded-lg ml-2 transition-colors"
                         title="Hapus"
