@@ -57,6 +57,10 @@ const NotificationDropdown = () => {
       case "tukar_shift_approved":
       case "tukar_shift_rejected":
         return <ArrowRightLeft className="w-5 h-5 text-purple-500" />;
+      case "lembur_new":
+      case "lembur_approved":
+      case "lembur_rejected":
+        return <Clock className="w-5 h-5 text-orange-500" />;
       default:
         return <AlertCircle className="w-5 h-5 text-blue-500" />;
     }
@@ -80,17 +84,19 @@ const NotificationDropdown = () => {
   };
 
   const handleNotificationClick = async (notification) => {
+    // Mark as read if unread
     if (!notification.is_read) {
       await markAsRead(notification.id);
     }
 
+    // Close dropdown
     setIsOpen(false);
     setShowAllNotifications(false);
 
     const notifData = notification.data || {};
-
     const notifType = notification.type;
 
+    // 🔥 PERBAIKAN UTAMA: Handle Web Admin Notifications
     if (notifType.startsWith("izin_")) {
       const pengajuanIzinId = notifData.pengajuan_izin_id;
       const projectId = notifData.project_id;
@@ -104,7 +110,7 @@ const NotificationDropdown = () => {
       else if (notifType === "izin_approved") statusFilter = "disetujui";
       else if (notifType === "izin_rejected") statusFilter = "ditolak";
 
-      // Dispatch navigation event
+      // Dispatch navigation event untuk Web Admin
       const navigationEvent = new CustomEvent("navigateToDetail", {
         detail: {
           page: "pengajuan-izin",
@@ -125,12 +131,42 @@ const NotificationDropdown = () => {
 
       window.dispatchEvent(navigationEvent);
     }
-    // Handle TUKAR SHIFT notifications
+    // 🔥 Handle LEMBUR Notifications
+    else if (notifType.startsWith("lembur_")) {
+      const pengajuanLemburId = notifData.pengajuan_lembur_id;
+      const projectId = notifData.project_id;
+      const karyawanId = notifData.karyawan_id;
+      const karyawanNama = notifData.karyawan_nama;
+      const karyawanNik = notifData.karyawan_nik;
+
+      let statusFilter = "all";
+      if (notifType === "lembur_new") statusFilter = "pending";
+
+      // Dispatch navigation event untuk Web Admin
+      const navigationEvent = new CustomEvent("navigateToDetail", {
+        detail: {
+          page: "pengajuan-lembur",
+          detailType: "lembur",
+          detailId: pengajuanLemburId,
+          filters: {
+            pengajuanLemburId,
+            projectId,
+            karyawanId,
+            karyawanNama,
+            karyawanNik,
+            status: statusFilter,
+            openDetail: true,
+          },
+        },
+      });
+
+      window.dispatchEvent(navigationEvent);
+    }
+    // 🔥 Handle TUKAR SHIFT Notifications
     else if (notifType.startsWith("tukar_shift_")) {
       const tukarShiftId = notifData.tukar_shift_id;
       const projectId = notifData.project_id;
 
-      // Determine status filter
       let statusFilter = "all";
       if (notifType === "tukar_shift_pending") statusFilter = "pending";
       else if (notifType === "tukar_shift_approved") statusFilter = "disetujui";
@@ -151,8 +187,11 @@ const NotificationDropdown = () => {
       });
 
       window.dispatchEvent(navigationEvent);
-    } else if (notifData.click_action) {
-      window.location.href = notifData.click_action;
+    }
+    // Fallback: jika ada click_action (untuk compatibility)
+    else if (notifData.click_action) {
+      // Jangan gunakan full URL, extract page info
+      console.warn("Using deprecated click_action:", notifData.click_action);
     }
   };
 

@@ -214,6 +214,7 @@ function createPresensiMasukSheet(
 
   data.forEach((item) => {
     const presensi = item.presensi_masuk;
+
     const status = presensi
       ? getStatusText(presensi.status)
       : item.shift_code === "L"
@@ -225,7 +226,11 @@ function createPresensiMasukSheet(
     ws.getCell(`C${currentRow}`).value = item.divisi;
     ws.getCell(`D${currentRow}`).value = item.jabatan;
     ws.getCell(`E${currentRow}`).value = item.shift;
-    ws.getCell(`F${currentRow}`).value = presensi?.waktu || "-";
+
+    // FIX: Hanya tampilkan waktu jika presensi ada dan waktu tidak null
+    ws.getCell(`F${currentRow}`).value =
+      presensi && presensi.waktu ? presensi.waktu : "-";
+
     ws.getCell(`G${currentRow}`).value = status;
     ws.getCell(`H${currentRow}`).value = presensi?.keterangan || "-";
 
@@ -417,6 +422,25 @@ function createPresensiPulangSheet(
 
   data.forEach((item) => {
     const presensi = item.presensi_pulang;
+
+    // LOGIC BARU: Cek apakah ada pengajuan lembur yang disetujui
+    let waktuPulang = "-";
+
+    if (presensi) {
+      // Jika status adalah lembur (bukan lembur_pending) dan ada data pengajuan lembur
+      if (
+        presensi.status === "lembur" &&
+        item.pengajuan_lembur &&
+        item.pengajuan_lembur.jam_selesai
+      ) {
+        // Gunakan jam selesai dari pengajuan lembur
+        waktuPulang = item.pengajuan_lembur.jam_selesai;
+      } else if (presensi.waktu) {
+        // Gunakan waktu presensi aktual
+        waktuPulang = presensi.waktu;
+      }
+    }
+
     const status = presensi
       ? getStatusTextPulang(presensi.status)
       : item.shift_code === "L"
@@ -428,7 +452,11 @@ function createPresensiPulangSheet(
     ws.getCell(`C${currentRow}`).value = item.divisi;
     ws.getCell(`D${currentRow}`).value = item.jabatan;
     ws.getCell(`E${currentRow}`).value = item.shift;
-    ws.getCell(`F${currentRow}`).value = presensi?.waktu || "-";
+
+    // FIX: Hanya tampilkan waktu jika presensi ada dan waktu tidak null
+    ws.getCell(`F${currentRow}`).value =
+      presensi && presensi.waktu ? presensi.waktu : "-";
+
     ws.getCell(`G${currentRow}`).value = status;
     ws.getCell(`H${currentRow}`).value = presensi?.keterangan || "-";
 

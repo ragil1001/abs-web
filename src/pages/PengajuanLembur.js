@@ -357,6 +357,35 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
     }
   };
 
+  const calculateDuration = (jamMulai, jamSelesai) => {
+    if (!jamMulai || !jamSelesai) return "-";
+
+    try {
+      const [startHour, startMin] = jamMulai.split(":").map(Number);
+      const [endHour, endMin] = jamSelesai.split(":").map(Number);
+
+      let totalMinutes = endHour * 60 + endMin - (startHour * 60 + startMin);
+
+      // Jika jam selesai lebih kecil dari jam mulai, tambah 24 jam
+      if (totalMinutes < 0) {
+        totalMinutes += 24 * 60;
+      }
+
+      const hours = Math.floor(totalMinutes / 60);
+      const minutes = totalMinutes % 60;
+
+      if (hours === 0) {
+        return `${minutes} menit`;
+      } else if (minutes === 0) {
+        return `${hours} jam`;
+      } else {
+        return `${hours} jam ${minutes} menit`;
+      }
+    } catch (error) {
+      return "-";
+    }
+  };
+
   const handleDeleteConfirm = (submission) => {
     setSelectedSubmission(submission);
     setShowDeleteModal(true);
@@ -814,27 +843,79 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
                     {getKodeHariBadge(selectedSubmission.kode_hari)}
                   </div>
 
-                  {selectedSubmission.kode_hari === "L" && (
-                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                      <p className="text-sm font-medium text-purple-900 mb-2">
-                        Jam Kerja Lembur (Hari Libur)
+                  {/* Jam Kerja Lembur yang Diajukan */}
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <p className="text-sm font-medium text-blue-900 mb-3">
+                      Jam Kerja Lembur (Sesuai Pengajuan)
+                    </p>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <p className="text-xs text-blue-700 mb-1">Jam Mulai</p>
+                        <p className="font-semibold text-blue-900 text-lg">
+                          {selectedSubmission.jam_mulai || "-"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-xs text-blue-700 mb-1">
+                          Jam Selesai
+                        </p>
+                        <p className="font-semibold text-blue-900 text-lg">
+                          {selectedSubmission.jam_selesai || "-"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="mt-3 pt-3 border-t border-blue-200">
+                      <p className="text-xs text-blue-700 mb-1">Total Durasi</p>
+                      <p className="font-medium text-blue-900">
+                        {selectedSubmission.jam_mulai &&
+                        selectedSubmission.jam_selesai
+                          ? calculateDuration(
+                              selectedSubmission.jam_mulai,
+                              selectedSubmission.jam_selesai
+                            )
+                          : "-"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Waktu Presensi Aktual */}
+                  {selectedSubmission.presensi_masuk ||
+                  selectedSubmission.presensi_pulang ? (
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <p className="text-sm font-medium text-green-900 mb-3">
+                        Waktu Presensi Aktual
                       </p>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <p className="text-xs text-purple-700">Jam Mulai</p>
-                          <p className="font-semibold text-purple-900">
-                            {selectedSubmission.jam_mulai || "-"}
+                          <p className="text-xs text-green-700 mb-1">
+                            Presensi Masuk
                           </p>
+                          <p className="font-semibold text-green-900 text-lg">
+                            {selectedSubmission.presensi_masuk?.waktu || "-"}
+                          </p>
+                          {selectedSubmission.presensi_masuk?.status && (
+                            <p className="text-xs text-green-600 mt-1">
+                              Status: {selectedSubmission.presensi_masuk.status}
+                            </p>
+                          )}
                         </div>
                         <div>
-                          <p className="text-xs text-purple-700">Jam Selesai</p>
-                          <p className="font-semibold text-purple-900">
-                            {selectedSubmission.jam_selesai || "-"}
+                          <p className="text-xs text-green-700 mb-1">
+                            Presensi Pulang
                           </p>
+                          <p className="font-semibold text-green-900 text-lg">
+                            {selectedSubmission.presensi_pulang?.waktu || "-"}
+                          </p>
+                          {selectedSubmission.presensi_pulang?.status && (
+                            <p className="text-xs text-green-600 mt-1">
+                              Status:{" "}
+                              {selectedSubmission.presensi_pulang.status}
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>
-                  )}
+                  ) : null}
 
                   <div>
                     <p className="text-sm text-gray-600 mb-2">
