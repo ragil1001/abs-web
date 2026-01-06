@@ -14,14 +14,16 @@ import {
   Briefcase,
   MapPin,
   ExternalLink,
-  Clock,
   RefreshCw,
+  UserCheck,
+  X,
 } from "lucide-react";
 import { useApi } from "@/hooks/useApi";
 import { projectAPI, rekapBulananAPI } from "@/lib/api";
 import { dateHelpers } from "@/utils/helpers";
 import { toast } from "react-toastify";
 import exportRekapBulanan from "@/utils/exportFunctions/exportRekapBulanan";
+import exportRekapPerKaryawan from "@/utils/exportFunctions/exportRekapPerKaryawan";
 
 const RekapPresensiBulanan = () => {
   const [projects, setProjects] = useState([]);
@@ -36,6 +38,15 @@ const RekapPresensiBulanan = () => {
   const [rekapData, setRekapData] = useState([]);
   const [projectInfo, setProjectInfo] = useState(null);
   const [daysInMonth, setDaysInMonth] = useState([]);
+
+  // Modal states
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [selectedKaryawanIds, setSelectedKaryawanIds] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [exportStartDate, setExportStartDate] = useState("");
+  const [exportEndDate, setExportEndDate] = useState("");
+  const [exportLoading, setExportLoading] = useState(false);
+  const [modalSearchTerm, setModalSearchTerm] = useState("");
 
   const { loading, call } = useApi();
 
@@ -315,6 +326,110 @@ const RekapPresensiBulanan = () => {
     fetchRekapData();
   }, [fetchRekapData]);
 
+  const openExportModal = () => {
+    if (!currentProject) {
+      toast.warning("Pilih project terlebih dahulu");
+      return;
+    }
+
+    // Set default dates to current period
+    const selectedPeriodObj = periodOptions.find(
+      (p) => p.value === selectedPeriod
+    );
+    if (selectedPeriodObj) {
+      setExportStartDate(
+        selectedPeriodObj.startDate.toISOString().slice(0, 10)
+      );
+      setExportEndDate(selectedPeriodObj.endDate.toISOString().slice(0, 10));
+    }
+
+    setSelectedKaryawanIds([]);
+    setSelectAll(false);
+    setModalSearchTerm("");
+    setShowExportModal(true);
+  };
+
+  const closeExportModal = () => {
+    setShowExportModal(false);
+    setSelectedKaryawanIds([]);
+    setSelectAll(false);
+    setExportStartDate("");
+    setExportEndDate("");
+    setModalSearchTerm("");
+  };
+
+  const toggleKaryawan = (karyawanId) => {
+    setSelectedKaryawanIds((prev) => {
+      if (prev.includes(karyawanId)) {
+        return prev.filter((id) => id !== karyawanId);
+      } else {
+        return [...prev, karyawanId];
+      }
+    });
+  };
+  const filteredModalData = useMemo(() => {
+    if (!modalSearchTerm) return rekapData;
+
+    const searchLower = modalSearchTerm.toLowerCase();
+    return rekapData.filter(
+      (emp) =>
+        emp.nama.toLowerCase().includes(searchLower) ||
+        emp.nik.toLowerCase().includes(searchLower) ||
+        emp.divisi.toLowerCase().includes(searchLower) ||
+        emp.jabatan.toLowerCase().includes(searchLower)
+    );
+  }, [rekapData, modalSearchTerm]);
+
+  const toggleSelectAll = () => {
+    if (selectAll) {
+      setSelectedKaryawanIds([]);
+    } else {
+      // Filter berdasarkan search term jika ada
+      const filteredNiks = filteredModalData.map((emp) => emp.nik);
+      setSelectedKaryawanIds(filteredNiks);
+    }
+    setSelectAll(!selectAll);
+  };
+
+  const handleExportPerKaryawan = async () => {
+    if (selectedKaryawanIds.length === 0) {
+      toast.warning("Pilih minimal 1 karyawan");
+      return;
+    }
+
+    if (!exportStartDate || !exportEndDate) {
+      toast.warning("Pilih tanggal mulai dan selesai");
+      return;
+    }
+
+    setExportLoading(true);
+
+    try {
+      const response = await call(rekapBulananAPI.getRekapPerKaryawan, {
+        project_id: selectedProject,
+        karyawan_niks: selectedKaryawanIds,
+        tanggal_mulai: exportStartDate,
+        tanggal_selesai: exportEndDate,
+      });
+
+      if (response.success) {
+        await exportRekapPerKaryawan({
+          data: response.data,
+          projectInfo: response.project,
+          periode: response.periode,
+        });
+
+        toast.success("Export berhasil!");
+        closeExportModal();
+      }
+    } catch (err) {
+      console.error("Export per karyawan error:", err);
+      toast.error(err.message || "Gagal mengekspor data");
+    } finally {
+      setExportLoading(false);
+    }
+  };
+
   if (loading && projects.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -346,6 +461,15 @@ const RekapPresensiBulanan = () => {
                 className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`}
               />
               Refresh
+            </button>
+            <button
+              onClick={openExportModal}
+              disabled={
+                !selectedProject || !selectedPeriod || rekapData.length === 0
+              }
+              className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <UserCheck className="w-3.5 h-3.5" /> Export Per Karyawan
             </button>
             <button
               onClick={handleExport}
@@ -424,6 +548,165 @@ const RekapPresensiBulanan = () => {
           </div>
         </div>
       </div>
+
+      {/* Export Modal */}
+      {showExportModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center">
+              <h2 className="text-xl font-bold">Export Rekap Per Karyawan</h2>
+              <button
+                onClick={closeExportModal}
+                className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Date Selection */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Tanggal Mulai *
+                  </label>
+                  <input
+                    type="date"
+                    value={exportStartDate}
+                    onChange={(e) => setExportStartDate(e.target.value)}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Tanggal Selesai *
+                  </label>
+                  <input
+                    type="date"
+                    value={exportEndDate}
+                    onChange={(e) => setExportEndDate(e.target.value)}
+                    min={exportStartDate}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  />
+                </div>
+              </div>
+
+              {/* Karyawan Selection */}
+              <div>
+                <div className="flex justify-between items-center mb-3">
+                  <label className="text-sm font-medium text-gray-700">
+                    Pilih Karyawan *
+                  </label>
+                  <button
+                    onClick={toggleSelectAll}
+                    className="text-sm text-orange-600 hover:text-orange-700 font-medium"
+                  >
+                    {selectAll ? "Hapus Semua" : "Pilih Semua"}
+                  </button>
+                </div>
+
+                {/* Search Input */}
+                <div className="mb-3">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Cari berdasarkan NIK, nama, jabatan, atau divisi..."
+                      value={modalSearchTerm}
+                      onChange={(e) => setModalSearchTerm(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    />
+                    {modalSearchTerm && (
+                      <button
+                        onClick={() => setModalSearchTerm("")}
+                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="border border-gray-300 rounded-lg max-h-96 overflow-y-auto">
+                  {filteredModalData.length > 0 ? (
+                    <div className="divide-y">
+                      {filteredModalData.map((emp) => (
+                        <label
+                          key={emp.nik}
+                          className="flex items-center gap-3 p-3 hover:bg-gray-50 cursor-pointer"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selectedKaryawanIds.includes(emp.nik)}
+                            onChange={() => toggleKaryawan(emp.nik)}
+                            className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500"
+                          />
+                          <div className="flex-1">
+                            <div className="font-medium text-sm">
+                              {emp.nama}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {emp.nik} • {emp.divisi} • {emp.jabatan}
+                            </div>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-8 text-center text-gray-500">
+                      <Search className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+                      <p className="font-medium">
+                        Tidak ada karyawan ditemukan
+                      </p>
+                      <p className="text-sm">
+                        Coba gunakan kata kunci pencarian yang berbeda
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                <div className="mt-2 text-sm text-gray-600">
+                  {selectedKaryawanIds.length} dari {filteredModalData.length}{" "}
+                  karyawan dipilih
+                  {modalSearchTerm && ` (${rekapData.length} total karyawan)`}
+                </div>
+              </div>
+            </div>
+
+            <div className="sticky bottom-0 bg-gray-50 px-6 py-4 border-t flex justify-end gap-3">
+              <button
+                onClick={closeExportModal}
+                disabled={exportLoading}
+                className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors disabled:opacity-50"
+              >
+                Batal
+              </button>
+              <button
+                onClick={handleExportPerKaryawan}
+                disabled={
+                  exportLoading ||
+                  selectedKaryawanIds.length === 0 ||
+                  !exportStartDate ||
+                  !exportEndDate
+                }
+                className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {exportLoading ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    Mengekspor...
+                  </>
+                ) : (
+                  <>
+                    <Download className="w-4 h-4" />
+                    Export
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {currentProject && (
         <div className="bg-white rounded-xl shadow-sm p-4 mb-4">

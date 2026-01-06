@@ -442,6 +442,23 @@ export const pengajuanIzinAPI = {
   },
 };
 
+export const rekapBulananAPI = {
+  getRekapBulanan: async (params) => {
+    const response = await api.get("/rekap-bulanan", {
+      params: addCacheBuster(params),
+    });
+    return response.data;
+  },
+
+  // NEW: Export per karyawan
+  getRekapPerKaryawan: async (params) => {
+    const response = await api.get("/rekap-per-karyawan", {
+      params: addCacheBuster(params),
+    });
+    return response.data;
+  },
+};
+
 export const presensiHarianAPI = {
   getRekapHarian: async (params) => {
     const response = await api.get("/presensi-harian", {
@@ -462,15 +479,6 @@ export const presensiHarianAPI = {
     const response = await api.post(
       `/presensi-harian/${presensiId}/konfirmasi-lembur`
     );
-    return response.data;
-  },
-};
-
-export const rekapBulananAPI = {
-  getRekapBulanan: async (params) => {
-    const response = await api.get("/rekap-bulanan", {
-      params: addCacheBuster(params),
-    });
     return response.data;
   },
 };
@@ -561,6 +569,13 @@ export const pengajuanLemburAPI = {
   getByProject: async (projectId, params = {}) => {
     const response = await api.get(`/pengajuan-lembur/project/${projectId}`, {
       params: addCacheBuster(params),
+    });
+    return response.data;
+  },
+
+  downloadFiles: async (pengajuanIds) => {
+    const response = await api.post("/pengajuan-lembur/download-files", {
+      pengajuan_ids: pengajuanIds,
     });
     return response.data;
   },
