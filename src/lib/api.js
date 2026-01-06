@@ -573,6 +573,13 @@ export const pengajuanLemburAPI = {
     return response.data;
   },
 
+  downloadFiles: async (pengajuanIds) => {
+    const response = await api.post("/pengajuan-lembur/download-files", {
+      pengajuan_ids: pengajuanIds,
+    });
+    return response.data;
+  },
+
   getById: async (id) => {
     const response = await api.get(`/pengajuan-lembur/${id}`, {
       params: addCacheBuster(),

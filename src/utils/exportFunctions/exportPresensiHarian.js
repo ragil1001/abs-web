@@ -428,17 +428,17 @@ function createPresensiPulangSheet(
 
     if (presensi) {
       // Jika status adalah lembur (bukan lembur_pending) dan ada data pengajuan lembur
-      if (
-        presensi.status === "lembur" &&
-        item.pengajuan_lembur &&
-        item.pengajuan_lembur.jam_selesai
-      ) {
-        // Gunakan jam selesai dari pengajuan lembur
-        waktuPulang = item.pengajuan_lembur.jam_selesai;
-      } else if (presensi.waktu) {
-        // Gunakan waktu presensi aktual
-        waktuPulang = presensi.waktu;
-      }
+      // if (
+      //   presensi.status === "lembur" &&
+      //   item.pengajuan_lembur &&
+      //   item.pengajuan_lembur.jam_selesai
+      // ) {
+      //   // Gunakan jam selesai dari pengajuan lembur
+      //   waktuPulang = item.pengajuan_lembur.jam_selesai;
+      // } else if (presensi.waktu) {
+      // Gunakan waktu presensi aktual
+      waktuPulang = presensi.waktu;
+      // }
     }
 
     const status = presensi

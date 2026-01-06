@@ -89,14 +89,16 @@ function createKaryawanSheet(wb, karyawanData, projectInfo, periode) {
     { width: 24 }, // A - Tanggal
     { width: 15 }, // B - Waktu Masuk
     { width: 15 }, // C - Waktu Pulang
-    { width: 25 }, // D - Shift
-    { width: 30 }, // E - Status
+    { width: 20 }, // D - Waktu Mulai Lembur
+    { width: 20 }, // E - Waktu Selesai Lembur
+    { width: 25 }, // F - Shift
+    { width: 30 }, // G - Status
   ];
 
   let currentRow = 1;
 
   // Row 1: Title
-  ws.mergeCells(`A${currentRow}:E${currentRow}`);
+  ws.mergeCells(`A${currentRow}:G${currentRow}`);
   const titleCell = ws.getCell(`A${currentRow}`);
   titleCell.value = "REKAP PRESENSI KARYAWAN";
   titleCell.font = { bold: true, size: 14, color: { argb: "FFFFFFFF" } };
@@ -160,7 +162,7 @@ function createKaryawanSheet(wb, karyawanData, projectInfo, periode) {
   applyBorder(ws, `A${currentRow}:B${currentRow}`);
   currentRow++;
 
-  // Row 11: Table Header Statistik (ubah menjadi "Status" dan "Jumlah")
+  // Row 11: Table Header Statistik
   ws.getCell(`A${currentRow}`).value = "Status";
   ws.getCell(`B${currentRow}`).value = "Jumlah";
   ws.getRow(currentRow).font = { bold: true, size: 11 };
@@ -181,6 +183,7 @@ function createKaryawanSheet(wb, karyawanData, projectInfo, periode) {
     ["Cuti", karyawanData.statistik.cuti],
     ["Alpa", karyawanData.statistik.alpa],
     ["Libur", karyawanData.statistik.libur],
+    ["Lembur", karyawanData.statistik.lembur || 0],
   ];
 
   stats.forEach(([status, jumlah]) => {
@@ -194,7 +197,15 @@ function createKaryawanSheet(wb, karyawanData, projectInfo, periode) {
   currentRow++;
 
   // Table Header Presensi
-  const headers = ["Tanggal", "Waktu Masuk", "Waktu Pulang", "Shift", "Status"];
+  const headers = [
+    "Tanggal",
+    "Waktu Masuk",
+    "Waktu Pulang",
+    "Waktu Mulai Lembur",
+    "Waktu Selesai Lembur",
+    "Shift",
+    "Status",
+  ];
   headers.forEach((header, idx) => {
     const cell = ws.getCell(currentRow, idx + 1);
     cell.value = header;
@@ -206,35 +217,62 @@ function createKaryawanSheet(wb, karyawanData, projectInfo, periode) {
     };
     cell.alignment = { vertical: "middle", horizontal: "center" };
   });
-  applyBorder(ws, `A${currentRow}:E${currentRow}`);
+  applyBorder(ws, `A${currentRow}:G${currentRow}`);
   ws.getRow(currentRow).height = 20;
   currentRow++;
 
   // Data Presensi
-  // Data Presensi
   karyawanData.presensi_data.forEach((item, idx) => {
-    // LOGIC BARU: Gunakan jam dari pengajuan lembur jika sudah disetujui
-    let waktuMasuk = item.waktu_masuk;
-    let waktuPulang = item.waktu_pulang;
+    // Waktu masuk dan pulang tetap dari presensi biasa
+    let waktuMasuk = item.waktu_masuk || "-";
+    let waktuPulang = item.waktu_pulang || "-";
 
-    // Cek apakah status pulang adalah Lembur (bukan Lembur Pending)
-    if (item.status_pulang === "Lembur" && item.pengajuan_lembur) {
-      // Hanya waktu PULANG yang diganti dengan jam selesai dari pengajuan lembur
-      if (item.pengajuan_lembur.jam_selesai) {
-        waktuPulang = item.pengajuan_lembur.jam_selesai;
-      }
+    // Jam lembur dari pengajuan lembur (jika ada)
+    let jamMulaiLembur = "-";
+    let jamSelesaiLembur = "-";
+
+    // Cek apakah ada pengajuan lembur yang disetujui
+    if (item.pengajuan_lembur && item.pengajuan_lembur.status === "disetujui") {
+      jamMulaiLembur = item.pengajuan_lembur.jam_mulai || "-";
+      jamSelesaiLembur = item.pengajuan_lembur.jam_selesai || "-";
     }
 
+    // A - Tanggal
     ws.getCell(`A${currentRow}`).value = item.tanggal_formatted;
+    ws.getCell(`A${currentRow}`).font = { size: 11 };
+
+    // B - Waktu Masuk
     ws.getCell(`B${currentRow}`).value = waktuMasuk;
+    ws.getCell(`B${currentRow}`).numFmt = "@";
+    ws.getCell(`B${currentRow}`).alignment = { horizontal: "center" };
+    ws.getCell(`B${currentRow}`).font = { size: 11 };
+
+    // C - Waktu Pulang
     ws.getCell(`C${currentRow}`).value = waktuPulang;
-    ws.getCell(`D${currentRow}`).value = item.shift;
+    ws.getCell(`C${currentRow}`).numFmt = "@";
+    ws.getCell(`C${currentRow}`).alignment = { horizontal: "center" };
+    ws.getCell(`C${currentRow}`).font = { size: 11 };
 
-    // Logika status: Jika pulang adalah lembur, tampilkan status pulang
-    // Jika tidak, tampilkan status masuk
-    let statusToShow = item.status_masuk;
+    // D - Waktu Mulai Lembur
+    ws.getCell(`D${currentRow}`).value = jamMulaiLembur;
+    ws.getCell(`D${currentRow}`).numFmt = "@";
+    ws.getCell(`D${currentRow}`).alignment = { horizontal: "center" };
+    ws.getCell(`D${currentRow}`).font = { size: 11 };
 
-    // Cek apakah status pulang adalah lembur atau lembur pending
+    // E - Waktu Selesai Lembur
+    ws.getCell(`E${currentRow}`).value = jamSelesaiLembur;
+    ws.getCell(`E${currentRow}`).numFmt = "@";
+    ws.getCell(`E${currentRow}`).alignment = { horizontal: "center" };
+    ws.getCell(`E${currentRow}`).font = { size: 11 };
+
+    // F - Shift
+    ws.getCell(`F${currentRow}`).value = item.shift || "-";
+    ws.getCell(`F${currentRow}`).font = { size: 11 };
+
+    // G - Status
+    // Logika status: Jika ada lembur yang disetujui, tampilkan status lembur
+    let statusToShow = item.status_masuk || "-";
+
     if (
       item.status_pulang &&
       (item.status_pulang.toLowerCase().includes("lembur") ||
@@ -244,24 +282,12 @@ function createKaryawanSheet(wb, karyawanData, projectInfo, periode) {
       statusToShow = item.status_pulang;
     }
 
-    ws.getCell(`E${currentRow}`).value = statusToShow;
-
-    // Format kolom waktu sebagai TEXT
-    ws.getCell(`B${currentRow}`).numFmt = "@";
-    ws.getCell(`C${currentRow}`).numFmt = "@";
-
-    // Center align untuk waktu
-    ws.getCell(`B${currentRow}`).alignment = { horizontal: "center" };
-    ws.getCell(`C${currentRow}`).alignment = { horizontal: "center" };
-
-    // Set font
-    for (let col = 1; col <= 5; col++) {
-      ws.getCell(currentRow, col).font = { size: 11 };
-    }
+    ws.getCell(`G${currentRow}`).value = statusToShow;
+    ws.getCell(`G${currentRow}`).font = { size: 11 };
 
     // Zebra striping
     if (idx % 2 === 1) {
-      for (let col = 1; col <= 5; col++) {
+      for (let col = 1; col <= 7; col++) {
         ws.getCell(currentRow, col).fill = {
           type: "pattern",
           pattern: "solid",
@@ -270,7 +296,7 @@ function createKaryawanSheet(wb, karyawanData, projectInfo, periode) {
       }
     }
 
-    applyBorder(ws, `A${currentRow}:E${currentRow}`);
+    applyBorder(ws, `A${currentRow}:G${currentRow}`);
     currentRow++;
   });
 }

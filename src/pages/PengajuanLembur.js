@@ -20,9 +20,11 @@ import {
   Loader2,
   FileX,
   Sun,
+  Image as ImageIcon,
 } from "lucide-react";
 import { pengajuanLemburAPI, projectAPI } from "@/lib/api";
 import { toast } from "react-toastify";
+import JSZip from "jszip";
 
 const PengajuanLembur = ({ navigationDetail = null }) => {
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
@@ -37,10 +39,18 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [projectFilter, setProjectFilter] = useState("all");
+  const [startDateFilter, setStartDateFilter] = useState("");
+  const [endDateFilter, setEndDateFilter] = useState("");
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+
+  // Checkbox states
+  const [selectedIds, setSelectedIds] = useState([]);
+  const [selectAll, setSelectAll] = useState(false);
+  const [downloadingPhotos, setDownloadingPhotos] = useState(false);
 
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -120,6 +130,15 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
         );
       }
 
+      if (startDateFilter && endDateFilter) {
+        filteredData = filteredData.filter((item) => {
+          const itemDate = new Date(item.tanggal);
+          const startDate = new Date(startDateFilter);
+          const endDate = new Date(endDateFilter);
+          return itemDate >= startDate && itemDate <= endDate;
+        });
+      }
+
       if (searchTerm.trim()) {
         const search = searchTerm.toLowerCase();
         filteredData = filteredData.filter(
@@ -157,6 +176,7 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
     } catch (err) {
       setError(err.message || "Gagal memuat data pengajuan lembur");
       console.error("Error fetching submissions:", err);
+      setSubmissions([]);
       if (!initialLoadComplete) {
         setInitialLoadComplete(true);
       }
@@ -168,6 +188,8 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
     projectFilter,
     statusFilter,
     searchTerm,
+    startDateFilter,
+    endDateFilter,
     currentPage,
     itemsPerPage,
     initialLoadComplete,
@@ -231,6 +253,8 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
     projects.length,
     statusFilter,
     searchTerm,
+    startDateFilter,
+    endDateFilter,
     currentPage,
     itemsPerPage,
     fetchSubmissions,
@@ -251,8 +275,6 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
       submissions.length > 0 &&
       processedNavigationId !== navigationDetail.id
     ) {
-      console.log("🎯 Processing navigation detail:", navigationDetail);
-
       const { filters } = navigationDetail;
 
       if (filters.projectId) {
@@ -295,6 +317,119 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
     submissions,
     processedNavigationId,
   ]);
+
+  // Checkbox handlers
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(submissions.map((s) => s.id));
+    }
+    setSelectAll(!selectAll);
+  };
+
+  const handleSelectOne = (id) => {
+    setSelectedIds((prev) => {
+      if (prev.includes(id)) {
+        return prev.filter((i) => i !== id);
+      } else {
+        return [...prev, id];
+      }
+    });
+  };
+
+  useEffect(() => {
+    if (selectedIds.length === submissions.length && submissions.length > 0) {
+      setSelectAll(true);
+    } else {
+      setSelectAll(false);
+    }
+  }, [selectedIds, submissions]);
+
+  // Download photos handler
+  const handleDownloadPhotos = async () => {
+    if (selectedIds.length === 0) {
+      toast.warning("Pilih minimal 1 pengajuan untuk download foto");
+      return;
+    }
+
+    setDownloadingPhotos(true);
+
+    try {
+      // Call backend API to get files
+      const result = await pengajuanLemburAPI.downloadFiles(selectedIds);
+
+      if (!result.success || !result.data || result.data.length === 0) {
+        toast.warning("Tidak ada file SKL yang tersedia untuk didownload");
+        setDownloadingPhotos(false);
+        return;
+      }
+
+      const filesData = result.data;
+
+      if (filesData.length === 1) {
+        // Download langsung jika hanya 1 file
+        const fileData = filesData[0];
+        const byteCharacters = atob(fileData.content);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+          byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: fileData.mime_type });
+
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = fileData.filename;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        toast.success("File SKL berhasil didownload");
+      } else {
+        // Create ZIP jika lebih dari 1 file
+        const zip = new JSZip();
+
+        for (const fileData of filesData) {
+          try {
+            const byteCharacters = atob(fileData.content);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+              byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            zip.file(fileData.filename, byteArray);
+          } catch (err) {
+            console.error(`Error processing file ${fileData.filename}:`, err);
+          }
+        }
+
+        const zipBlob = await zip.generateAsync({ type: "blob" });
+        const url = URL.createObjectURL(zipBlob);
+        const a = document.createElement("a");
+        a.href = url;
+        const today = new Date().toISOString().split("T")[0];
+        a.download = `SKL_Lembur_${today}.zip`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+        toast.success(`${filesData.length} file SKL berhasil didownload`);
+      }
+
+      // Reset selection
+      setSelectedIds([]);
+      setSelectAll(false);
+    } catch (err) {
+      console.error("Error downloading photos:", err);
+      toast.error(
+        "Gagal mendownload file SKL: " + (err.message || "Unknown error")
+      );
+    } finally {
+      setDownloadingPhotos(false);
+    }
+  };
 
   const handleViewDetail = async (submission) => {
     try {
@@ -366,7 +501,6 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
 
       let totalMinutes = endHour * 60 + endMin - (startHour * 60 + startMin);
 
-      // Jika jam selesai lebih kecil dari jam mulai, tambah 24 jam
       if (totalMinutes < 0) {
         totalMinutes += 24 * 60;
       }
@@ -538,12 +672,14 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <select
             value={projectFilter}
             onChange={(e) => {
               setProjectFilter(e.target.value);
               setCurrentPage(1);
+              setSelectedIds([]);
+              setSelectAll(false);
             }}
             className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
           >
@@ -560,6 +696,8 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
             onChange={(e) => {
               setStatusFilter(e.target.value);
               setCurrentPage(1);
+              setSelectedIds([]);
+              setSelectAll(false);
             }}
             className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
           >
@@ -570,6 +708,33 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
             <option value="dibatalkan">Dibatalkan</option>
           </select>
 
+          <input
+            type="date"
+            value={startDateFilter}
+            onChange={(e) => {
+              setStartDateFilter(e.target.value);
+              setCurrentPage(1);
+              setSelectedIds([]);
+              setSelectAll(false);
+            }}
+            className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+            placeholder="Tanggal Mulai"
+          />
+
+          <input
+            type="date"
+            value={endDateFilter}
+            onChange={(e) => {
+              setEndDateFilter(e.target.value);
+              setCurrentPage(1);
+              setSelectedIds([]);
+              setSelectAll(false);
+            }}
+            min={startDateFilter}
+            className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+            placeholder="Tanggal Selesai"
+          />
+
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
             <input
@@ -579,11 +744,42 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
               onChange={(e) => {
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
+                setSelectedIds([]);
+                setSelectAll(false);
               }}
               className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
             />
           </div>
         </div>
+
+        {/* Download Photos Button */}
+        {selectedIds.length > 0 && (
+          <div className="mt-4 flex items-center justify-between bg-orange-50 border border-orange-200 rounded-lg p-4">
+            <div className="flex items-center gap-2">
+              <ImageIcon className="w-5 h-5 text-orange-600" />
+              <span className="text-sm font-medium text-orange-900">
+                {selectedIds.length} pengajuan dipilih
+              </span>
+            </div>
+            <button
+              onClick={handleDownloadPhotos}
+              disabled={downloadingPhotos}
+              className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 flex items-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {downloadingPhotos ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Mendownload...
+                </>
+              ) : (
+                <>
+                  <Download className="w-4 h-4" />
+                  Download Foto SKL ({selectedIds.length})
+                </>
+              )}
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -595,6 +791,8 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
               onChange={(e) => {
                 setItemsPerPage(parseInt(e.target.value));
                 setCurrentPage(1);
+                setSelectedIds([]);
+                setSelectAll(false);
               }}
               className="px-3 py-1 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
             >
@@ -622,6 +820,14 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
             <table className="w-full">
               <thead className="bg-gradient-to-r from-orange-500 to-orange-600 text-white">
                 <tr>
+                  <th className="px-4 py-3 text-center font-semibold w-12">
+                    <input
+                      type="checkbox"
+                      checked={selectAll}
+                      onChange={handleSelectAll}
+                      className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500"
+                    />
+                  </th>
                   {projectFilter === "all" && (
                     <th className="px-4 py-3 text-left font-semibold">
                       Project
@@ -645,6 +851,14 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
                       index % 2 === 0 ? "bg-white" : "bg-gray-50"
                     }`}
                   >
+                    <td className="px-4 py-3 text-center">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.includes(submission.id)}
+                        onChange={() => handleSelectOne(submission.id)}
+                        className="w-4 h-4 text-orange-600 rounded focus:ring-orange-500"
+                      />
+                    </td>
                     {projectFilter === "all" && (
                       <td className="px-4 py-3">
                         <span className="px-2 py-1 bg-purple-100 text-purple-700 rounded text-xs font-medium">
@@ -708,7 +922,7 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
                 {submissions.length === 0 && (
                   <tr>
                     <td
-                      colSpan={projectFilter === "all" ? "7" : "6"}
+                      colSpan={projectFilter === "all" ? "8" : "7"}
                       className="px-6 py-8 text-center text-gray-500"
                     >
                       <Clock className="w-12 h-12 mx-auto mb-2 text-gray-400" />
@@ -769,6 +983,7 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
         )}
       </div>
 
+      {/* Detail Modal */}
       {showDetailModal && selectedSubmission && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-3xl max-h-[90vh] overflow-y-auto">
@@ -843,7 +1058,6 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
                     {getKodeHariBadge(selectedSubmission.kode_hari)}
                   </div>
 
-                  {/* Jam Kerja Lembur yang Diajukan */}
                   <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <p className="text-sm font-medium text-blue-900 mb-3">
                       Jam Kerja Lembur (Sesuai Pengajuan)
@@ -878,9 +1092,8 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
                     </div>
                   </div>
 
-                  {/* Waktu Presensi Aktual */}
-                  {selectedSubmission.presensi_masuk ||
-                  selectedSubmission.presensi_pulang ? (
+                  {(selectedSubmission.presensi_masuk ||
+                    selectedSubmission.presensi_pulang) && (
                     <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                       <p className="text-sm font-medium text-green-900 mb-3">
                         Waktu Presensi Aktual
@@ -915,7 +1128,7 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
                         </div>
                       </div>
                     </div>
-                  ) : null}
+                  )}
 
                   <div>
                     <p className="text-sm text-gray-600 mb-2">
@@ -1043,6 +1256,7 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
         </div>
       )}
 
+      {/* Confirm Modal */}
       {showConfirmModal && selectedSubmission && (
         <div className="fixed inset-0 bg-gray-900/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg">
@@ -1180,6 +1394,7 @@ const PengajuanLembur = ({ navigationDetail = null }) => {
         </div>
       )}
 
+      {/* Delete Modal */}
       {showDeleteModal && selectedSubmission && (
         <div className="fixed inset-0 bg-gray-900/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md">
